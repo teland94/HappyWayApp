@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29424.173
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HappyWayApp", "HappyWayApp\HappyWayApp.csproj", "{9EDBDC93-6DD4-469F-A156-A89C0DCBFCA0}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HappyWayApp.Persistence", "HappyWayApp.Persistence\HappyWayApp.Persistence.csproj", "{46016163-71BE-49EA-8438-0C17AB6DEEE2}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{9EDBDC93-6DD4-469F-A156-A89C0DCBFCA0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9EDBDC93-6DD4-469F-A156-A89C0DCBFCA0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9EDBDC93-6DD4-469F-A156-A89C0DCBFCA0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9EDBDC93-6DD4-469F-A156-A89C0DCBFCA0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{46016163-71BE-49EA-8438-0C17AB6DEEE2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{46016163-71BE-49EA-8438-0C17AB6DEEE2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{46016163-71BE-49EA-8438-0C17AB6DEEE2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{46016163-71BE-49EA-8438-0C17AB6DEEE2}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {28E9756C-6C49-40AC-9629-F7986C6BFDBD}
+	EndGlobalSection
+EndGlobal

@@ -1,0 +1,21 @@
+<div class="container">
+  <mat-card *ngFor="let result of resultMembers">
+    <mat-card-title>{{result.member.number}}. {{result.member.name}}
+      <a href="javasript:void(0);" (click)="copy(result.member.phoneNumber)">({{result.member.phoneNumber}})</a></mat-card-title>
+    <mat-card-content>
+      <textarea matInput #resultTextArea
+        [rows]="10" readonly>{{result.text}}</textarea>
+    </mat-card-content>
+    <mat-card-actions align="end">
+      <button mat-icon-button [ngxClipboard]="resultTextArea">
+        <mat-icon svgIcon="copy"></mat-icon>
+      </button>
+      <div class="fill-remaining-space"></div>
+      <a [href]="getViberUrl(result.member.phoneNumber)">
+        <button mat-icon-button [ngxClipboard]="resultTextArea">
+          <mat-icon svgIcon="viber"></mat-icon>
+        </button>
+      </a>
+    </mat-card-actions>
+  </mat-card>
+</div>

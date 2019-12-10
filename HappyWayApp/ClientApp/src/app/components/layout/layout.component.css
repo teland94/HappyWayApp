@@ -1,0 +1,44 @@
+.sidenav-container {
+  height: 100%;
+}
+
+.sidenav {
+  width: 200px;
+  box-shadow: 3px 0 6px rgba(0,0,0,.24);
+}
+
+.app-title {
+  display: flex;
+  align-items: center;
+  margin-left: 8px;
+}
+
+.app-title > .mat-icon {
+  padding-left: 6px;
+}
+
+main {
+  margin: 5px;
+}
+
+.nav-caption {
+  display: inline-block;
+  padding-left: 6px;
+}
+
+::ng-deep .block-ui-spinner {
+  top: 50% !important;
+}
+
+.hide {
+  width: 0;
+  height: 0;
+  padding: 0;
+  margin: 0;
+  border: none;
+  visibility: hidden;
+}
+
+.mat-datepicker-toggle-active {
+  color: #ff8cbe;
+}

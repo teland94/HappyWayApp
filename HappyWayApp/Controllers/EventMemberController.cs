@@ -1,0 +1,124 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using HappyWayApp.Persistence;
+using HappyWayApp.Persistence.Entity;
+
+namespace HappyWayApp.Controllers
+{
+    [Route("api/[controller]")]
+    [ApiController]
+    public class EventMemberController : ControllerBase
+    {
+        private readonly AppDbContext _context;
+
+        public EventMemberController(AppDbContext context)
+        {
+            _context = context;
+        }
+
+        // GET: api/EventMember
+        [HttpGet]
+        public async Task<ActionResult<IEnumerable<EventMember>>> GetEventMembers()
+        {
+            var lastEvent = await _context.Events
+                .OrderByDescending(e => e.Date)
+                .FirstOrDefaultAsync();
+
+            var members = await _context.EventMembers
+                .Where(m => m.EventId == lastEvent.Id)
+                .OrderBy(m => m.Number)
+                .ToListAsync();
+
+            foreach (var eventMember in members)
+            {
+                eventMember.Event = null;
+            }
+
+            return members;
+        }
+
+        // GET: api/EventMember/5
+        [HttpGet("{id}")]
+        public async Task<ActionResult<EventMember>> GetEventMember(int id)
+        {
+            var eventMember = await _context.EventMembers.FindAsync(id);
+
+            if (eventMember == null)
+            {
+                return NotFound();
+            }
+
+            return eventMember;
+        }
+
+        // PUT: api/EventMember/5
+        // To protect from overposting attacks, please enable the specific properties you want to bind to, for
+        // more details see https://aka.ms/RazorPagesCRUD.
+        [HttpPut("{id}")]
+        public async Task<IActionResult> PutEventMember(int id, EventMember eventMember)
+        {
+            if (id != eventMember.Id)
+            {
+                return BadRequest();
+            }
+
+            _context.Entry(eventMember).State = EntityState.Modified;
+
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!EventMemberExists(id))
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    throw;
+                }
+            }
+
+            return NoContent();
+        }
+
+        // POST: api/EventMember
+        // To protect from overposting attacks, please enable the specific properties you want to bind to, for
+        // more details see https://aka.ms/RazorPagesCRUD.
+        [HttpPost]
+        public async Task<ActionResult<EventMember>> PostEventMember(EventMember eventMember)
+        {
+            _context.EventMembers.Add(eventMember);
+            await _context.SaveChangesAsync();
+
+            return CreatedAtAction("GetEventMember", new { id = eventMember.Id }, eventMember);
+        }
+
+        // DELETE: api/EventMember/5
+        [HttpDelete("{id}")]
+        public async Task<ActionResult<EventMember>> DeleteEventMember(int id)
+        {
+            var eventMember = await _context.EventMembers.FindAsync(id);
+            if (eventMember == null)
+            {
+                return NotFound();
+            }
+
+            _context.EventMembers.Remove(eventMember);
+            await _context.SaveChangesAsync();
+
+            return eventMember;
+        }
+
+        private bool EventMemberExists(int id)
+        {
+            return _context.EventMembers.Any(e => e.Id == id);
+        }
+    }
+}

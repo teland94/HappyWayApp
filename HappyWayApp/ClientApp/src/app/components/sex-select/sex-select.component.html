@@ -1,0 +1,14 @@
+<mat-form-field floatPlaceholder="never">
+  <mat-select [formControl]="sex">
+    <mat-select-trigger>
+      <div class="sex-label">
+        <mat-icon [svgIcon]="sexItems[sex.value].icon"></mat-icon>
+        <span class="sex-text">&nbsp;{{sexItems[sex.value].label}}</span>
+      </div>
+    </mat-select-trigger>
+    <mat-option *ngFor="let sex of sexItems" [value]="sex.value">
+      <mat-icon [svgIcon]="sex.icon"></mat-icon>
+      <span>{{sex.label}}</span>
+    </mat-option>
+  </mat-select>
+</mat-form-field>

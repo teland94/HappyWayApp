@@ -1,0 +1,47 @@
+<mat-sidenav-container *blockUI="''; delayStart: 500; delayStop: 500;" class="sidenav-container">
+  <mat-sidenav
+      #drawer
+      class="sidenav"
+      fixedInViewport="true"
+      mode="over">
+    <mat-toolbar color="primary">Меню</mat-toolbar>
+    <mat-nav-list>
+      <a mat-list-item routerLink="/events">
+        <mat-icon>event</mat-icon>
+        <span class="nav-caption">Мероприятия</span>
+      </a>
+      <a mat-list-item routerLink="/event-members">
+        <mat-icon>people</mat-icon>
+        <span class="nav-caption">Участники</span>
+      </a>
+      <a mat-list-item routerLink="/home">
+        <mat-icon>favorite</mat-icon>
+        <span class="nav-caption">Симпатии</span>
+      </a>
+      <a mat-list-item routerLink="/results">
+        <mat-icon>message</mat-icon>
+        <span class="nav-caption">Результаты</span>
+      </a>
+    </mat-nav-list>
+  </mat-sidenav>
+  <mat-sidenav-content>
+    <mat-toolbar color="primary">
+      <button
+        type="button"
+        aria-label="Toggle sidenav"
+        mat-icon-button
+        (click)="drawer.toggle()">
+        <mat-icon aria-label="Side nav toggle icon">menu</mat-icon>
+      </button>
+      <div class="app-title">Happy Way <mat-icon>favorite</mat-icon></div>
+      <span class="fill-remaining-space"></span>
+      <app-sex-select></app-sex-select>
+      <!-- <input [matDatepicker]="picker" class="hide" (dateChange)="dateChange($event)">
+      <mat-datepicker #picker></mat-datepicker>
+      <mat-datepicker-toggle [for]="picker"></mat-datepicker-toggle> -->
+    </mat-toolbar>
+    <main>
+      <router-outlet></router-outlet>
+    </main>
+  </mat-sidenav-content>
+</mat-sidenav-container>
