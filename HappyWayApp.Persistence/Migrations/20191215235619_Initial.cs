@@ -62,7 +62,7 @@ namespace HappyWayApp.Persistence.Migrations
                         column: x => x.SourceMemberId,
                         principalTable: "EventMembers",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_Likes_EventMembers_TargetMemberId",
                         column: x => x.TargetMemberId,
@@ -74,7 +74,7 @@ namespace HappyWayApp.Persistence.Migrations
             migrationBuilder.InsertData(
                 table: "Events",
                 columns: new[] { "Id", "Date", "Name" },
-                values: new object[] { 1, new DateTime(2019, 12, 5, 13, 52, 31, 171, DateTimeKind.Utc).AddTicks(6167), "Основная группа" });
+                values: new object[] { 1, new DateTime(2019, 12, 15, 23, 56, 19, 59, DateTimeKind.Utc).AddTicks(3028), "Основная группа" });
 
             migrationBuilder.CreateIndex(
                 name: "IX_EventMembers_EventId",

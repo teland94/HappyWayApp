@@ -6,6 +6,7 @@ import { StepperSelectionEvent } from '@angular/cdk/stepper';
 import { LikeService } from 'src/app/services/like.service';
 import { LikeModel, SaveLikeModel } from '../../models/like.model';
 import { BlockUI, NgBlockUI } from 'ng-block-ui';
+import { of } from 'rxjs';
 
 @Component({
   selector: 'app-home',
@@ -53,6 +54,10 @@ export class HomeComponent implements OnInit {
   }
 
   selectionChanged(event: StepperSelectionEvent) {
+    this.saveCurrentMember().subscribe(() => {
+    }, error => {
+      this.showError('Ошибка сохранения 💔', error);
+    });
     const currentCardMember = this.cardMembers[event.selectedIndex];
     this.setLikedMembers(currentCardMember);
   }
@@ -89,33 +94,26 @@ export class HomeComponent implements OnInit {
   }
 
   save() {
-    let likes = new Array<SaveLikeModel>();
-    this.cardMembers.forEach(m => {
-      const saveLike = <SaveLikeModel> {
-        sourceMemberId: m.member.id,
-        targetMemberIds: []
-      };
-      m.likedMembers.forEach(lm => {
-        if (lm.liked) {
-          saveLike.targetMemberIds.push(lm.id);
-        }
-      });
-      likes.push(saveLike);
-    });
-    console.log(likes);
-
-    // const cms = this.cardMembers.filter(m => m.likedMembers.some(lm => lm.liked));
-    // likes = cms.map(m => m.likedMembers.map(lm => <LikeModel>{
-    //     sourceMemberId: m.member.id,
-    //     targetMemberId: lm.id
-    //   }
-    // ));
-
-    this.likeService.saveAll(likes).subscribe(() => {
+    this.saveCurrentMember().subscribe(() => {
       this.snackBar.open('Успешно сохранено ❤');
     }, error => {
       this.showError('Ошибка сохранения 💔', error);
     });
+  }
+
+  private saveCurrentMember() {
+    if (!this.currentCardMember) { return of(null); }
+    const member = this.currentCardMember;
+    const saveLike = <SaveLikeModel> {
+      sourceMemberId: member.member.id,
+      targetMemberIds: []
+    };
+    member.likedMembers.forEach(lm => {
+      if (lm.liked) {
+        saveLike.targetMemberIds.push(lm.id);
+      }
+    });
+    return this.likeService.save(saveLike);
   }
 
   private setCardMembers(members: EventMemberModel[], sex: Sex) {
@@ -136,8 +134,6 @@ export class HomeComponent implements OnInit {
 
   private setLikedMembers(cardMember: EventMemberCardModel) {
     this.currentCardMember = cardMember;
-    const setLikedLength = this.currentCardMember.likedMembers.filter(lm => typeof lm.liked !== 'undefined').length;
-    if (setLikedLength === this.currentCardMember.likedMembers.length) { return; }
     this.likeService.getByMember(cardMember.member.id).subscribe(likes => {
       cardMember.likedMembers.forEach(lm => {
         lm.liked = likes.some(l => l.targetMemberId === lm.id);

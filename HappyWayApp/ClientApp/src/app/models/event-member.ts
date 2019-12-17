@@ -4,6 +4,7 @@ export class EventMemberModel {
   name: string;
   sex: Sex;
   phoneNumber: string;
+  eventId: number;
 }
 
 export class EventMemberCardModel {

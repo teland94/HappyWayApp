@@ -49,29 +49,44 @@ namespace HappyWayApp.Controllers
                 .ToListAsync());
         }
 
+        [HttpPost(nameof(Save))]
+        public async Task<IActionResult> Save([FromBody]SaveLikesViewModel saveLikes)
+        {
+            await SyncLikes(saveLikes);
+
+            await _context.SaveChangesAsync();
+
+            return Ok();
+        }
+
         [HttpPost(nameof(SaveAll))]
-        public async Task<IActionResult> SaveAll([FromBody]IEnumerable<SaveLikeViewModel> likes)
+        public async Task<IActionResult> SaveAll([FromBody]IEnumerable<SaveLikesViewModel> likes)
         {
             foreach (var like in likes)
             {
-                var sourceMemberLikes = _context.Likes.Where(l => l.SourceMemberId == like.SourceMemberId);
-                
-                var nonExistLikes =
-                    sourceMemberLikes.Where(l => like.TargetMemberIds.All(tl => l.TargetMemberId != tl));
-                _context.Likes.RemoveRange(nonExistLikes);
-
-                var nonExistDbLikes =
-                    like.TargetMemberIds.Where(tl => sourceMemberLikes.All(l => l.TargetMemberId != tl));
-                await _context.Likes.AddRangeAsync(nonExistDbLikes.Select(tl => new Like
-                {
-                    SourceMemberId = like.SourceMemberId,
-                    TargetMemberId = tl
-                }));
+                await SyncLikes(like);
             }
 
             await _context.SaveChangesAsync();
 
             return Ok();
+        }
+
+        private async Task SyncLikes(SaveLikesViewModel saveLikes)
+        {
+            var sourceMemberLikes = _context.Likes.Where(l => l.SourceMemberId == saveLikes.SourceMemberId);
+
+            var nonExistLikes =
+                sourceMemberLikes.Where(l => saveLikes.TargetMemberIds.All(tl => l.TargetMemberId != tl));
+            _context.Likes.RemoveRange(nonExistLikes);
+
+            var nonExistDbLikes =
+                saveLikes.TargetMemberIds.Where(tl => sourceMemberLikes.All(l => l.TargetMemberId != tl));
+            await _context.Likes.AddRangeAsync(nonExistDbLikes.Select(tl => new Like
+            {
+                SourceMemberId = saveLikes.SourceMemberId,
+                TargetMemberId = tl
+            }));
         }
     }
 }

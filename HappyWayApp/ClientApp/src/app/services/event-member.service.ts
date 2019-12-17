@@ -23,6 +23,18 @@ export class EventMemberService {
     return this.httpClient.get('api/ImportData/' + this.getIdFromUrl(docUrl));
   }
 
+  create(eventMember: EventMemberModel) {
+    return this.httpClient.post(this.baseUrl, eventMember);
+  }
+
+  update(eventMember: EventMemberModel) {
+    return this.httpClient.put(this.baseUrl + '/' + eventMember.id, eventMember);
+  }
+
+  delete(id: number) {
+    return this.httpClient.delete(this.baseUrl + '/' + id);
+  }
+
   sexChange(sex: Sex) {
     this.sexChangesSource$.next(sex);
   }

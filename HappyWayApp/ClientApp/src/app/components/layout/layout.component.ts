@@ -32,6 +32,6 @@ export class LayoutComponent implements OnInit, AfterViewInit {
   }
 
   dateChange(event: MatDatepickerInputEvent<Date>) {
-    this.eventService.setEvent(event.value);
+
   }
 }

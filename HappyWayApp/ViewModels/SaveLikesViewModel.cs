@@ -2,11 +2,7 @@
 
 namespace HappyWayApp.ViewModels
 {
-    public class LikeViewModel
-    {
-    }
-
-    public class SaveLikeViewModel
+    public class SaveLikesViewModel
     {
         public int SourceMemberId { get; set; }
 

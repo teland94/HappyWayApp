@@ -110,9 +110,23 @@ namespace HappyWayApp.Controllers
                 return NotFound();
             }
 
-            _context.EventMembers.Remove(eventMember);
-            await _context.SaveChangesAsync();
+            try
+            {
+                var sourceMemberLikes = _context.Likes.Where(l => l.SourceMemberId == eventMember.Id);
+                _context.Likes.RemoveRange(sourceMemberLikes);
 
+                _context.EventMembers.Remove(eventMember);
+                await _context.SaveChangesAsync();
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                throw;
+            }
+
+            eventMember.Likes = null;
+            eventMember.Liked = null;
+            
             return eventMember;
         }
 

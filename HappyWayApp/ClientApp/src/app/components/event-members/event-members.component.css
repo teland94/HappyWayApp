@@ -5,3 +5,11 @@
 .table-controls {
   margin-bottom: 5px;
 }
+
+.table-controls .mat-raised-button {
+  margin-left: 5px;
+}
+
+.table-controls .mat-raised-button:first-child {
+  margin-left: 0px;
+}

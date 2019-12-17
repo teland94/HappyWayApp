@@ -19,6 +19,10 @@ export class LikeService {
     return this.httpClient.get<LikeModel[]>(`${this.baseUrl}/GetAllByMember/${memberId}`);
   }
 
+  save(likes: SaveLikeModel) {
+    return this.httpClient.post(`${this.baseUrl}/Save`, likes);
+  }
+
   saveAll(likes: SaveLikeModel[]) {
     return this.httpClient.post(`${this.baseUrl}/SaveAll`, likes);
   }

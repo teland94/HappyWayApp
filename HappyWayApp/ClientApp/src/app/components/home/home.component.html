@@ -10,7 +10,7 @@
       <table mat-table *ngIf="card.likedMembers && card.likedMembers.length > 0" [dataSource]="card.likedMembers"
         class="mat-elevation-z8">
         <ng-container matColumnDef="number">
-          <th mat-header-cell *matHeaderCellDef>Номер</th>
+          <th mat-header-cell *matHeaderCellDef>№</th>
           <td mat-cell *matCellDef="let member">{{member.number}}</td>
         </ng-container>
         <ng-container matColumnDef="liked">

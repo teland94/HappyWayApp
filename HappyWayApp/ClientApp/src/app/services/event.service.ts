@@ -11,23 +11,7 @@ export class EventService {
 
   private baseUrl = 'api/event';
 
-  private eventChangesSource$ = new BehaviorSubject(null);
-  eventChange = this.eventChangesSource$.asObservable();
-
-  events: EventModel[];
-
   constructor(private httpClient: HttpClient) {
-    // this.setEvent(new Date());
-  }
-
-  setEvent(date: Date) {
-    this.get().subscribe(data => {
-      this.events = data;
-      const event = this.events.find(e => new Date(e.date).getTime() === date.getTime());
-      if (event) {
-        this.eventChangesSource$.next(event);
-      }
-    });
   }
 
   get() {

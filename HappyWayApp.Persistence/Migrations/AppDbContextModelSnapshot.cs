@@ -36,7 +36,7 @@ namespace HappyWayApp.Persistence.Migrations
                         new
                         {
                             Id = 1,
-                            Date = new DateTime(2019, 12, 5, 13, 52, 31, 171, DateTimeKind.Utc).AddTicks(6167),
+                            Date = new DateTime(2019, 12, 15, 23, 56, 19, 59, DateTimeKind.Utc).AddTicks(3028),
                             Name = "Основная группа"
                         });
                 });
@@ -108,7 +108,7 @@ namespace HappyWayApp.Persistence.Migrations
                     b.HasOne("HappyWayApp.Persistence.Entity.EventMember", "SourceMember")
                         .WithMany("Likes")
                         .HasForeignKey("SourceMemberId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("HappyWayApp.Persistence.Entity.EventMember", "TargetMember")

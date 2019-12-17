@@ -12,6 +12,24 @@
   font-weight: 500;
 }
 
+.mat-cell {
+  word-wrap: break-word !important;
+  white-space: unset !important;
+  overflow-wrap: break-word;
+
+  word-break: break-word;
+
+  -ms-hyphens: auto;
+  -moz-hyphens: auto;
+  -webkit-hyphens: auto;
+  hyphens: auto;
+}
+
+.mat-column-number {
+  flex: 0 0 8%;
+  width: 8%;
+}
+
 @media only screen and (max-width: 768px) {
   .mat-horizontal-stepper-header {
     padding: 0 !important;
@@ -22,5 +40,20 @@
   }
   .mat-horizontal-stepper-header:last-child {
     padding-right: 5px !important;
+  }
+
+  .mat-column-number {
+    flex: 0 0 12%;
+    width: 12%;
+  }
+  .mat-column-liked {
+    flex: 0 0 7%;
+    width: 7%;
+  }
+}
+
+@media only screen and (min-width: 1200px) {
+  .mat-card {
+    width: calc(50% - 42px);
   }
 }

@@ -34,8 +34,7 @@ namespace HappyWayApp.Persistence
             modelBuilder.Entity<Like>()
                 .HasOne(pt => pt.SourceMember)
                 .WithMany(p => p.Likes)
-                .HasForeignKey(pt => pt.SourceMemberId)
-                .OnDelete(DeleteBehavior.Restrict);
+                .HasForeignKey(pt => pt.SourceMemberId);
 
             modelBuilder.Entity<Like>()
                 .HasOne(pt => pt.TargetMember)

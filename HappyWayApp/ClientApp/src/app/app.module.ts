@@ -17,11 +17,11 @@ import { ResultsComponent } from './components/results/results.component';
 import { EventsComponent } from './components/events/events.component';
 import { SexSelectComponent } from './components/sex-select/sex-select.component';
 import { MAT_SNACK_BAR_DEFAULT_OPTIONS, MAT_DATE_LOCALE, DateAdapter } from '@angular/material';
-import { HeartCheckboxComponent } from './components/heart-checkbox/heart-checkbox.component';
 import { EventDialogComponent } from './components/event-dialog/event-dialog.component';
 import { ConfirmationDialogComponent } from './components/confirmation-dialog/confirmation-dialog.component';
 import { CustomDateAdapter } from './custom-date-adapter';
 import { EventMembersComponent } from './components/event-members/event-members.component';
+import { EventMemberDialogComponent } from './components/event-member-dialog/event-member-dialog.component';
 
 registerLocaleData(localeRu, 'ru');
 
@@ -33,13 +33,14 @@ registerLocaleData(localeRu, 'ru');
     SexSelectComponent,
     EventsComponent,
     EventDialogComponent,
+    EventMemberDialogComponent,
     ConfirmationDialogComponent,
     ResultsComponent,
-    HeartCheckboxComponent,
     EventMembersComponent
   ],
   entryComponents: [
     EventDialogComponent,
+    EventMemberDialogComponent,
     ConfirmationDialogComponent
   ],
   imports: [

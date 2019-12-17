@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { EventMemberService } from 'src/app/services/event-member.service';
-import { ResultMemberModel, EventMemberModel, ResultLikedMemberModel } from '../../models/event-member';
+import { ResultMemberModel, EventMemberModel, ResultLikedMemberModel, Sex } from '../../models/event-member';
 import { DomSanitizer } from '@angular/platform-browser';
 import { LikeService } from 'src/app/services/like.service';
 import { LikeModel } from '../../models/like.model';
@@ -9,6 +9,8 @@ import { MatSnackBar } from '@angular/material';
 import { map } from 'rxjs/operators';
 import { concat } from 'rxjs';
 import { ClipboardService } from 'ngx-clipboard';
+import { EventService } from 'src/app/services/event.service';
+import { EventModel } from 'src/app/models/event.model';
 
 @Component({
   selector: 'app-results',
@@ -17,8 +19,8 @@ import { ClipboardService } from 'ngx-clipboard';
 })
 export class ResultsComponent implements OnInit {
 
-  private readonly matchedText = 'Здравствуйте, на "Быстрых свиданиях 8.12 в Арт-кафе «Пластилиновая ворона»" у Вас взаимные симпатии с:';
-  private readonly nonMatchedText = 'Здравствуйте, на "Быстрых свиданиях 8.12 в Арт-кафе «Пластилиновая ворона»" у Вас симпатии, к сожалению, не совпали.';
+  private readonly matchedText = 'Здравствуйте, на "Быстрых свиданиях {{date}} в Арт-кафе «Пластилиновая ворона»" у Вас взаимные симпатии с:';
+  private readonly nonMatchedText = 'Здравствуйте, на "Быстрых свиданиях {{date}} в Арт-кафе «Пластилиновая ворона»" у Вас симпатии, к сожалению, не совпали.';
   private readonly likedText = 'А также Вам проявили симпатию (Вы понравились), им Вы можете написать самостоятельно, т.к. у них Ваших контактов нет:';
 
   private readonly endMatchedText = `Оцените, пожалуйста, наше мероприятие в GOOGLE
@@ -34,17 +36,22 @@ https://www.facebook.com/happyway.club
 
   @BlockUI() blockUI: NgBlockUI;
 
+  event: EventModel;
   members: EventMemberModel[];
   resultMembers: ResultMemberModel[];
 
-  constructor(private readonly eventMemberService: EventMemberService,
+  constructor(private readonly eventService: EventService,
+              private readonly eventMemberService: EventMemberService,
               private readonly likeService: LikeService,
               private readonly sanitizer: DomSanitizer,
               private readonly snackBar: MatSnackBar,
               private readonly clipboardService: ClipboardService) { }
 
   ngOnInit() {
-    this.eventMemberService.sexChanges.subscribe(sex => {
+    concat(this.setLastEvent(), this.eventMemberService.sexChanges)
+    .subscribe(value => {
+      if (typeof value === 'undefined') { return; }
+      const sex = value as Sex;
       this.blockUI.start();
       this.eventMemberService.get().subscribe(data => {
         this.members = data;
@@ -103,13 +110,13 @@ https://www.facebook.com/happyway.club
 
     let resText = '';
     if (matched && matched.length > 0) {
-      resText = `${this.matchedText}\n\n`;
+      resText = `${this.matchedText.replace('{{date}}', this.getDateText(this.event.date))}\n\n`;
       const matchedMembers = this.getLikedMembers(matched);
       matchedMembers.forEach(m => {
         resText += `${this.getMemberText(m)}\n`;
       });
     } else {
-      resText = `${this.nonMatchedText}\n`;
+      resText = `${this.nonMatchedText.replace('{{date}}', this.getDateText(this.event.date))}\n`;
     }
     if (liked && liked.length > 0) {
       resText += `\n${this.likedText}\n\n`;
@@ -151,5 +158,29 @@ https://www.facebook.com/happyway.club
       && !matched.some(m => m === l.sourceMemberId))
       .map(l => l.sourceMemberId);
     return { matched, liked };
+  }
+
+  private setLastEvent() {
+    return this.eventService.get()
+      .pipe(map(events => {
+        if (!events || events.length === 0) { return; }
+        const event = events[0];
+        if (event) {
+          event.date = new Date(event.date);
+        }
+        this.event = event;
+      }));
+  }
+
+  private getDateText(date: Date) {
+    let dd: number | string = date.getDate();
+    let mm: number | string = date.getMonth() + 1;
+    if (dd < 10) {
+      dd = '0' + dd;
+    }
+    if (mm < 10) {
+      mm = '0' + mm;
+    }
+    return `${dd}.${mm}`;
   }
 }

@@ -1,12 +1,12 @@
 <mat-form-field class="full-width">
-  <input matInput placeholder="URL документа" [(ngModel)]="docUrl" required>
+  <input matInput type="url" placeholder="URL документа" [(ngModel)]="docUrl" required>
 </mat-form-field>
 <div class="table-controls">
-  <button mat-raised-button (click)="downloadDocData()">Загрузить</button>
+  <button mat-raised-button (click)="downloadDocData()" [disabled]="!docUrl">Загрузить</button>
 </div>
 <table mat-table *ngIf="eventMembers && eventMembers.length > 0" [dataSource]="eventMembers" class="mat-elevation-z8">
   <ng-container matColumnDef="number">
-    <th mat-header-cell *matHeaderCellDef>Номер</th>
+    <th mat-header-cell *matHeaderCellDef>№</th>
     <td mat-cell *matCellDef="let member">{{member.number}}</td>
   </ng-container>
   <ng-container matColumnDef="name">
@@ -16,6 +16,22 @@
   <ng-container matColumnDef="phoneNumber">
     <th mat-header-cell *matHeaderCellDef>Номер телефона</th>
     <td mat-cell *matCellDef="let member">{{member.phoneNumber}}</td>
+  </ng-container>
+  <ng-container matColumnDef="edit">
+    <th mat-header-cell *matHeaderCellDef></th>
+    <td mat-cell *matCellDef="let member">
+      <button mat-icon-button (click)="edit(member)">
+        <mat-icon>edit</mat-icon>
+      </button>
+    </td>
+  </ng-container>
+  <ng-container matColumnDef="delete">
+    <th mat-header-cell *matHeaderCellDef></th>
+    <td mat-cell *matCellDef="let member">
+      <button mat-icon-button (click)="delete(member)">
+        <mat-icon>delete</mat-icon>
+      </button>
+    </td>
   </ng-container>
 
   <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
