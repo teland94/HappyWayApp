@@ -1,4 +1,4 @@
-<div class="container">
+<div *ngIf="resultMembers && resultMembers.length > 0" class="container">
   <mat-card *ngFor="let result of resultMembers">
     <mat-card-title>{{result.member.number}}. {{result.member.name}}
       <a href="javasript:void(0);" (click)="copy(result.member.phoneNumber)">({{result.member.phoneNumber}})</a></mat-card-title>
@@ -19,3 +19,6 @@
     </mat-card-actions>
   </mat-card>
 </div>
+<ng-container *ngIf="!resultMembers || resultMembers.length === 0">
+  <span>Нет данных об участниках мероприятия.</span>
+</ng-container>

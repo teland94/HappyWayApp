@@ -46,3 +46,6 @@
     <button mat-raised-button color="primary" (click)="save()">Сохранить</button>
   </div>
 </ng-container>
+<ng-container *ngIf="!cardMembers || cardMembers.length === 0">
+  <span>Нет данных об участниках мероприятия.</span>
+</ng-container>

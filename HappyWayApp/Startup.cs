@@ -1,3 +1,4 @@
+using HappyWayApp.Configuration;
 using HappyWayApp.Filters;
 using HappyWayApp.Persistence;
 using HappyWayApp.Persistence.Configuration;
@@ -36,6 +37,7 @@ namespace HappyWayApp
 
             services.AddDbContext<AppDbContext>();
             services.Configure<DatabaseSettings>(Configuration.GetSection("Database"));
+            services.Configure<GoogleSheetsSettings>(Configuration.GetSection("GoogleSheets"));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

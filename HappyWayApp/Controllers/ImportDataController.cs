@@ -8,12 +8,14 @@ using Google.Apis.Auth.OAuth2;
 using Google.Apis.Services;
 using Google.Apis.Sheets.v4;
 using Google.Apis.Util.Store;
+using HappyWayApp.Configuration;
 using HappyWayApp.Persistence;
 using HappyWayApp.Persistence.Entity;
 using HappyWayApp.ViewModels;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 
 namespace HappyWayApp.Controllers
 {
@@ -25,10 +27,13 @@ namespace HappyWayApp.Controllers
         private const string ApplicationName = "HappyWay App";
 
         private readonly AppDbContext _context;
+        private readonly GoogleSheetsSettings _googleSheetsSettings;
 
-        public ImportDataController(AppDbContext context)
+        public ImportDataController(AppDbContext context,
+            IOptions<GoogleSheetsSettings> googleSheetsOptions)
         {
             _context = context;
+            _googleSheetsSettings = googleSheetsOptions.Value;
         }
 
         [HttpGet("{spreadsheetId}")]
@@ -84,7 +89,7 @@ namespace HappyWayApp.Controllers
 
         private async Task<IEnumerable<EventMemberDocInfo>> GetDocData(string spreadsheetId, string range)
         {
-            var service = GetService("AIzaSyDQPYmK7S - nFpI3UpMnrCCp6AvBn5rAJKw");
+            var service = GetService(_googleSheetsSettings.ApiKey);
 
             var request =
                 service.Spreadsheets.Values.Get(spreadsheetId, range);
