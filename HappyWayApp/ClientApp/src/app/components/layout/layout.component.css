@@ -42,3 +42,23 @@ main {
 .mat-datepicker-toggle-active {
   color: #ff8cbe;
 }
+
+@media only screen and (max-width: 1200px) {
+  .mat-toolbar {
+    height: 56px;
+  }
+
+  main {
+    height: calc(100% - 66px);
+  }
+}
+
+@media only screen and (min-width: 1200px) {
+  .mat-toolbar {
+    height: 64px;
+  }
+
+  main {
+    height: calc(100% - 74px);
+  }
+}

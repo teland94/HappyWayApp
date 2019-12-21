@@ -10,8 +10,9 @@ using Google.Apis.Sheets.v4;
 using Google.Apis.Util.Store;
 using HappyWayApp.Configuration;
 using HappyWayApp.Persistence;
-using HappyWayApp.Persistence.Entity;
+using HappyWayApp.Persistence.Entities;
 using HappyWayApp.ViewModels;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -19,6 +20,7 @@ using Microsoft.Extensions.Options;
 
 namespace HappyWayApp.Controllers
 {
+    [Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class ImportDataController : ControllerBase
@@ -66,7 +68,6 @@ namespace HappyWayApp.Controllers
                 if (dbMember != null)
                 {
                     dbMember.Number = docMember.Number;
-                    dbMember.Age = docMember.Age;
                     dbMember.Name = docMember.Name.Trim();
                     dbMember.PhoneNumber = docMember.PhoneNumber.Trim();
                 }
@@ -75,7 +76,6 @@ namespace HappyWayApp.Controllers
                     var member = new EventMember
                     {
                         Number = docMember.Number,
-                        Age = docMember.Age,
                         Name = docMember.Name.Trim(),
                         Sex = sex,
                         PhoneNumber = docMember.PhoneNumber.Trim(),
@@ -99,7 +99,6 @@ namespace HappyWayApp.Controllers
 
             var members = values.Select(row => new EventMemberDocInfo
             {
-                Age = Convert.ToInt32(row[1]),
                 Number = Convert.ToInt32(row[2]),
                 Name = row[3].ToString(),
                 PhoneNumber = row[4].ToString()

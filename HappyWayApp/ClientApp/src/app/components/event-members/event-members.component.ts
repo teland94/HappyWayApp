@@ -1,11 +1,10 @@
 import { Component, OnInit } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
 import { MatSnackBar, MatSnackBarConfig, MatDialog } from '@angular/material';
 import { EventMemberModel } from 'src/app/models/event-member';
 import { EventMemberService } from 'src/app/services/event-member.service';
 import { BlockUI, NgBlockUI } from 'ng-block-ui';
-import { ConfirmationDialogComponent } from '../confirmation-dialog/confirmation-dialog.component';
-import { EventMemberDialogComponent } from '../event-member-dialog/event-member-dialog.component';
+import { ConfirmationDialogComponent } from '../dialogs/confirmation-dialog/confirmation-dialog.component';
+import { EventMemberDialogComponent } from '../dialogs/event-member-dialog/event-member-dialog.component';
 
 @Component({
   selector: 'app-event-members',
@@ -21,8 +20,7 @@ export class EventMembersComponent implements OnInit {
 
   @BlockUI() blockUI: NgBlockUI;
 
-  constructor(private readonly httpClient: HttpClient,
-              private readonly eventMemberService: EventMemberService,
+  constructor(private readonly eventMemberService: EventMemberService,
               private readonly snackBar: MatSnackBar,
               private readonly dialog: MatDialog) { }
 

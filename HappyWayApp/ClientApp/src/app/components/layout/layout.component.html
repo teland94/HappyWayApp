@@ -6,7 +6,7 @@
       mode="over">
     <mat-toolbar color="primary">Меню</mat-toolbar>
     <mat-nav-list>
-      <a mat-list-item routerLink="/events">
+      <a mat-list-item *ngIf="isAdmin" routerLink="/events">
         <mat-icon>event</mat-icon>
         <span class="nav-caption">Мероприятия</span>
       </a>
@@ -22,6 +22,15 @@
         <mat-icon>message</mat-icon>
         <span class="nav-caption">Результаты</span>
       </a>
+      <ng-container *ngIf="loggedIn">
+        <mat-divider></mat-divider>
+        <mat-action-list>
+          <button mat-list-item (click)="logout()">
+            <mat-icon>power_off</mat-icon>
+            <span class="nav-caption">Выйти</span>
+          </button>
+        </mat-action-list>
+      </ng-container>
     </mat-nav-list>
   </mat-sidenav>
   <mat-sidenav-content>
@@ -35,7 +44,7 @@
       </button>
       <div class="app-title">Happy Way <mat-icon>favorite</mat-icon></div>
       <span class="fill-remaining-space"></span>
-      <app-sex-select></app-sex-select>
+      <app-sex-select *ngIf="loggedIn"></app-sex-select>
       <!-- <input [matDatepicker]="picker" class="hide" (dateChange)="dateChange($event)">
       <mat-datepicker #picker></mat-datepicker>
       <mat-datepicker-toggle [for]="picker"></mat-datepicker-toggle> -->

@@ -6,10 +6,12 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using HappyWayApp.Persistence;
-using HappyWayApp.Persistence.Entity;
+using HappyWayApp.Persistence.Entities;
+using Microsoft.AspNetCore.Authorization;
 
 namespace HappyWayApp.Controllers
 {
+    [Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class EventMemberController : ControllerBase

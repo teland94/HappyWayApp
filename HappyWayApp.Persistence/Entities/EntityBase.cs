@@ -1,4 +1,4 @@
-﻿namespace HappyWayApp.Persistence.Entity
+﻿namespace HappyWayApp.Persistence.Entities
 {
     public class EntityBase
     {

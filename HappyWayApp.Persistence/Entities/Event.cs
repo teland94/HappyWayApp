@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace HappyWayApp.Persistence.Entity
+namespace HappyWayApp.Persistence.Entities
 {
     public class Event : EntityBase
     {
@@ -10,5 +10,8 @@ namespace HappyWayApp.Persistence.Entity
         public string Name { get; set; }
 
         public List<EventMember> EventMembers { get; set; }
+
+        public int UserId { get; set; }
+        public User User { get; set; }
     }
 }

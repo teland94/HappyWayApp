@@ -1,7 +1,7 @@
 import { Component, OnInit, Inject } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
-import { EventModel } from '../../models/event.model';
+import { EventModel } from '../../../models/event.model';
 
 @Component({
   selector: 'app-event',

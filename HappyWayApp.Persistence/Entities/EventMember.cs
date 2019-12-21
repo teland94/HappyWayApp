@@ -1,14 +1,12 @@
 ﻿using System.Collections.Generic;
 
-namespace HappyWayApp.Persistence.Entity
+namespace HappyWayApp.Persistence.Entities
 {
     public class EventMember : EntityBase
     {
         public int Number { get; set; }
 
         public string Name { get; set; }
-
-        public int Age { get; set; }
 
         public Sex Sex { get; set; }
 

@@ -51,9 +51,3 @@
     width: 7%;
   }
 }
-
-@media only screen and (min-width: 1200px) {
-  .mat-card {
-    width: calc(50% - 42px);
-  }
-}

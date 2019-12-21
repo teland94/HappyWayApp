@@ -9,6 +9,8 @@ import { AppMaterialModule } from '../material.module';
 import { ClipboardModule } from 'ngx-clipboard';
 import { BlockUIModule } from 'ng-block-ui';
 import localeRu from '@angular/common/locales/ru';
+import { appRoutingModule } from './app.routing';
+import { AdminComponent } from './components/admin/admin.component';
 
 import { AppComponent } from './app.component';
 import { LayoutComponent } from './components/layout/layout.component';
@@ -17,11 +19,15 @@ import { ResultsComponent } from './components/results/results.component';
 import { EventsComponent } from './components/events/events.component';
 import { SexSelectComponent } from './components/sex-select/sex-select.component';
 import { MAT_SNACK_BAR_DEFAULT_OPTIONS, MAT_DATE_LOCALE, DateAdapter } from '@angular/material';
-import { EventDialogComponent } from './components/event-dialog/event-dialog.component';
-import { ConfirmationDialogComponent } from './components/confirmation-dialog/confirmation-dialog.component';
+import { EventDialogComponent } from './components/dialogs/event-dialog/event-dialog.component';
+import { ConfirmationDialogComponent } from './components/dialogs/confirmation-dialog/confirmation-dialog.component';
 import { CustomDateAdapter } from './custom-date-adapter';
 import { EventMembersComponent } from './components/event-members/event-members.component';
-import { EventMemberDialogComponent } from './components/event-member-dialog/event-member-dialog.component';
+import { EventMemberDialogComponent } from './components/dialogs/event-member-dialog/event-member-dialog.component';
+import { UserDialogComponent } from './components/dialogs/user-dialog/user-dialog.component';
+import { LoginComponent } from './components/login/login.component';
+import { JwtInterceptor } from './interceptors/jwt.interceptor';
+import { ErrorInterceptor } from './interceptors/error.interceptor';
 
 registerLocaleData(localeRu, 'ru');
 
@@ -34,36 +40,36 @@ registerLocaleData(localeRu, 'ru');
     EventsComponent,
     EventDialogComponent,
     EventMemberDialogComponent,
+    UserDialogComponent,
     ConfirmationDialogComponent,
     ResultsComponent,
-    EventMembersComponent
+    EventMembersComponent,
+    LoginComponent,
+    AdminComponent
   ],
   entryComponents: [
     EventDialogComponent,
     EventMemberDialogComponent,
-    ConfirmationDialogComponent
+    ConfirmationDialogComponent,
+    UserDialogComponent
   ],
   imports: [
     BrowserModule.withServerTransition({ appId: 'ng-cli-universal' }),
     HttpClientModule,
     FormsModule,
-    RouterModule.forRoot([
-      { path: '', redirectTo: 'home', pathMatch: 'full' },
-      { path: 'home', component: HomeComponent },
-      { path: 'events', component: EventsComponent },
-      { path: 'event-members', component: EventMembersComponent },
-      { path: 'results', component: ResultsComponent },
-    ]),
     BrowserAnimationsModule,
     AppMaterialModule,
     ReactiveFormsModule,
     ClipboardModule,
-    BlockUIModule.forRoot()
+    BlockUIModule.forRoot(),
+    appRoutingModule
   ],
   providers: [
     { provide: MAT_SNACK_BAR_DEFAULT_OPTIONS, useValue: {duration: 2500, panelClass: 'info-panel'} },
     { provide: LOCALE_ID, useValue: 'ru' },
-    { provide: DateAdapter, useClass: CustomDateAdapter }
+    { provide: DateAdapter, useClass: CustomDateAdapter },
+    { provide: HTTP_INTERCEPTORS, useClass: JwtInterceptor, multi: true },
+    { provide: HTTP_INTERCEPTORS, useClass: ErrorInterceptor, multi: true },
   ],
   bootstrap: [AppComponent]
 })

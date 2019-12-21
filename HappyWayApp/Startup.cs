@@ -1,7 +1,10 @@
+using System.Text;
 using HappyWayApp.Configuration;
 using HappyWayApp.Filters;
 using HappyWayApp.Persistence;
 using HappyWayApp.Persistence.Configuration;
+using HappyWayApp.Services;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -9,6 +12,7 @@ using Microsoft.AspNetCore.SpaServices.AngularCli;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.IdentityModel.Tokens;
 
 namespace HappyWayApp
 {
@@ -37,7 +41,31 @@ namespace HappyWayApp
 
             services.AddDbContext<AppDbContext>();
             services.Configure<DatabaseSettings>(Configuration.GetSection("Database"));
+            services.Configure<AuthSettings>(Configuration.GetSection("Auth"));
             services.Configure<GoogleSheetsSettings>(Configuration.GetSection("GoogleSheets"));
+
+            services.AddTransient<IUserService, UserService>();
+
+            var appSettingsSection = Configuration.GetSection("Auth");
+            var authSettings = appSettingsSection.Get<AuthSettings>();
+            var key = Encoding.ASCII.GetBytes(authSettings.Secret);
+            services.AddAuthentication(x =>
+                {
+                    x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                    x.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+                })
+                .AddJwtBearer(x =>
+                {
+                    x.RequireHttpsMetadata = false;
+                    x.SaveToken = true;
+                    x.TokenValidationParameters = new TokenValidationParameters
+                    {
+                        ValidateIssuerSigningKey = true,
+                        IssuerSigningKey = new SymmetricSecurityKey(key),
+                        ValidateIssuer = false,
+                        ValidateAudience = false
+                    };
+                });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -62,6 +90,9 @@ namespace HappyWayApp
             }
 
             app.UseRouting();
+
+            app.UseAuthentication();
+            app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
             {

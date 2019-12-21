@@ -2,8 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import { EventService } from 'src/app/services/event.service';
 import { EventModel } from 'src/app/models/event.model';
 import { MatSnackBar, MatSnackBarConfig, MatDialog } from '@angular/material';
-import { EventDialogComponent } from '../event-dialog/event-dialog.component';
-import { ConfirmationDialogComponent } from '../confirmation-dialog/confirmation-dialog.component';
+import { EventDialogComponent } from '../dialogs/event-dialog/event-dialog.component';
+import { ConfirmationDialogComponent } from '../dialogs/confirmation-dialog/confirmation-dialog.component';
 
 @Component({
   selector: 'app-events',
