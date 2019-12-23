@@ -7,11 +7,11 @@ import {ConfirmationDialogComponent} from '../dialogs/confirmation-dialog/confir
 import {BlockUI, NgBlockUI} from 'ng-block-ui';
 
 @Component({
-  selector: 'app-admin',
-  templateUrl: './admin.component.html',
-  styleUrls: ['./admin.component.css']
+  selector: 'app-users',
+  templateUrl: './users.component.html',
+  styleUrls: ['./users.component.css']
 })
-export class AdminComponent implements OnInit {
+export class UsersComponent implements OnInit {
 
   users: UserModel[] = [];
 

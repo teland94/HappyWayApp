@@ -10,7 +10,7 @@ import { ClipboardModule } from 'ngx-clipboard';
 import { BlockUIModule } from 'ng-block-ui';
 import localeRu from '@angular/common/locales/ru';
 import { appRoutingModule } from './app.routing';
-import { AdminComponent } from './components/admin/admin.component';
+import { UsersComponent } from './components/admin/users.component';
 
 import { AppComponent } from './app.component';
 import { LayoutComponent } from './components/layout/layout.component';
@@ -45,7 +45,7 @@ registerLocaleData(localeRu, 'ru');
     ResultsComponent,
     EventMembersComponent,
     LoginComponent,
-    AdminComponent
+    UsersComponent
   ],
   entryComponents: [
     EventDialogComponent,
