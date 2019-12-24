@@ -6,10 +6,18 @@
       mode="over">
     <mat-toolbar color="primary">Меню</mat-toolbar>
     <mat-nav-list>
-      <a mat-list-item *ngIf="isAdmin" routerLink="/events">
-        <mat-icon>event</mat-icon>
-        <span class="nav-caption">Мероприятия</span>
-      </a>
+      <ng-container *ngIf="isAdmin">
+        <a mat-list-item routerLink="/events">
+          <mat-icon>event</mat-icon>
+          <span class="nav-caption">Мероприятия</span>
+        </a>
+        <a mat-list-item routerLink="/users">
+          <mat-icon>supervised_user_circle</mat-icon>
+          <span class="nav-caption">Хостесы</span>
+        </a>
+        <mat-divider></mat-divider>
+      </ng-container>
+
       <a mat-list-item routerLink="/event-members">
         <mat-icon>people</mat-icon>
         <span class="nav-caption">Участники</span>
