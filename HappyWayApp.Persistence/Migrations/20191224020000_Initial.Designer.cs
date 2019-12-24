@@ -9,7 +9,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace HappyWayApp.Persistence.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20191219151701_Initial")]
+    [Migration("20191224020000_Initial")]
     partial class Initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -43,7 +43,7 @@ namespace HappyWayApp.Persistence.Migrations
                         new
                         {
                             Id = 1,
-                            Date = new DateTime(2019, 12, 19, 15, 17, 1, 42, DateTimeKind.Utc).AddTicks(6064),
+                            Date = new DateTime(2019, 12, 24, 2, 0, 0, 338, DateTimeKind.Utc).AddTicks(4502),
                             Name = "Основная группа",
                             UserId = 1
                         });
@@ -132,10 +132,10 @@ namespace HappyWayApp.Persistence.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
-                    b.Property<string>("FirstName")
+                    b.Property<string>("City")
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("LastName")
+                    b.Property<string>("DisplayName")
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Password")
@@ -162,8 +162,8 @@ namespace HappyWayApp.Persistence.Migrations
                         new
                         {
                             Id = 1,
-                            FirstName = "Admin",
-                            LastName = "User",
+                            City = "Харьков",
+                            DisplayName = "Admin",
                             Password = "admin",
                             RoleId = 1,
                             Username = "admin"
@@ -171,8 +171,8 @@ namespace HappyWayApp.Persistence.Migrations
                         new
                         {
                             Id = 2,
-                            FirstName = "Normal",
-                            LastName = "User",
+                            City = "Харьков",
+                            DisplayName = "Normal",
                             Password = "user",
                             RoleId = 2,
                             Username = "user"

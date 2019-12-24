@@ -9,10 +9,10 @@
         <input matInput type="password" formControlName="password" placeholder="Пароль" required>
       </mat-form-field>
       <mat-form-field>
-        <input matInput formControlName="firstName" placeholder="Фамилия">
+        <input matInput formControlName="displayName" placeholder="ФИО">
       </mat-form-field>
       <mat-form-field>
-        <input matInput formControlName="lastName" placeholder="Имя">
+        <input matInput formControlName="city" placeholder="Город" [matAutocomplete]="auto">
       </mat-form-field>
     </div>
   </mat-dialog-content>
@@ -21,3 +21,9 @@
     <button mat-button type="button" mat-dialog-close>Отмена</button>
   </mat-dialog-actions>
 </form>
+
+<mat-autocomplete #auto="matAutocomplete">
+  <mat-option *ngFor="let city of filteredCities" [value]="city">
+    {{ city }}
+  </mat-option>
+</mat-autocomplete>

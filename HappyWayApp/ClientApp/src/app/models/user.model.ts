@@ -2,8 +2,8 @@ export class UserModel {
   id: number;
   username: string;
   password: string;
-  firstName: string;
-  lastName: string;
+  displayName: string;
+  city: string;
   role: Role;
   token?: string;
 }

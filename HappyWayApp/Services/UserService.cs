@@ -93,8 +93,8 @@ namespace HappyWayApp.Services
 
             var userDto = new UserDto
             {
-                FirstName = user.FirstName,
-                LastName = user.FirstName,
+                DisplayName = user.DisplayName,
+                City = user.City,
                 Role = user.Role.Name,
                 Token = user.Token,
                 Username = user.Username

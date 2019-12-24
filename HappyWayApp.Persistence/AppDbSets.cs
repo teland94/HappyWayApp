@@ -81,17 +81,17 @@ namespace HappyWayApp.Persistence
                     new User
                     {
                         Id = 1, 
-                        FirstName = "Admin", 
-                        LastName = "User", 
+                        DisplayName = "Admin", 
+                        City = "Харьков", 
                         Username = "admin",
                         Password = "admin",
                         RoleId = 1
                     },
                     new User
                     {
-                        Id = 2, 
-                        FirstName = "Normal", 
-                        LastName = "User", 
+                        Id = 2,
+                        DisplayName = "Normal", 
+                        City = "Харьков", 
                         Username = "user", 
                         Password = "user",
                         RoleId = 2

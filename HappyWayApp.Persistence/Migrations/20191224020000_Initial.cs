@@ -29,8 +29,8 @@ namespace HappyWayApp.Persistence.Migrations
                     Username = table.Column<string>(nullable: false),
                     Password = table.Column<string>(nullable: false),
                     Token = table.Column<string>(nullable: true),
-                    FirstName = table.Column<string>(nullable: true),
-                    LastName = table.Column<string>(nullable: true),
+                    DisplayName = table.Column<string>(nullable: true),
+                    City = table.Column<string>(nullable: true),
                     RoleId = table.Column<int>(nullable: false)
                 },
                 constraints: table =>
@@ -126,18 +126,18 @@ namespace HappyWayApp.Persistence.Migrations
 
             migrationBuilder.InsertData(
                 table: "Users",
-                columns: new[] { "Id", "FirstName", "LastName", "Password", "RoleId", "Token", "Username" },
-                values: new object[] { 1, "Admin", "User", "admin", 1, null, "admin" });
+                columns: new[] { "Id", "City", "DisplayName", "Password", "RoleId", "Token", "Username" },
+                values: new object[] { 1, "Харьков", "Admin", "admin", 1, null, "admin" });
 
             migrationBuilder.InsertData(
                 table: "Users",
-                columns: new[] { "Id", "FirstName", "LastName", "Password", "RoleId", "Token", "Username" },
-                values: new object[] { 2, "Normal", "User", "user", 2, null, "user" });
+                columns: new[] { "Id", "City", "DisplayName", "Password", "RoleId", "Token", "Username" },
+                values: new object[] { 2, "Харьков", "Normal", "user", 2, null, "user" });
 
             migrationBuilder.InsertData(
                 table: "Events",
                 columns: new[] { "Id", "Date", "Name", "UserId" },
-                values: new object[] { 1, new DateTime(2019, 12, 19, 15, 17, 1, 42, DateTimeKind.Utc).AddTicks(6064), "Основная группа", 1 });
+                values: new object[] { 1, new DateTime(2019, 12, 24, 2, 0, 0, 338, DateTimeKind.Utc).AddTicks(4502), "Основная группа", 1 });
 
             migrationBuilder.CreateIndex(
                 name: "IX_EventMembers_EventId",

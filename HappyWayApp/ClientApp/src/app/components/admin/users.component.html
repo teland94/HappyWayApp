@@ -4,13 +4,13 @@
     <th mat-header-cell *matHeaderCellDef>Имя пользователя</th>
     <td mat-cell *matCellDef="let user">{{user.username}}</td>
   </ng-container>
-  <ng-container matColumnDef="firstName">
-    <th mat-header-cell *matHeaderCellDef>Фамилия</th>
-    <td mat-cell *matCellDef="let user">{{user.firstName}}</td>
+  <ng-container matColumnDef="displayName">
+    <th mat-header-cell *matHeaderCellDef>ФИО</th>
+    <td mat-cell *matCellDef="let user">{{user.displayName}}</td>
   </ng-container>
-  <ng-container matColumnDef="lastName">
-    <th mat-header-cell *matHeaderCellDef>Имя</th>
-    <td mat-cell *matCellDef="let user">{{user.lastName}}</td>
+  <ng-container matColumnDef="city">
+    <th mat-header-cell *matHeaderCellDef>Город</th>
+    <td mat-cell *matCellDef="let user">{{user.city}}</td>
   </ng-container>
   <ng-container matColumnDef="edit">
     <th mat-header-cell *matHeaderCellDef></th>

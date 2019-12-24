@@ -10,9 +10,9 @@ namespace HappyWayApp.Persistence.Entities
 
         public string Token { get; set; }
 
-        public string FirstName { get; set; }
+        public string DisplayName { get; set; }
 
-        public string LastName { get; set; }
+        public string City { get; set; }
 
         public int RoleId { get; set; }
         public Role Role { get; set; }

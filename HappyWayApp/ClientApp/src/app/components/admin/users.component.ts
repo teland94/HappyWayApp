@@ -2,9 +2,12 @@ import { Component, OnInit } from '@angular/core';
 import {UserService} from '../../services/user.service';
 import {UserModel} from '../../models/user.model';
 import {MatDialog, MatSnackBar, MatSnackBarConfig} from '@angular/material';
-import {UserDialogComponent} from '../dialogs/user-dialog/user-dialog.component';
+import {UserDialogComponent, UserDialogData} from '../dialogs/user-dialog/user-dialog.component';
 import {ConfirmationDialogComponent} from '../dialogs/confirmation-dialog/confirmation-dialog.component';
 import {BlockUI, NgBlockUI} from 'ng-block-ui';
+import { DatabaseService } from 'src/app/services/database.service';
+import { forkJoin } from 'rxjs';
+import { Area } from 'src/app/models/area.model';
 
 @Component({
   selector: 'app-users',
@@ -15,10 +18,13 @@ export class UsersComponent implements OnInit {
 
   users: UserModel[] = [];
 
-  displayedColumns: string[] = ['username', 'firstName', 'lastName', 'edit', 'delete'];
+  cities: string[];
+
+  displayedColumns: string[] = ['username', 'displayName', 'city', 'edit', 'delete'];
   @BlockUI() blockUI: NgBlockUI;
 
   constructor(private readonly userService: UserService,
+              private readonly databaseService: DatabaseService,
               private readonly snackBar: MatSnackBar,
               private readonly dialog: MatDialog) { }
 
@@ -52,13 +58,28 @@ export class UsersComponent implements OnInit {
 
   private load() {
     this.blockUI.start();
-    this.userService.getAll().subscribe(users => {
-      this.users = users;
-      this.blockUI.stop();
-    }, error => {
-      this.blockUI.stop();
-      this.showError('Ошибка загрузки пользователей.', error);
-    });
+    forkJoin([this.userService.getAll(), this.databaseService.getAreas()])
+      .subscribe(([users, areas]) => {
+        this.users = users;
+        this.cities = this.getCities(areas);
+        this.blockUI.stop();
+      }, error => {
+        this.blockUI.stop();
+        this.showError('Ошибка загрузки пользователей.', error);
+      });
+  }
+
+  private getCities(areas: Area[]) {
+    const cities = [];
+    const addCity = (area: Area) => {
+      if (!area.areas || area.areas.length === 0) {
+        cities.push(area.name);
+      }
+      area.areas.forEach(addCity);
+    };
+    areas.forEach(addCity);
+    cities.sort();
+    return cities;
   }
 
   private openConfirmDialog() {
@@ -73,7 +94,10 @@ export class UsersComponent implements OnInit {
   private openDialog(user?: UserModel) {
     const dialogRef = this.dialog.open(UserDialogComponent, {
       width: '270px',
-      data: user ? user : { }
+      data: <UserDialogData>{
+        user: user ? user : { },
+        cities: this.cities
+      }
     });
 
     return dialogRef.afterClosed();
