@@ -18,8 +18,8 @@ export class UserDialogComponent implements OnInit {
     this.form = this.fb.group({
       username: this.fb.control(this.user.username, Validators.required),
       password: this.fb.control(this.user.password, Validators.required),
-      firstName: this.fb.control(this.user.firstName, Validators.required),
-      lastName: this.fb.control(this.user.lastName, Validators.required),
+      firstName: this.fb.control(this.user.firstName),
+      lastName: this.fb.control(this.user.lastName),
     });
   }
 
