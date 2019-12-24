@@ -9,7 +9,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace HappyWayApp.Persistence.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20191224020000_Initial")]
+    [Migration("20191224163409_Initial")]
     partial class Initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -22,6 +22,9 @@ namespace HappyWayApp.Persistence.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<bool>("Completed")
                         .HasColumnType("INTEGER");
 
                     b.Property<DateTime>("Date")
@@ -43,7 +46,8 @@ namespace HappyWayApp.Persistence.Migrations
                         new
                         {
                             Id = 1,
-                            Date = new DateTime(2019, 12, 24, 2, 0, 0, 338, DateTimeKind.Utc).AddTicks(4502),
+                            Completed = false,
+                            Date = new DateTime(2019, 12, 24, 16, 34, 9, 102, DateTimeKind.Utc).AddTicks(21),
                             Name = "Основная группа",
                             UserId = 1
                         });
@@ -142,6 +146,9 @@ namespace HappyWayApp.Persistence.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
+                    b.Property<string>("PhoneNumber")
+                        .HasColumnType("TEXT");
+
                     b.Property<int>("RoleId")
                         .HasColumnType("INTEGER");
 
@@ -164,7 +171,8 @@ namespace HappyWayApp.Persistence.Migrations
                             Id = 1,
                             City = "Харьков",
                             DisplayName = "Admin",
-                            Password = "admin",
+                            Password = "admin12345678",
+                            PhoneNumber = "095 214 51 32",
                             RoleId = 1,
                             Username = "admin"
                         },
@@ -173,7 +181,8 @@ namespace HappyWayApp.Persistence.Migrations
                             Id = 2,
                             City = "Харьков",
                             DisplayName = "Normal",
-                            Password = "user",
+                            Password = "user12345678",
+                            PhoneNumber = "095 777 22 22",
                             RoleId = 2,
                             Username = "user"
                         });

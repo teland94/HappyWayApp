@@ -9,6 +9,8 @@ namespace HappyWayApp.Persistence.Entities
 
         public string Name { get; set; }
 
+        public bool Completed { get; set; }
+
         public List<EventMember> EventMembers { get; set; }
 
         public int UserId { get; set; }

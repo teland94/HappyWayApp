@@ -1,19 +1,19 @@
-.mat-select {
+.sex-control .mat-select {
   width: fit-content !important;
   min-width: 100%;
 }
 
-.mat-form-field-infix {
+.sex-control .mat-form-field-infix {
   min-width: 25px !important;
   width: fit-content !important;
 }
 
-.mat-select .mat-select-value {
+.sex-control .mat-select .mat-select-value {
   width: fit-content;
   min-width: 2ch;
   max-width: 25ch;
 }
-.mat-select .mat-select-placeholder {
+.sex-control .mat-select .mat-select-placeholder {
   width: fit-content;
   min-width: 10ch;
 }

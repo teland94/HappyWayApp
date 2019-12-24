@@ -82,18 +82,20 @@ namespace HappyWayApp.Persistence
                     {
                         Id = 1, 
                         DisplayName = "Admin", 
-                        City = "Харьков", 
+                        City = "Харьков",
+                        PhoneNumber = "095 214 51 32",
                         Username = "admin",
-                        Password = "admin",
+                        Password = "admin12345678",
                         RoleId = 1
                     },
                     new User
                     {
                         Id = 2,
                         DisplayName = "Normal", 
-                        City = "Харьков", 
+                        City = "Харьков",
+                        PhoneNumber = "095 777 22 22",
                         Username = "user", 
-                        Password = "user",
+                        Password = "user12345678",
                         RoleId = 2
                     }
                 );

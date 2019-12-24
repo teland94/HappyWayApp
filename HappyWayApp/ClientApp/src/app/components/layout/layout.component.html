@@ -13,15 +13,11 @@
         </a>
         <a mat-list-item routerLink="/users">
           <mat-icon>supervised_user_circle</mat-icon>
-          <span class="nav-caption">Хостесы</span>
+          <span class="nav-caption">Пользователи</span>
         </a>
         <mat-divider></mat-divider>
       </ng-container>
 
-      <a mat-list-item routerLink="/event-members">
-        <mat-icon>people</mat-icon>
-        <span class="nav-caption">Участники</span>
-      </a>
       <a mat-list-item routerLink="/home">
         <mat-icon>favorite</mat-icon>
         <span class="nav-caption">Симпатии</span>
@@ -29,6 +25,10 @@
       <a mat-list-item routerLink="/results">
         <mat-icon>message</mat-icon>
         <span class="nav-caption">Результаты</span>
+      </a>
+      <a mat-list-item routerLink="/event-members">
+        <mat-icon>people</mat-icon>
+        <span class="nav-caption">Участники</span>
       </a>
       <ng-container *ngIf="loggedIn">
         <mat-divider></mat-divider>

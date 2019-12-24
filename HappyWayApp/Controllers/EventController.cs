@@ -84,6 +84,7 @@ namespace HappyWayApp.Controllers
         [HttpPost]
         public async Task<ActionResult<Event>> PostEvent(Event @event)
         {
+            @event.UserId = Convert.ToInt32(User.Identity.Name);
             _context.Events.Add(@event);
             await _context.SaveChangesAsync();
 

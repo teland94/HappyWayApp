@@ -1,3 +1,7 @@
-.table-controls {
-  margin-bottom: 5px;
+.event-row:hover {
+  background: #777;
+}
+
+.event-row:active {
+  background: #ff226e;
 }

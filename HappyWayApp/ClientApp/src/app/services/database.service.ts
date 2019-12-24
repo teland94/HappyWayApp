@@ -11,7 +11,11 @@ export class DatabaseService {
 
   constructor(private readonly httpClient: HttpClient) { }
 
-  public getAreas() {
+  getAreas() {
     return this.httpClient.get<Area[]>(`${this._jsonURL}/cities.json`);
+  }
+
+  getGroups() {
+    return this.httpClient.get<string[]>(`${this._jsonURL}/groups.json`);
   }
 }

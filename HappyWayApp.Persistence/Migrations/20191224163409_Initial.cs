@@ -31,6 +31,7 @@ namespace HappyWayApp.Persistence.Migrations
                     Token = table.Column<string>(nullable: true),
                     DisplayName = table.Column<string>(nullable: true),
                     City = table.Column<string>(nullable: true),
+                    PhoneNumber = table.Column<string>(nullable: true),
                     RoleId = table.Column<int>(nullable: false)
                 },
                 constraints: table =>
@@ -52,6 +53,7 @@ namespace HappyWayApp.Persistence.Migrations
                         .Annotation("Sqlite:Autoincrement", true),
                     Date = table.Column<DateTime>(nullable: false),
                     Name = table.Column<string>(nullable: true),
+                    Completed = table.Column<bool>(nullable: false),
                     UserId = table.Column<int>(nullable: false)
                 },
                 constraints: table =>
@@ -126,18 +128,18 @@ namespace HappyWayApp.Persistence.Migrations
 
             migrationBuilder.InsertData(
                 table: "Users",
-                columns: new[] { "Id", "City", "DisplayName", "Password", "RoleId", "Token", "Username" },
-                values: new object[] { 1, "Харьков", "Admin", "admin", 1, null, "admin" });
+                columns: new[] { "Id", "City", "DisplayName", "Password", "PhoneNumber", "RoleId", "Token", "Username" },
+                values: new object[] { 1, "Харьков", "Admin", "admin12345678", "095 214 51 32", 1, null, "admin" });
 
             migrationBuilder.InsertData(
                 table: "Users",
-                columns: new[] { "Id", "City", "DisplayName", "Password", "RoleId", "Token", "Username" },
-                values: new object[] { 2, "Харьков", "Normal", "user", 2, null, "user" });
+                columns: new[] { "Id", "City", "DisplayName", "Password", "PhoneNumber", "RoleId", "Token", "Username" },
+                values: new object[] { 2, "Харьков", "Normal", "user12345678", "095 777 22 22", 2, null, "user" });
 
             migrationBuilder.InsertData(
                 table: "Events",
-                columns: new[] { "Id", "Date", "Name", "UserId" },
-                values: new object[] { 1, new DateTime(2019, 12, 24, 2, 0, 0, 338, DateTimeKind.Utc).AddTicks(4502), "Основная группа", 1 });
+                columns: new[] { "Id", "Completed", "Date", "Name", "UserId" },
+                values: new object[] { 1, false, new DateTime(2019, 12, 24, 16, 34, 9, 102, DateTimeKind.Utc).AddTicks(21), "Основная группа", 1 });
 
             migrationBuilder.CreateIndex(
                 name: "IX_EventMembers_EventId",

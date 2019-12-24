@@ -40,3 +40,17 @@ tr.mat-row {
   background: rgb(153, 50, 50);
   color: white;
 }
+
+.table-controls {
+  margin-bottom: 5px;
+}
+
+.table-controls .mat-raised-button {
+  margin-left: 5px;
+}
+
+.table-controls .mat-raised-button:first-child {
+  margin-left: 0;
+}
+
+

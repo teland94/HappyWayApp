@@ -8,6 +8,7 @@ import {BlockUI, NgBlockUI} from 'ng-block-ui';
 import { DatabaseService } from 'src/app/services/database.service';
 import { forkJoin } from 'rxjs';
 import { Area } from 'src/app/models/area.model';
+import {AuthenticationService} from '../../services/authentication.service';
 
 @Component({
   selector: 'app-users',
@@ -19,27 +20,42 @@ export class UsersComponent implements OnInit {
   users: UserModel[] = [];
 
   cities: string[];
+  currentUser: UserModel;
 
-  displayedColumns: string[] = ['username', 'displayName', 'city', 'edit', 'delete'];
+  displayedColumns: string[] = ['username', 'displayName', 'city', 'phoneNumber', 'edit', 'delete'];
   @BlockUI() blockUI: NgBlockUI;
 
   constructor(private readonly userService: UserService,
+              private readonly authenticationService: AuthenticationService,
               private readonly databaseService: DatabaseService,
               private readonly snackBar: MatSnackBar,
               private readonly dialog: MatDialog) { }
 
   ngOnInit() {
     this.load();
+    this.currentUser = this.authenticationService.currentUserValue;
+  }
+
+  add() {
+    this.openDialog().subscribe(user => {
+      if (!user) { return; }
+      this.userService.create(user)
+        .subscribe(() => {
+          this.load();
+        }, error => {
+          this.showError('Ошибка добавления хостес.', error);
+        });
+    });
   }
 
   edit(user: UserModel) {
     this.openDialog(user).subscribe(editedUser => {
       if (!editedUser) { return; }
-      this.userService.update(user)
+      this.userService.update(editedUser)
         .subscribe(() => {
           this.load();
         }, error => {
-          this.showError('Ошибка редактирования пользователя.', error);
+          this.showError('Ошибка редактирования хостес.', error);
         });
     });
   }
@@ -51,7 +67,7 @@ export class UsersComponent implements OnInit {
         .subscribe(() => {
           this.load();
         }, error => {
-          this.showError('Ошибка удаления пользователя.', error);
+          this.showError('Ошибка удаления хостес.', error);
         });
     });
   }

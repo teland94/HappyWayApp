@@ -1,7 +1,12 @@
-import { Component, OnInit, Inject } from '@angular/core';
-import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
-import { FormGroup, FormBuilder, Validators } from '@angular/forms';
-import { EventModel } from '../../../models/event.model';
+import {Component, Inject, ViewEncapsulation} from '@angular/core';
+import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material';
+import {FormBuilder, FormGroup, Validators} from '@angular/forms';
+import {EventModel} from '../../../models/event.model';
+
+export class EventDialogData {
+  event: EventModel;
+  groups: string[];
+}
 
 @Component({
   selector: 'app-event',
@@ -11,19 +16,22 @@ import { EventModel } from '../../../models/event.model';
 export class EventDialogComponent {
 
   form: FormGroup;
+  groups: string[];
 
   constructor(private readonly dialogRef: MatDialogRef<EventDialogComponent>,
-    @Inject(MAT_DIALOG_DATA) public event: EventModel,
+    @Inject(MAT_DIALOG_DATA) private data: EventDialogData,
     private readonly fb: FormBuilder) {
+    const { name, date } = this.data.event;
     this.form = this.fb.group({
-      name: this.fb.control(this.event.name, Validators.required),
-      date: this.fb.control(this.event.date, Validators.required)
+      name: this.fb.control(name, Validators.required),
+      date: this.fb.control(date ? date : new Date(), Validators.required)
     });
+    this.groups = this.data.groups;
   }
 
   submit(form: FormGroup) {
     const event = form.value as EventModel;
-    event.id = this.event.id;
+    event.id = this.data.event.id;
     this.dialogRef.close(event);
   }
 }

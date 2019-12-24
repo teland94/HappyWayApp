@@ -2,8 +2,12 @@ import { Component, OnInit } from '@angular/core';
 import { EventService } from 'src/app/services/event.service';
 import { EventModel } from 'src/app/models/event.model';
 import { MatSnackBar, MatSnackBarConfig, MatDialog } from '@angular/material';
-import { EventDialogComponent } from '../dialogs/event-dialog/event-dialog.component';
+import { EventDialogComponent, EventDialogData } from '../dialogs/event-dialog/event-dialog.component';
 import { ConfirmationDialogComponent } from '../dialogs/confirmation-dialog/confirmation-dialog.component';
+import { Router } from '@angular/router';
+import { forkJoin } from 'rxjs';
+import { DatabaseService } from '../../services/database.service';
+import { BlockUI, NgBlockUI } from 'ng-block-ui';
 
 @Component({
   selector: 'app-events',
@@ -14,13 +18,17 @@ export class EventsComponent implements OnInit {
 
   private initialDisplayedColumns: string[] = ['name', 'date', 'edit'];
   displayedColumns: string[];
+  @BlockUI() blockUI: NgBlockUI;
 
   events: EventModel[];
+  groups: string[];
   currentEvent: EventModel;
 
   constructor(private readonly eventService: EventService,
+              private readonly databaseService: DatabaseService,
               private readonly snackBar: MatSnackBar,
-              private readonly dialog: MatDialog) { }
+              private readonly dialog: MatDialog,
+              private readonly router: Router) { }
 
   ngOnInit() {
     this.load();
@@ -64,12 +72,21 @@ export class EventsComponent implements OnInit {
     });
   }
 
+  eventClick(event: EventModel) {
+    this.router.navigate(['/event', event.id]);
+  }
+
   private load() {
-    this.eventService.get().subscribe(data => {
-      this.displayedColumns = this.getDisplayedColumns(data);
-      this.events = data;
-    }, error => {
-      this.showError('Ошибка загрузки мероприятий.', error);
+    this.blockUI.start();
+    forkJoin([this.eventService.get(), this.databaseService.getGroups()])
+      .subscribe(([events, groups]) => {
+        this.displayedColumns = this.getDisplayedColumns(events);
+        this.events = events;
+        this.groups = groups;
+        this.blockUI.stop();
+      }, error => {
+        this.blockUI.stop();
+        this.showError('Ошибка загрузки мероприятий.', error);
     });
   }
 
@@ -100,7 +117,10 @@ export class EventsComponent implements OnInit {
   private openDialog(event?: EventModel) {
     const dialogRef = this.dialog.open(EventDialogComponent, {
       width: '270px',
-      data: event ? event : { }
+      data: <EventDialogData>{
+        event: event ? event : { },
+        groups: this.groups
+      }
     });
 
     return dialogRef.afterClosed();

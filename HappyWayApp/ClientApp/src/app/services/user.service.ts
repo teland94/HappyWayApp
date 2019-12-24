@@ -19,6 +19,10 @@ export class UserService {
     return this.httpClient.get<UserModel>(`${this.baseUrl}/${id}`);
   }
 
+  create(user: UserModel) {
+    return this.httpClient.post(this.baseUrl, user);
+  }
+
   update(user: UserModel) {
     return this.httpClient.put(this.baseUrl + '/' + user.id, user);
   }

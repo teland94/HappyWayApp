@@ -1,9 +1,13 @@
-﻿using HappyWayApp.Persistence.Entities;
+﻿using System;
+using System.Threading.Tasks;
+using HappyWayApp.DTOs;
+using HappyWayApp.Persistence.Entities;
 using HappyWayApp.Persistence.Helpers;
 using HappyWayApp.Services;
 using HappyWayApp.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace HappyWayApp.Controllers
 {
@@ -21,9 +25,9 @@ namespace HappyWayApp.Controllers
 
         [AllowAnonymous]
         [HttpPost("authenticate")]
-        public IActionResult Authenticate([FromBody]AuthenticateModel model)
+        public async Task<IActionResult> Authenticate([FromBody]AuthenticateModel model)
         {
-            var user = _userService.Authenticate(model.Username, model.Password);
+            var user = await _userService.Authenticate(model.Username, model.Password);
 
             if (user == null)
             {
@@ -58,6 +62,35 @@ namespace HappyWayApp.Controllers
             }
 
             return Ok(user);
+        }
+
+        [HttpPut("{id}")]
+        public async Task<IActionResult> PutUser(int id, UserDto userDto)
+        {
+            if (id != userDto.Id)
+            {
+                return BadRequest();
+            }
+
+            await _userService.UpdateUser(userDto);
+
+            return NoContent();
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> PostUser(UserDto userDto)
+        {
+            var userId = await _userService.AddUser(userDto);
+
+            return CreatedAtAction("GetById", new { id = userId });
+        }
+
+        [HttpDelete("{id}")]
+        public async Task<ActionResult> DeleteUser(int id)
+        {
+            await _userService.DeleteUser(id);
+
+            return NoContent();
         }
     }
 }

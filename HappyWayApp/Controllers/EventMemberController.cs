@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using HappyWayApp.Persistence;
 using HappyWayApp.Persistence.Entities;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.HttpOverrides;
 
 namespace HappyWayApp.Controllers
 {
@@ -25,14 +26,23 @@ namespace HappyWayApp.Controllers
 
         // GET: api/EventMember
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<EventMember>>> GetEventMembers()
+        public async Task<ActionResult<IEnumerable<EventMember>>> GetEventMembers(int? eventId)
         {
-            var lastEvent = await _context.Events
-                .OrderByDescending(e => e.Date)
-                .FirstOrDefaultAsync();
+            int eId;
+            if (eventId != null)
+            {
+                eId = eventId.Value;
+            }
+            else
+            {
+                var lastEvent = await _context.Events
+                    .OrderByDescending(e => e.Date)
+                    .FirstOrDefaultAsync();
+                eId = lastEvent.Id;
+            }
 
             var members = await _context.EventMembers
-                .Where(m => m.EventId == lastEvent.Id)
+                .Where(m => m.EventId == eId)
                 .OrderBy(m => m.Number)
                 .ToListAsync();
 
@@ -59,8 +69,6 @@ namespace HappyWayApp.Controllers
         }
 
         // PUT: api/EventMember/5
-        // To protect from overposting attacks, please enable the specific properties you want to bind to, for
-        // more details see https://aka.ms/RazorPagesCRUD.
         [HttpPut("{id}")]
         public async Task<IActionResult> PutEventMember(int id, EventMember eventMember)
         {
@@ -91,8 +99,6 @@ namespace HappyWayApp.Controllers
         }
 
         // POST: api/EventMember
-        // To protect from overposting attacks, please enable the specific properties you want to bind to, for
-        // more details see https://aka.ms/RazorPagesCRUD.
         [HttpPost]
         public async Task<ActionResult<EventMember>> PostEventMember(EventMember eventMember)
         {

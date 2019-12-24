@@ -5,6 +5,7 @@ import { EventMemberService } from 'src/app/services/event-member.service';
 import { BlockUI, NgBlockUI } from 'ng-block-ui';
 import { ConfirmationDialogComponent } from '../dialogs/confirmation-dialog/confirmation-dialog.component';
 import { EventMemberDialogComponent } from '../dialogs/event-member-dialog/event-member-dialog.component';
+import { ActivatedRoute } from '@angular/router';
 
 @Component({
   selector: 'app-event-members',
@@ -22,10 +23,16 @@ export class EventMembersComponent implements OnInit {
 
   constructor(private readonly eventMemberService: EventMemberService,
               private readonly snackBar: MatSnackBar,
-              private readonly dialog: MatDialog) { }
+              private readonly dialog: MatDialog,
+              private readonly route: ActivatedRoute) { }
 
   ngOnInit() {
-    this.load();
+    const id = this.route.snapshot.paramMap.get('id');
+    if (id) {
+      this.load(+id);
+    } else {
+      this.load();
+    }
   }
 
   downloadDocData() {
@@ -41,10 +48,10 @@ export class EventMembersComponent implements OnInit {
       });
   }
 
-  private load() {
+  private load(eventId?: number) {
     this.blockUI.start();
     this.eventMemberService.sexChanges.subscribe(sex => {
-      this.eventMemberService.get().subscribe(data => {
+      this.eventMemberService.get(eventId).subscribe(data => {
         this.eventMembers = data.filter(m => m.sex === sex);
         this.blockUI.stop();
       }, error => {
@@ -54,8 +61,8 @@ export class EventMembersComponent implements OnInit {
     });
   }
 
-  edit(event: EventMemberModel) {
-    this.openDialog(event).subscribe(editedEventMember => {
+  edit(eventMember: EventMemberModel) {
+    this.openDialog(eventMember).subscribe(editedEventMember => {
       if (!editedEventMember) { return; }
       this.eventMemberService.update(editedEventMember)
         .subscribe(() => {
@@ -66,10 +73,10 @@ export class EventMembersComponent implements OnInit {
     });
   }
 
-  delete(event: EventMemberModel) {
+  delete(eventMember: EventMemberModel) {
     this.openConfirmDialog().subscribe(data => {
       if (!data) { return; }
-      this.eventMemberService.delete(event.id)
+      this.eventMemberService.delete(eventMember.id)
         .subscribe(() => {
           this.load();
         }, error => {

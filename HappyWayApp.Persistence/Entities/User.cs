@@ -14,6 +14,8 @@ namespace HappyWayApp.Persistence.Entities
 
         public string City { get; set; }
 
+        public string PhoneNumber { get; set; }
+
         public int RoleId { get; set; }
         public Role Role { get; set; }
 

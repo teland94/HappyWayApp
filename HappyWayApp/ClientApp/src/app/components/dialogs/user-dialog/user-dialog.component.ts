@@ -17,17 +17,20 @@ export class UserDialogComponent implements OnInit {
 
   form: FormGroup;
   filteredCities: string[];
+  editMode: boolean;
 
   constructor(private readonly dialogRef: MatDialogRef<UserDialogComponent>,
               @Inject(MAT_DIALOG_DATA) private data: UserDialogData,
               private readonly fb: FormBuilder) {
-    const { username, password, displayName, city } = this.data.user;
+    const { username, displayName, city, phoneNumber } = this.data.user;
     this.form = this.fb.group({
-      username: this.fb.control(username, Validators.required),
-      password: this.fb.control(password, Validators.required),
+      username: this.fb.control(username),
+      password: this.fb.control(''),
       displayName: this.fb.control(displayName),
       city: this.fb.control(city),
+      phoneNumber: this.fb.control(phoneNumber)
     });
+    this.editMode = !!this.data.user.id;
   }
 
   ngOnInit() {
@@ -38,7 +41,7 @@ export class UserDialogComponent implements OnInit {
 
   submit(form: FormGroup) {
     const user = form.value as UserModel;
-    user.id = this.user.id;
+    user.id = this.data.user.id;
     this.dialogRef.close(user);
   }
 }
