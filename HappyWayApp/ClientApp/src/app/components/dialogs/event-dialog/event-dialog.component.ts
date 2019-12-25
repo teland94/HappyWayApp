@@ -3,6 +3,11 @@ import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material';
 import {FormBuilder, FormGroup, Validators} from '@angular/forms';
 import {EventModel} from '../../../models/event.model';
 
+export class EventDialogResult {
+  event: EventModel;
+  docUrl: string;
+}
+
 export class EventDialogData {
   event: EventModel;
   groups: string[];
@@ -24,14 +29,15 @@ export class EventDialogComponent {
     const { name, date } = this.data.event;
     this.form = this.fb.group({
       name: this.fb.control(name, Validators.required),
-      date: this.fb.control(date ? date : new Date(), Validators.required)
+      date: this.fb.control(date ? date : new Date(), Validators.required),
+      docUrl: this.fb.control('')
     });
     this.groups = this.data.groups;
   }
 
   submit(form: FormGroup) {
-    const event = form.value as EventModel;
-    event.id = this.data.event.id;
-    this.dialogRef.close(event);
+    const { date, name, docUrl } = form.value;
+    const event = <EventModel>{ id: this.data.event.id, date, name };
+    this.dialogRef.close(<EventDialogResult>{ event, docUrl });
   }
 }

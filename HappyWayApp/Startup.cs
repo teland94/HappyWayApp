@@ -3,11 +3,13 @@ using HappyWayApp.Configuration;
 using HappyWayApp.Filters;
 using HappyWayApp.Persistence;
 using HappyWayApp.Persistence.Configuration;
+using HappyWayApp.Persistence.Entities;
 using HappyWayApp.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.SpaServices.AngularCli;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -44,6 +46,7 @@ namespace HappyWayApp
             services.Configure<AuthSettings>(Configuration.GetSection("Auth"));
             services.Configure<GoogleSheetsSettings>(Configuration.GetSection("GoogleSheets"));
 
+            services.AddSingleton<IPasswordHasher<User>, PasswordHasher<User>>();
             services.AddTransient<IUserService, UserService>();
 
             var appSettingsSection = Configuration.GetSection("Auth");

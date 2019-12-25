@@ -9,7 +9,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace HappyWayApp.Persistence.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20191224163409_Initial")]
+    [Migration("20191225142423_Initial")]
     partial class Initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -47,7 +47,7 @@ namespace HappyWayApp.Persistence.Migrations
                         {
                             Id = 1,
                             Completed = false,
-                            Date = new DateTime(2019, 12, 24, 16, 34, 9, 102, DateTimeKind.Utc).AddTicks(21),
+                            Date = new DateTime(2019, 12, 25, 14, 24, 23, 211, DateTimeKind.Utc).AddTicks(1172),
                             Name = "Основная группа",
                             UserId = 1
                         });
@@ -171,7 +171,7 @@ namespace HappyWayApp.Persistence.Migrations
                             Id = 1,
                             City = "Харьков",
                             DisplayName = "Admin",
-                            Password = "admin12345678",
+                            Password = "ALBUWwYxK+q96msCYfUWP9gOPcnIc8l6B44F24o/pjsvF2cfiTFE+aui/FRTSNFjZA==",
                             PhoneNumber = "095 214 51 32",
                             RoleId = 1,
                             Username = "admin"
@@ -181,7 +181,7 @@ namespace HappyWayApp.Persistence.Migrations
                             Id = 2,
                             City = "Харьков",
                             DisplayName = "Normal",
-                            Password = "user12345678",
+                            Password = "AA4f7YH1rTdfWS5I0ec3M9keQwh8oL3pGzGu0vmQe2oodRHPRX1PP6aNssc2Ttz0XA==",
                             PhoneNumber = "095 777 22 22",
                             RoleId = 2,
                             Username = "user"

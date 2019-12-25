@@ -1,9 +1,9 @@
 import { Injectable } from '@angular/core';
-import { MatDialog } from '@angular/material';
+import {MatDialog, MatDialogRef, MatSnackBar, MatSnackBarConfig, MatSnackBarDismiss} from '@angular/material';
 import { ConfirmationDialogComponent } from '../components/dialogs/confirmation-dialog/confirmation-dialog.component';
 import { PasswordPromptDialogComponent } from '../components/dialogs/password-prompt-dialog/password-prompt-dialog.component';
 import { AuthenticationService } from './authentication.service';
-import { flatMap } from 'rxjs/operators';
+import { catchError, flatMap, map } from 'rxjs/operators';
 import { of } from 'rxjs';
 
 @Injectable({
@@ -13,24 +13,18 @@ export class ConfirmationService {
 
   private readonly dialogWidth = '350px';
 
+  private passwordDialogRef: MatDialogRef<PasswordPromptDialogComponent, any>;
+
   constructor(private readonly dialog: MatDialog,
+              private readonly snackBar: MatSnackBar,
               private readonly authenticationService: AuthenticationService) { }
 
   openConfirmDialogWithPassword(action: string) {
     return this.openConfirmDialog(action)
       .pipe(
           flatMap(confirmResult => {
-            if (!confirmResult) { return of(confirmResult); }
-            const dialogRef = this.dialog.open(PasswordPromptDialogComponent, {
-              width: this.dialogWidth,
-              data: `Чтобы ${action} необходимо ввести пароль.`
-            });
-            return dialogRef.afterClosed()
-              .pipe(
-                flatMap(password => {
-                  return this.authenticationService.checkPassword(password);
-                })
-              );
+            if (!confirmResult) { return of(false); }
+            return this.openPasswordPromptDialog(action);
           })
       );
   }
@@ -40,7 +34,46 @@ export class ConfirmationService {
       width: this.dialogWidth,
       data: `Вы действительно хотите ${action}?`
     });
-
     return dialogRef.afterClosed();
+  }
+
+  private openPasswordPromptDialog(action: string) {
+    this.passwordDialogRef = this.dialog.open(PasswordPromptDialogComponent, {
+      width: this.dialogWidth,
+      data: `Чтобы ${action} необходимо ввести пароль.`
+    });
+    return this.passwordDialogRef.afterClosed()
+      .pipe(
+        flatMap(passwordResult => {
+          if (!passwordResult) { return of(false); }
+          return this.authenticationService.checkPassword(passwordResult)
+            .pipe(
+              map(() => true),
+              catchError(this.checkPasswordErrorHandler(action))
+            );
+        })
+      );
+  }
+
+  private checkPasswordErrorHandler(action: string) {
+    return (err: any) => {
+      return this.openRetryBar('Неверный пароль.')
+       .pipe(
+         flatMap((dismiss: MatSnackBarDismiss) => {
+          if (dismiss.dismissedByAction) {
+            return this.openPasswordPromptDialog(action);
+          } else {
+            return of(false);
+          }
+        })
+       );
+    };
+  }
+
+  private openRetryBar(errorText: string) {
+    const config = new MatSnackBarConfig();
+    config.duration = 5000;
+    config.panelClass = ['error-panel'];
+    return this.snackBar.open(errorText, 'Повторить', config).afterDismissed();
   }
 }

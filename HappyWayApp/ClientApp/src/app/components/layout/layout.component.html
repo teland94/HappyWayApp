@@ -17,25 +17,31 @@
         </a>
         <mat-divider></mat-divider>
       </ng-container>
-
+      <mat-action-list>
+        <button mat-list-item (click)="createEvent()">
+          <mat-icon>event_note</mat-icon>
+          <span class="nav-caption">Создать мероприятие</span>
+        </button>
+      </mat-action-list>
+      <mat-divider></mat-divider>
       <a mat-list-item routerLink="/home">
         <mat-icon>favorite</mat-icon>
-        <span class="nav-caption">Симпатии</span>
+        <span class="nav-caption">Рассчитать симпатии</span>
       </a>
       <a mat-list-item routerLink="/results">
         <mat-icon>message</mat-icon>
-        <span class="nav-caption">Результаты</span>
+        <span class="nav-caption">Посмотреть результаты</span>
       </a>
       <a mat-list-item routerLink="/event-members">
         <mat-icon>people</mat-icon>
-        <span class="nav-caption">Участники</span>
+        <span class="nav-caption">Инфо об участниках</span>
       </a>
       <ng-container *ngIf="loggedIn">
         <mat-divider></mat-divider>
         <mat-action-list>
           <button mat-list-item (click)="logout()">
             <mat-icon>power_off</mat-icon>
-            <span class="nav-caption">Выйти</span>
+            <span class="nav-caption">Завершить работу</span>
           </button>
         </mat-action-list>
       </ng-container>

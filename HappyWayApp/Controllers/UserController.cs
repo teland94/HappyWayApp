@@ -29,7 +29,7 @@ namespace HappyWayApp.Controllers
 
             if (user == null)
             {
-                return BadRequest(new { message = "Username or password is incorrect" });
+                return BadRequest(new { message = "Неверный логин или пароль." });
             }
 
             return Ok(user);
@@ -40,7 +40,13 @@ namespace HappyWayApp.Controllers
         {
             var currentUserId = Convert.ToInt32(User.Identity.Name);
             var res = await _userService.CheckPassword(currentUserId, model.Password);
-            return Ok(res);
+
+            if (!res)
+            {
+                return BadRequest(new { message = "Неверный пароль." });
+            }
+
+            return NoContent();
         }
 
         [Authorize(Roles = Constants.Strings.Roles.Admin)]

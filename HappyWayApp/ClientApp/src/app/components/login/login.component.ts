@@ -1,5 +1,4 @@
 import { Component, OnInit } from '@angular/core';
-import { first } from 'rxjs/operators';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AuthenticationService } from '../../services/authentication.service';
@@ -55,14 +54,18 @@ export class LoginComponent implements OnInit {
 
     this.blockUI.start();
     this.authenticationService.login(this.f.username.value, this.f.password.value)
-      .pipe(first())
       .subscribe(
         data => {
           this.router.navigate([this.returnUrl]);
           this.blockUI.stop();
         },
         error => {
-          this.error = error;
+          if (error.message) {
+            this.error = error.message;
+          } else {
+            console.log(error);
+            this.error = 'Неизвестная ошибка.';
+          }
           this.blockUI.stop();
         });
   }

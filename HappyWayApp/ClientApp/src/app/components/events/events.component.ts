@@ -8,6 +8,7 @@ import { forkJoin } from 'rxjs';
 import { DatabaseService } from '../../services/database.service';
 import { BlockUI, NgBlockUI } from 'ng-block-ui';
 import { ConfirmationService } from '../../services/confirmation.service';
+import { getDateWithTimeZoneOffsetHours } from '../../utilities';
 
 @Component({
   selector: 'app-events',
@@ -36,9 +37,10 @@ export class EventsComponent implements OnInit {
   }
 
   edit(event: EventModel) {
-    this.openDialog(event).subscribe(editedEvent => {
-      if (!editedEvent) { return; }
-      editedEvent.date = this.getDateWithTimeZoneOffsetHours(editedEvent.date);
+    this.openDialog(event).subscribe(eventDialogResult => {
+      if (!eventDialogResult) { return; }
+      const editedEvent = eventDialogResult.event;
+      editedEvent.date = getDateWithTimeZoneOffsetHours(editedEvent.date);
       this.eventService.update(editedEvent)
         .subscribe(() => {
           this.load();
@@ -61,9 +63,10 @@ export class EventsComponent implements OnInit {
   }
 
   add() {
-    this.openDialog().subscribe(event => {
-      if (!event) { return; }
-      event.date = this.getDateWithTimeZoneOffsetHours(event.date);
+    this.openDialog().subscribe(eventDialogResult => {
+      if (!eventDialogResult) { return; }
+      const event = eventDialogResult.event;
+      event.date = getDateWithTimeZoneOffsetHours(event.date);
       this.eventService.create(event)
         .subscribe(() => {
           this.load();
@@ -99,16 +102,9 @@ export class EventsComponent implements OnInit {
     return displayedColumns;
   }
 
-  private getDateWithTimeZoneOffsetHours(date: Date) {
-    const resDate = new Date(date);
-    const currentTimeZoneOffsetInHours = resDate.getTimezoneOffset() / -60;
-    resDate.setHours(resDate.getHours() + currentTimeZoneOffsetInHours);
-    return resDate;
-  }
-
   private openDialog(event?: EventModel) {
     const dialogRef = this.dialog.open(EventDialogComponent, {
-      width: '270px',
+      width: '370px',
       data: <EventDialogData>{
         event: event ? event : { },
         groups: this.groups

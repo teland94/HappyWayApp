@@ -129,17 +129,17 @@ namespace HappyWayApp.Persistence.Migrations
             migrationBuilder.InsertData(
                 table: "Users",
                 columns: new[] { "Id", "City", "DisplayName", "Password", "PhoneNumber", "RoleId", "Token", "Username" },
-                values: new object[] { 1, "Харьков", "Admin", "admin12345678", "095 214 51 32", 1, null, "admin" });
+                values: new object[] { 1, "Харьков", "Admin", "ALBUWwYxK+q96msCYfUWP9gOPcnIc8l6B44F24o/pjsvF2cfiTFE+aui/FRTSNFjZA==", "095 214 51 32", 1, null, "admin" });
 
             migrationBuilder.InsertData(
                 table: "Users",
                 columns: new[] { "Id", "City", "DisplayName", "Password", "PhoneNumber", "RoleId", "Token", "Username" },
-                values: new object[] { 2, "Харьков", "Normal", "user12345678", "095 777 22 22", 2, null, "user" });
+                values: new object[] { 2, "Харьков", "Normal", "AA4f7YH1rTdfWS5I0ec3M9keQwh8oL3pGzGu0vmQe2oodRHPRX1PP6aNssc2Ttz0XA==", "095 777 22 22", 2, null, "user" });
 
             migrationBuilder.InsertData(
                 table: "Events",
                 columns: new[] { "Id", "Completed", "Date", "Name", "UserId" },
-                values: new object[] { 1, false, new DateTime(2019, 12, 24, 16, 34, 9, 102, DateTimeKind.Utc).AddTicks(21), "Основная группа", 1 });
+                values: new object[] { 1, false, new DateTime(2019, 12, 25, 14, 24, 23, 211, DateTimeKind.Utc).AddTicks(1172), "Основная группа", 1 });
 
             migrationBuilder.CreateIndex(
                 name: "IX_EventMembers_EventId",
