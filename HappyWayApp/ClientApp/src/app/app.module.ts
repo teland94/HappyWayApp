@@ -11,6 +11,7 @@ import { BlockUIModule } from 'ng-block-ui';
 import localeRu from '@angular/common/locales/ru';
 import { appRoutingModule } from './app.routing';
 import { UsersComponent } from './components/users/users.component';
+import { PasswordPromptDialogComponent } from './components/dialogs/password-prompt-dialog/password-prompt-dialog.component';
 
 import { AppComponent } from './app.component';
 import { LayoutComponent } from './components/layout/layout.component';
@@ -45,13 +46,15 @@ registerLocaleData(localeRu, 'ru');
     ResultsComponent,
     EventMembersComponent,
     LoginComponent,
-    UsersComponent
+    UsersComponent,
+    PasswordPromptDialogComponent
   ],
   entryComponents: [
     EventDialogComponent,
     EventMemberDialogComponent,
     ConfirmationDialogComponent,
-    UserDialogComponent
+    UserDialogComponent,
+    PasswordPromptDialogComponent
   ],
   imports: [
     BrowserModule.withServerTransition({ appId: 'ng-cli-universal' }),

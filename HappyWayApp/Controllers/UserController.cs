@@ -1,13 +1,11 @@
 ﻿using System;
 using System.Threading.Tasks;
 using HappyWayApp.DTOs;
-using HappyWayApp.Persistence.Entities;
 using HappyWayApp.Persistence.Helpers;
 using HappyWayApp.Services;
 using HappyWayApp.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 
 namespace HappyWayApp.Controllers
 {
@@ -24,7 +22,7 @@ namespace HappyWayApp.Controllers
         }
 
         [AllowAnonymous]
-        [HttpPost("authenticate")]
+        [HttpPost(nameof(Authenticate))]
         public async Task<IActionResult> Authenticate([FromBody]AuthenticateModel model)
         {
             var user = await _userService.Authenticate(model.Username, model.Password);
@@ -35,6 +33,14 @@ namespace HappyWayApp.Controllers
             }
 
             return Ok(user);
+        }
+
+        [HttpPost(nameof(CheckPassword))]
+        public async Task<IActionResult> CheckPassword([FromBody]CheckPasswordModel model)
+        {
+            var currentUserId = Convert.ToInt32(User.Identity.Name);
+            var res = await _userService.CheckPassword(currentUserId, model.Password);
+            return Ok(res);
         }
 
         [Authorize(Roles = Constants.Strings.Roles.Admin)]

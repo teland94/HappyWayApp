@@ -1,14 +1,14 @@
 import { Component, OnInit } from '@angular/core';
-import {UserService} from '../../services/user.service';
-import {UserModel} from '../../models/user.model';
-import {MatDialog, MatSnackBar, MatSnackBarConfig} from '@angular/material';
-import {UserDialogComponent, UserDialogData} from '../dialogs/user-dialog/user-dialog.component';
-import {ConfirmationDialogComponent} from '../dialogs/confirmation-dialog/confirmation-dialog.component';
-import {BlockUI, NgBlockUI} from 'ng-block-ui';
-import { DatabaseService } from 'src/app/services/database.service';
+import { UserService } from '../../services/user.service';
+import { UserModel } from '../../models/user.model';
+import { MatDialog, MatSnackBar, MatSnackBarConfig } from '@angular/material';
+import { UserDialogComponent, UserDialogData } from '../dialogs/user-dialog/user-dialog.component';
+import { BlockUI, NgBlockUI } from 'ng-block-ui';
+import { DatabaseService } from '../../services/database.service';
 import { forkJoin } from 'rxjs';
 import { Area } from 'src/app/models/area.model';
-import {AuthenticationService} from '../../services/authentication.service';
+import { AuthenticationService } from '../../services/authentication.service';
+import { ConfirmationService } from '../../services/confirmation.service';
 
 @Component({
   selector: 'app-users',
@@ -27,6 +27,7 @@ export class UsersComponent implements OnInit {
 
   constructor(private readonly userService: UserService,
               private readonly authenticationService: AuthenticationService,
+              private readonly confirmationService: ConfirmationService,
               private readonly databaseService: DatabaseService,
               private readonly snackBar: MatSnackBar,
               private readonly dialog: MatDialog) { }
@@ -61,7 +62,7 @@ export class UsersComponent implements OnInit {
   }
 
   delete(user: UserModel) {
-    this.openConfirmDialog().subscribe(data => {
+    this.confirmationService.openConfirmDialogWithPassword('удалить').subscribe(data => {
       if (!data) { return; }
       this.userService.delete(user.id)
         .subscribe(() => {
@@ -96,15 +97,6 @@ export class UsersComponent implements OnInit {
     areas.forEach(addCity);
     cities.sort();
     return cities;
-  }
-
-  private openConfirmDialog() {
-    const dialogRef = this.dialog.open(ConfirmationDialogComponent, {
-      width: '350px',
-      data: 'Вы действительно хотите удалить?'
-    });
-
-    return dialogRef.afterClosed();
   }
 
   private openDialog(user?: UserModel) {

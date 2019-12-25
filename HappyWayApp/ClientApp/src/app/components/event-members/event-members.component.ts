@@ -1,11 +1,11 @@
 import { Component, OnInit } from '@angular/core';
 import { MatSnackBar, MatSnackBarConfig, MatDialog } from '@angular/material';
-import { EventMemberModel } from 'src/app/models/event-member';
-import { EventMemberService } from 'src/app/services/event-member.service';
+import { EventMemberModel } from '../../models/event-member';
+import { EventMemberService } from '../../services/event-member.service';
 import { BlockUI, NgBlockUI } from 'ng-block-ui';
-import { ConfirmationDialogComponent } from '../dialogs/confirmation-dialog/confirmation-dialog.component';
 import { EventMemberDialogComponent } from '../dialogs/event-member-dialog/event-member-dialog.component';
 import { ActivatedRoute } from '@angular/router';
+import { ConfirmationService } from '../../services/confirmation.service';
 
 @Component({
   selector: 'app-event-members',
@@ -22,6 +22,7 @@ export class EventMembersComponent implements OnInit {
   @BlockUI() blockUI: NgBlockUI;
 
   constructor(private readonly eventMemberService: EventMemberService,
+              private readonly confirmationService: ConfirmationService,
               private readonly snackBar: MatSnackBar,
               private readonly dialog: MatDialog,
               private readonly route: ActivatedRoute) { }
@@ -74,7 +75,7 @@ export class EventMembersComponent implements OnInit {
   }
 
   delete(eventMember: EventMemberModel) {
-    this.openConfirmDialog().subscribe(data => {
+    this.confirmationService.openConfirmDialog('удалить').subscribe(data => {
       if (!data) { return; }
       this.eventMemberService.delete(eventMember.id)
         .subscribe(() => {
@@ -95,15 +96,6 @@ export class EventMembersComponent implements OnInit {
           this.showError('Ошибка добавления участника.', error);
         });
     });
-  }
-
-  private openConfirmDialog() {
-    const dialogRef = this.dialog.open(ConfirmationDialogComponent, {
-      width: '350px',
-      data: 'Вы действительно хотите удалить?'
-    });
-
-    return dialogRef.afterClosed();
   }
 
   private openDialog(event?: EventMemberModel) {

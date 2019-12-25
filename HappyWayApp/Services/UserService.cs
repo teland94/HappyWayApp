@@ -19,6 +19,8 @@ namespace HappyWayApp.Services
     {
         Task<UserDto> Authenticate(string username, string password);
 
+        Task<bool> CheckPassword(int userId, string password);
+
         IEnumerable<UserDto> GetAll();
 
         UserDto GetById(int id);
@@ -69,6 +71,11 @@ namespace HappyWayApp.Services
             user.Token = tokenHandler.WriteToken(token);
 
             return user.WithoutPassword();
+        }
+
+        public async Task<bool> CheckPassword(int userId, string password)
+        {
+            return await _context.Users.AnyAsync(x => x.Id == userId && x.Password == password);
         }
 
         public IEnumerable<UserDto> GetAll()

@@ -1,13 +1,13 @@
 import { Component, OnInit } from '@angular/core';
-import { EventService } from 'src/app/services/event.service';
-import { EventModel } from 'src/app/models/event.model';
+import { EventService } from '../../services/event.service';
+import { EventModel } from '../../models/event.model';
 import { MatSnackBar, MatSnackBarConfig, MatDialog } from '@angular/material';
 import { EventDialogComponent, EventDialogData } from '../dialogs/event-dialog/event-dialog.component';
-import { ConfirmationDialogComponent } from '../dialogs/confirmation-dialog/confirmation-dialog.component';
 import { Router } from '@angular/router';
 import { forkJoin } from 'rxjs';
 import { DatabaseService } from '../../services/database.service';
 import { BlockUI, NgBlockUI } from 'ng-block-ui';
+import { ConfirmationService } from '../../services/confirmation.service';
 
 @Component({
   selector: 'app-events',
@@ -26,6 +26,7 @@ export class EventsComponent implements OnInit {
 
   constructor(private readonly eventService: EventService,
               private readonly databaseService: DatabaseService,
+              private readonly confirmationService: ConfirmationService,
               private readonly snackBar: MatSnackBar,
               private readonly dialog: MatDialog,
               private readonly router: Router) { }
@@ -48,7 +49,7 @@ export class EventsComponent implements OnInit {
   }
 
   delete(event: EventModel) {
-    this.openConfirmDialog().subscribe(data => {
+    this.confirmationService.openConfirmDialogWithPassword('удалить').subscribe(data => {
       if (!data) { return; }
       this.eventService.delete(event.id)
         .subscribe(() => {
@@ -103,15 +104,6 @@ export class EventsComponent implements OnInit {
     const currentTimeZoneOffsetInHours = resDate.getTimezoneOffset() / -60;
     resDate.setHours(resDate.getHours() + currentTimeZoneOffsetInHours);
     return resDate;
-  }
-
-  private openConfirmDialog() {
-    const dialogRef = this.dialog.open(ConfirmationDialogComponent, {
-      width: '350px',
-      data: 'Вы действительно хотите удалить?'
-    });
-
-    return dialogRef.afterClosed();
   }
 
   private openDialog(event?: EventModel) {
