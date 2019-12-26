@@ -10,8 +10,9 @@ import { EventModel } from '../../models/event.model';
 import { EventDialogComponent, EventDialogData } from '../dialogs/event-dialog/event-dialog.component';
 import { getDateWithTimeZoneOffsetHours } from '../../utilities';
 import { concat } from 'rxjs';
-import {DatabaseService} from '../../services/database.service';
-import {BlockUI, NgBlockUI} from 'ng-block-ui';
+import { DatabaseService } from '../../services/database.service';
+import { BlockUI, NgBlockUI } from 'ng-block-ui';
+import { ConfirmationService } from '../../services/confirmation.service';
 
 @Component({
   selector: 'app-layout',
@@ -28,6 +29,7 @@ export class LayoutComponent implements OnInit, AfterViewInit {
 
   constructor(private readonly router: Router,
               private readonly authenticationService: AuthenticationService,
+              private readonly confirmationService: ConfirmationService,
               private readonly dialog: MatDialog,
               private readonly snackBar: MatSnackBar,
               private readonly eventService: EventService,
@@ -90,8 +92,20 @@ export class LayoutComponent implements OnInit, AfterViewInit {
   }
 
   logout() {
-    this.authenticationService.logout();
-    this.router.navigate(['/login']);
+    this.confirmationService.openConfirmDialogWithPassword('завершить работу').subscribe(data => {
+      if (!data) { return; }
+      this.blockUI.start();
+      this.eventService.setCompleted(0, true).subscribe(() => {
+        this.authenticationService.logout();
+        this.router.navigate(['/login']).then(() => {
+          this.blockUI.stop();
+          this.snackBar.open('Благодарим, что были сегодня с нами ❤');
+        });
+      }, error => {
+        this.blockUI.stop();
+        this.showError('Ошибка завершения работы.', error);
+      });
+    });
   }
 
   private openDialog(event?: EventModel) {

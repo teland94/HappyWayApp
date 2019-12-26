@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using HappyWayApp.Persistence;
 using HappyWayApp.Persistence.Entities;
+using HappyWayApp.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 
 namespace HappyWayApp.Controllers
@@ -74,6 +75,26 @@ namespace HappyWayApp.Controllers
                     throw;
                 }
             }
+
+            return NoContent();
+        }
+
+        [HttpPatch("SetCompleted/{id}")]
+        public async Task<IActionResult> SetCompleted(int id, SetEventCompletedModel model)
+        {
+            //var @event = await _context.Events.FindAsync(id);
+            //if (@event == null)
+            //{
+            //    return NotFound();
+            //}
+
+            var @event = await _context.Events
+                .OrderByDescending(e => e.Date)
+                .FirstOrDefaultAsync();
+
+            @event.Completed = model.Completed;
+
+            await _context.SaveChangesAsync();
 
             return NoContent();
         }

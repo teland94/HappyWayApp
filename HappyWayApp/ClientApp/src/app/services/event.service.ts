@@ -26,6 +26,10 @@ export class EventService {
     return this.httpClient.put(this.baseUrl + '/' + event.id, event);
   }
 
+  setCompleted(id: number, completed: boolean) {
+    return this.httpClient.patch(this.baseUrl + '/SetCompleted/' + id, { completed });
+  }
+
   delete(id: number) {
     return this.httpClient.delete(this.baseUrl + '/' + id);
   }

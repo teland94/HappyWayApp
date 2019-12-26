@@ -68,7 +68,7 @@ registerLocaleData(localeRu, 'ru');
     appRoutingModule
   ],
   providers: [
-    { provide: MAT_SNACK_BAR_DEFAULT_OPTIONS, useValue: {duration: 2500, panelClass: 'info-panel'} },
+    { provide: MAT_SNACK_BAR_DEFAULT_OPTIONS, useValue: {duration: 3000, panelClass: 'info-panel'} },
     { provide: LOCALE_ID, useValue: 'ru' },
     { provide: DateAdapter, useClass: CustomDateAdapter },
     { provide: HTTP_INTERCEPTORS, useClass: JwtInterceptor, multi: true },

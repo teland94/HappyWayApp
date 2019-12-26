@@ -17,13 +17,15 @@
         </a>
         <mat-divider></mat-divider>
       </ng-container>
-      <mat-action-list>
-        <button mat-list-item (click)="createEvent()">
-          <mat-icon>event_note</mat-icon>
-          <span class="nav-caption">Создать мероприятие</span>
-        </button>
-      </mat-action-list>
-      <mat-divider></mat-divider>
+      <ng-container *ngIf="loggedIn">
+        <mat-action-list>
+          <button mat-list-item (click)="createEvent()">
+            <mat-icon>event_note</mat-icon>
+            <span class="nav-caption">Создать мероприятие</span>
+          </button>
+        </mat-action-list>
+        <mat-divider></mat-divider>
+      </ng-container>
       <a mat-list-item routerLink="/home">
         <mat-icon>favorite</mat-icon>
         <span class="nav-caption">Рассчитать симпатии</span>
