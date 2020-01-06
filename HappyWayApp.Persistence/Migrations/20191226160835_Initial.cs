@@ -136,11 +136,6 @@ namespace HappyWayApp.Persistence.Migrations
                 columns: new[] { "Id", "City", "DisplayName", "Password", "PhoneNumber", "RoleId", "Token", "Username" },
                 values: new object[] { 2, "Харьков", "Normal", "AA4f7YH1rTdfWS5I0ec3M9keQwh8oL3pGzGu0vmQe2oodRHPRX1PP6aNssc2Ttz0XA==", "095 777 22 22", 2, null, "user" });
 
-            migrationBuilder.InsertData(
-                table: "Events",
-                columns: new[] { "Id", "Completed", "Date", "Name", "UserId" },
-                values: new object[] { 1, false, new DateTime(2019, 12, 25, 14, 24, 23, 211, DateTimeKind.Utc).AddTicks(1172), "Основная группа", 1 });
-
             migrationBuilder.CreateIndex(
                 name: "IX_EventMembers_EventId",
                 table: "EventMembers",

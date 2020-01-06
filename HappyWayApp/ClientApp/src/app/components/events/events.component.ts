@@ -9,6 +9,7 @@ import { DatabaseService } from '../../services/database.service';
 import { BlockUI, NgBlockUI } from 'ng-block-ui';
 import { ConfirmationService } from '../../services/confirmation.service';
 import { getDateWithTimeZoneOffsetHours } from '../../utilities';
+import { ImportDataService } from '../../services/import-data.service';
 
 @Component({
   selector: 'app-events',
@@ -17,8 +18,7 @@ import { getDateWithTimeZoneOffsetHours } from '../../utilities';
 })
 export class EventsComponent implements OnInit {
 
-  private initialDisplayedColumns: string[] = ['name', 'date', 'edit'];
-  displayedColumns: string[];
+  displayedColumns: string[] = ['name', 'date', 'user', 'edit', 'delete'];
   @BlockUI() blockUI: NgBlockUI;
 
   events: EventModel[];
@@ -26,6 +26,7 @@ export class EventsComponent implements OnInit {
   currentEvent: EventModel;
 
   constructor(private readonly eventService: EventService,
+              private readonly importDataService: ImportDataService,
               private readonly databaseService: DatabaseService,
               private readonly confirmationService: ConfirmationService,
               private readonly snackBar: MatSnackBar,
@@ -40,6 +41,7 @@ export class EventsComponent implements OnInit {
     this.openDialog(event).subscribe(eventDialogResult => {
       if (!eventDialogResult) { return; }
       const editedEvent = eventDialogResult.event;
+      editedEvent.id = event.id;
       editedEvent.date = getDateWithTimeZoneOffsetHours(editedEvent.date);
       this.eventService.update(editedEvent)
         .subscribe(() => {
@@ -67,12 +69,20 @@ export class EventsComponent implements OnInit {
       if (!eventDialogResult) { return; }
       const event = eventDialogResult.event;
       event.date = getDateWithTimeZoneOffsetHours(event.date);
-      this.eventService.create(event)
-        .subscribe(() => {
+
+      this.blockUI.start();
+      this.eventService.create(event).subscribe(createdEvent => {
+        this.importDataService.downloadDocData(createdEvent.id, eventDialogResult.docUrl).subscribe(() => {
+          this.blockUI.stop();
           this.load();
         }, error => {
+          this.blockUI.stop();
           this.showError('Ошибка добавления мероприятия.', error);
         });
+      }, error => {
+        this.blockUI.stop();
+        this.showError('Ошибка добавления мероприятия.', error);
+      });
     });
   }
 
@@ -84,8 +94,8 @@ export class EventsComponent implements OnInit {
     this.blockUI.start();
     forkJoin([this.eventService.get(), this.databaseService.getGroups()])
       .subscribe(([events, groups]) => {
-        this.displayedColumns = this.getDisplayedColumns(events);
         this.events = events;
+        this.setLastEvent();
         this.groups = groups;
         this.blockUI.stop();
       }, error => {
@@ -94,12 +104,11 @@ export class EventsComponent implements OnInit {
     });
   }
 
-  private getDisplayedColumns(events: EventModel[]) {
-    const displayedColumns = [...this.initialDisplayedColumns];
-    if (events.length > 1) {
-      displayedColumns.push('delete');
+  private setLastEvent() {
+    const event = this.events[0];
+    if (event) {
+      this.eventService.setCurrentEvent(event);
     }
-    return displayedColumns;
   }
 
   private openDialog(event?: EventModel) {

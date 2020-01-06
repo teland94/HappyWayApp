@@ -1,12 +1,12 @@
 import { Component, OnInit } from '@angular/core';
 import { UserService } from '../../services/user.service';
-import { UserModel } from '../../models/user.model';
+import { UserModel, Role } from '../../models/user.model';
 import { MatDialog, MatSnackBar, MatSnackBarConfig } from '@angular/material';
 import { UserDialogComponent, UserDialogData } from '../dialogs/user-dialog/user-dialog.component';
 import { BlockUI, NgBlockUI } from 'ng-block-ui';
 import { DatabaseService } from '../../services/database.service';
 import { forkJoin } from 'rxjs';
-import { Area } from 'src/app/models/area.model';
+import { Area } from '../../models/area.model';
 import { AuthenticationService } from '../../services/authentication.service';
 import { ConfirmationService } from '../../services/confirmation.service';
 
@@ -21,6 +21,7 @@ export class UsersComponent implements OnInit {
 
   cities: string[];
   currentUser: UserModel;
+  role = Role;
 
   displayedColumns: string[] = ['username', 'displayName', 'city', 'phoneNumber', 'edit', 'delete'];
   @BlockUI() blockUI: NgBlockUI;
@@ -52,6 +53,7 @@ export class UsersComponent implements OnInit {
   edit(user: UserModel) {
     this.openDialog(user).subscribe(editedUser => {
       if (!editedUser) { return; }
+      editedUser.id = user.id;
       this.userService.update(editedUser)
         .subscribe(() => {
           this.load();
@@ -101,7 +103,7 @@ export class UsersComponent implements OnInit {
 
   private openDialog(user?: UserModel) {
     const dialogRef = this.dialog.open(UserDialogComponent, {
-      width: '270px',
+      width: '370px',
       data: <UserDialogData>{
         user: user ? user : { },
         cities: this.cities

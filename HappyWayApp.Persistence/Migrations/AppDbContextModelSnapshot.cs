@@ -39,16 +39,6 @@ namespace HappyWayApp.Persistence.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("Events");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            Completed = false,
-                            Date = new DateTime(2019, 12, 25, 14, 24, 23, 211, DateTimeKind.Utc).AddTicks(1172),
-                            Name = "Основная группа",
-                            UserId = 1
-                        });
                 });
 
             modelBuilder.Entity("HappyWayApp.Persistence.Entities.EventMember", b =>

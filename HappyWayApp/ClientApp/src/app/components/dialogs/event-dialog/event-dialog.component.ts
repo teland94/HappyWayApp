@@ -22,22 +22,24 @@ export class EventDialogComponent {
 
   form: FormGroup;
   groups: string[];
+  editMode: boolean;
 
   constructor(private readonly dialogRef: MatDialogRef<EventDialogComponent>,
     @Inject(MAT_DIALOG_DATA) private data: EventDialogData,
     private readonly fb: FormBuilder) {
-    const { name, date } = this.data.event;
+    const { id, name, date } = this.data.event;
     this.form = this.fb.group({
-      name: this.fb.control(name, Validators.required),
-      date: this.fb.control(date ? date : new Date(), Validators.required),
+      name: this.fb.control(name),
+      date: this.fb.control(date ? date : new Date()),
       docUrl: this.fb.control('')
     });
     this.groups = this.data.groups;
+    this.editMode = !!id;
   }
 
   submit(form: FormGroup) {
     const { date, name, docUrl } = form.value;
-    const event = <EventModel>{ id: this.data.event.id, date, name };
+    const event = <EventModel>{ date, name };
     this.dialogRef.close(<EventDialogResult>{ event, docUrl });
   }
 }

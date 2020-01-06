@@ -1,4 +1,4 @@
-﻿namespace HappyWayApp.ViewModels
+﻿namespace HappyWayApp.ViewModels.Request
 {
     public class SetEventCompletedModel
     {

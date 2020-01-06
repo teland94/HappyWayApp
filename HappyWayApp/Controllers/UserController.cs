@@ -4,6 +4,7 @@ using HappyWayApp.DTOs;
 using HappyWayApp.Persistence.Helpers;
 using HappyWayApp.Services;
 using HappyWayApp.ViewModels;
+using HappyWayApp.ViewModels.Request;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 

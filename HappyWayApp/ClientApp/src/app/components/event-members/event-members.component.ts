@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import {Component, OnDestroy, OnInit} from '@angular/core';
 import { MatSnackBar, MatSnackBarConfig, MatDialog } from '@angular/material';
 import { EventMemberModel } from '../../models/event-member';
 import { EventMemberService } from '../../services/event-member.service';
@@ -6,22 +6,30 @@ import { BlockUI, NgBlockUI } from 'ng-block-ui';
 import { EventMemberDialogComponent } from '../dialogs/event-member-dialog/event-member-dialog.component';
 import { ActivatedRoute } from '@angular/router';
 import { ConfirmationService } from '../../services/confirmation.service';
+import { EventService } from '../../services/event.service';
+import { Subscription } from 'rxjs';
+import { ImportDataService } from '../../services/import-data.service';
 
 @Component({
   selector: 'app-event-members',
   templateUrl: './event-members.component.html',
   styleUrls: ['./event-members.component.css']
 })
-export class EventMembersComponent implements OnInit {
+export class EventMembersComponent implements OnInit, OnDestroy {
+
+  private eventChangesSubscription: Subscription;
 
   displayedColumns: string[] = ['number', 'name', 'phoneNumber', 'edit', 'delete'];
 
+  eventId: number;
   docUrl: string;
   eventMembers: EventMemberModel[];
 
   @BlockUI() blockUI: NgBlockUI;
 
-  constructor(private readonly eventMemberService: EventMemberService,
+  constructor(private readonly eventService: EventService,
+              private readonly importDataService: ImportDataService,
+              private readonly eventMemberService: EventMemberService,
               private readonly confirmationService: ConfirmationService,
               private readonly snackBar: MatSnackBar,
               private readonly dialog: MatDialog,
@@ -30,26 +38,36 @@ export class EventMembersComponent implements OnInit {
   ngOnInit() {
     const id = this.route.snapshot.paramMap.get('id');
     if (id) {
+      this.eventId = +id;
       this.load(+id);
     } else {
-      this.load();
+      this.eventChangesSubscription = this.eventService.eventChanges.subscribe(event => {
+        if (!event) { return; }
+        this.eventId = event.id;
+        this.load(event.id);
+      });
     }
+  }
+
+  ngOnDestroy() {
+    if (!this.eventChangesSubscription) { return; }
+    this.eventChangesSubscription.unsubscribe();
   }
 
   downloadDocData() {
     this.blockUI.start();
-    this.eventMemberService.downloadDocData(this.docUrl)
+    this.importDataService.downloadDocData(this.eventId, this.docUrl)
       .subscribe(() => {
         this.blockUI.stop();
         this.snackBar.open('Данные успешно загружены.');
-        this.load();
+        this.load(this.eventId);
       }, error => {
         this.blockUI.stop();
         this.showError('Ошибка загрузки данных.', error);
       });
   }
 
-  private load(eventId?: number) {
+  private load(eventId: number) {
     this.blockUI.start();
     this.eventMemberService.sexChanges.subscribe(sex => {
       this.eventMemberService.get(eventId).subscribe(data => {
@@ -65,9 +83,11 @@ export class EventMembersComponent implements OnInit {
   edit(eventMember: EventMemberModel) {
     this.openDialog(eventMember).subscribe(editedEventMember => {
       if (!editedEventMember) { return; }
+      editedEventMember.id = eventMember.id;
+      editedEventMember.eventId = eventMember.eventId;
       this.eventMemberService.update(editedEventMember)
         .subscribe(() => {
-          this.load();
+          this.load(this.eventId);
         }, error => {
           this.showError('Ошибка редактирования участника.', error);
         });
@@ -79,28 +99,16 @@ export class EventMembersComponent implements OnInit {
       if (!data) { return; }
       this.eventMemberService.delete(eventMember.id)
         .subscribe(() => {
-          this.load();
+          this.load(this.eventId);
         }, error => {
           this.showError('Ошибка удаления участника.', error);
         });
     });
   }
 
-  add() {
-    this.openDialog().subscribe(event => {
-      if (!event) { return; }
-      this.eventMemberService.create(event)
-        .subscribe(() => {
-          this.load();
-        }, error => {
-          this.showError('Ошибка добавления участника.', error);
-        });
-    });
-  }
-
   private openDialog(event?: EventMemberModel) {
     const dialogRef = this.dialog.open(EventMemberDialogComponent, {
-      width: '270px',
+      width: '370px',
       data: event ? event : { }
     });
 

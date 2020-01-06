@@ -6,6 +6,7 @@
         <input matInput [matDatepicker]="picker" formControlName="date" placeholder="Дата" required>
         <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
         <mat-datepicker #picker></mat-datepicker>
+        <mat-error app-validation-error [control]="form.get('date')" propertyName="Дата"></mat-error>
       </mat-form-field>
       <mat-form-field>
         <mat-select formControlName="name" placeholder="Название" required cdkFocusInitial>
@@ -13,9 +14,11 @@
             {{group}}
           </mat-option>
         </mat-select>
+        <mat-error app-validation-error [control]="form.get('name')" propertyName="Название"></mat-error>
       </mat-form-field>
-      <mat-form-field>
-        <input matInput type="url" formControlName="docUrl" placeholder="URL документа">
+      <mat-form-field *ngIf="!editMode">
+        <input matInput type="url" formControlName="docUrl" placeholder="URL документа" required>
+        <mat-error app-validation-error [control]="form.get('docUrl')" propertyName="URL документа"></mat-error>
       </mat-form-field>
     </div>
   </mat-dialog-content>

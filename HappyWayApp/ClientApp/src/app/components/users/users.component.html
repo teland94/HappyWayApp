@@ -30,7 +30,8 @@
   <ng-container matColumnDef="delete">
     <th mat-header-cell *matHeaderCellDef></th>
     <td mat-cell *matCellDef="let user">
-      <button *ngIf="user.id !== currentUser.id" mat-icon-button (click)="delete(user)">
+      <button *ngIf="user.id !== currentUser.id && user.role !== role.Admin" mat-icon-button
+        (click)="delete(user)">
         <mat-icon>delete</mat-icon>
       </button>
     </td>

@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
+import {Component, OnDestroy, OnInit, ViewChild, ViewEncapsulation} from '@angular/core';
 import { EventMemberService } from 'src/app/services/event-member.service';
 import { EventMemberCardModel, Sex, CardLikedMember, EventMemberModel } from '../../models/event-member';
 import { MatHorizontalStepper, MatSnackBar, MatStepper, MatSnackBarConfig } from '@angular/material';
@@ -6,7 +6,8 @@ import { StepperSelectionEvent } from '@angular/cdk/stepper';
 import { LikeService } from 'src/app/services/like.service';
 import { LikeModel, SaveLikeModel } from '../../models/like.model';
 import { BlockUI, NgBlockUI } from 'ng-block-ui';
-import { of } from 'rxjs';
+import {of, Subscription} from 'rxjs';
+import {EventService} from '../../services/event.service';
 
 @Component({
   selector: 'app-home',
@@ -14,7 +15,9 @@ import { of } from 'rxjs';
   styleUrls: ['./home.component.css'],
   encapsulation: ViewEncapsulation.None
 })
-export class HomeComponent implements OnInit {
+export class HomeComponent implements OnInit, OnDestroy {
+
+  private eventChangesSubscription: Subscription;
 
   stepper: MatStepper;
 
@@ -30,27 +33,22 @@ export class HomeComponent implements OnInit {
     this.stepper._getIndicatorType = () => 'number';
   }
 
-  constructor(private readonly eventMemberService: EventMemberService,
+  constructor(private readonly eventService: EventService,
+              private readonly eventMemberService: EventMemberService,
               private readonly likeService: LikeService,
               private readonly snackBar: MatSnackBar) {
 
   }
 
   ngOnInit() {
-    this.eventMemberService.sexChanges.subscribe(sex => {
-      this.blockUI.start();
-      this.cardMembers = [];
-      this.eventMemberService.get().subscribe(data => {
-        this.setCardMembers(data, sex);
-        if (this.cardMembers && this.cardMembers.length > 0) {
-          this.setLikedMembers(this.cardMembers[0]);
-        }
-        this.blockUI.stop();
-      }, error => {
-        this.blockUI.stop();
-        this.showError('Ошибка загрузки участников 💔', error);
-      });
+    this.eventChangesSubscription = this.eventService.eventChanges.subscribe(event => {
+      if (!event) { return; }
+      this.load(event.id);
     });
+  }
+
+  ngOnDestroy() {
+    this.eventChangesSubscription.unsubscribe();
   }
 
   selectionChanged(event: StepperSelectionEvent) {
@@ -98,6 +96,23 @@ export class HomeComponent implements OnInit {
       this.snackBar.open('Успешно сохранено ❤');
     }, error => {
       this.showError('Ошибка сохранения 💔', error);
+    });
+  }
+
+  private load(eventId: number) {
+    this.eventMemberService.sexChanges.subscribe(sex => {
+      this.blockUI.start();
+      this.cardMembers = [];
+      this.eventMemberService.get(eventId).subscribe(data => {
+        this.setCardMembers(data, sex);
+        if (this.cardMembers && this.cardMembers.length > 0) {
+          this.setLikedMembers(this.cardMembers[0]);
+        }
+        this.blockUI.stop();
+      }, error => {
+        this.blockUI.stop();
+        this.showError('Ошибка загрузки участников 💔', error);
+      });
     });
   }
 

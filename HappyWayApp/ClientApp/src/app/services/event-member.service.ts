@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import {HttpClient, HttpParams} from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { BehaviorSubject } from 'rxjs';
 import { Sex, EventMemberModel } from '../models/event-member';
 
@@ -15,16 +15,9 @@ export class EventMemberService {
 
   constructor(private httpClient: HttpClient) { }
 
-  get(eventId?: number) {
-    let params = new HttpParams();
-    if (eventId) {
-      params = params.set('eventId', eventId.toString());
-    }
+  get(eventId: number) {
+    const params = new HttpParams().set('eventId', eventId.toString());
     return this.httpClient.get<EventMemberModel[]>(this.baseUrl, { params });
-  }
-
-  downloadDocData(docUrl: string) {
-    return this.httpClient.get('api/ImportData/' + this.getIdFromUrl(docUrl));
   }
 
   create(eventMember: EventMemberModel) {
@@ -41,9 +34,5 @@ export class EventMemberService {
 
   sexChange(sex: Sex) {
     this.sexChangesSource$.next(sex);
-  }
-
-  private getIdFromUrl(url: string) {
-    return url.match(/[-\w]{25,}/);
   }
 }

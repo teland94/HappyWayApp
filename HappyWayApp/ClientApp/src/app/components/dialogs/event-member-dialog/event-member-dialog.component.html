@@ -4,12 +4,15 @@
       <div class="dialog-container">
         <mat-form-field>
           <input matInput type="number" formControlName="number" placeholder="Номер" required>
+          <mat-error app-validation-error [control]="form.get('number')" propertyName="Номер"></mat-error>
         </mat-form-field>
         <mat-form-field>
-          <input matInput formControlName="name" placeholder="Название" required>
+          <input matInput formControlName="name" placeholder="Имя" required>
+          <mat-error app-validation-error [control]="form.get('name')" propertyName="Имя"></mat-error>
         </mat-form-field>
         <mat-form-field>
           <input matInput formControlName="phoneNumber" placeholder="Номер телефона" required>
+          <mat-error app-validation-error [control]="form.get('phoneNumber')" propertyName="Номер телефона"></mat-error>
         </mat-form-field>
       </div>
     </mat-dialog-content>

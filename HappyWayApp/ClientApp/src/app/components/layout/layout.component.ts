@@ -2,8 +2,7 @@ import { AfterViewInit, Component, ViewChild, OnInit } from '@angular/core';
 import { MatDrawer, MatDatepickerInputEvent, MatDialog, MatSnackBarConfig, MatSnackBar } from '@angular/material';
 import { Router } from '@angular/router';
 import { FormControl, Validators } from '@angular/forms';
-import { EventMemberService } from 'src/app/services/event-member.service';
-import { EventService } from 'src/app/services/event.service';
+import { EventService } from '../../services/event.service';
 import { AuthenticationService } from '../../services/authentication.service';
 import { Role, UserModel } from '../../models/user.model';
 import { EventModel } from '../../models/event.model';
@@ -13,6 +12,8 @@ import { concat } from 'rxjs';
 import { DatabaseService } from '../../services/database.service';
 import { BlockUI, NgBlockUI } from 'ng-block-ui';
 import { ConfirmationService } from '../../services/confirmation.service';
+import { map } from 'rxjs/operators';
+import { ImportDataService } from '../../services/import-data.service';
 
 @Component({
   selector: 'app-layout',
@@ -24,6 +25,7 @@ export class LayoutComponent implements OnInit, AfterViewInit {
   @ViewChild('drawer', { static: false }) drawer: MatDrawer;
   @BlockUI() blockUI: NgBlockUI;
 
+  event: EventModel;
   currentUser: UserModel;
   groups: string[];
 
@@ -34,13 +36,17 @@ export class LayoutComponent implements OnInit, AfterViewInit {
               private readonly snackBar: MatSnackBar,
               private readonly eventService: EventService,
               private readonly databaseService: DatabaseService,
-              private readonly eventMemberService: EventMemberService) {
+              private readonly importDataService: ImportDataService) {
     this.authenticationService.currentUser.subscribe(x => this.currentUser = x);
   }
 
   ngOnInit() {
     this.databaseService.getGroups().subscribe(data => {
       this.groups = data;
+    });
+    this.authenticationService.currentUser.subscribe(user => {
+      if (!user) { return; }
+      this.setLastEvent(false);
     });
   }
 
@@ -63,49 +69,69 @@ export class LayoutComponent implements OnInit, AfterViewInit {
       if (!eventDialogResult) { return; }
       const event = eventDialogResult.event;
       event.date = getDateWithTimeZoneOffsetHours(event.date);
-    //   let createEventObs = this.eventService.create(event);
-    //   if (eventDialogResult.docUrl) {
-    //     createEventObs = concat(createEventObs, this.eventMemberService.downloadDocData(eventDialogResult.docUrl));
-    //   }
-    //   createEventObs.subscribe(() => {
-    //       this.router.navigate(['/home']);
-    //     }, error => {
-    //       this.showError('Ошибка добавления мероприятия.', error);
-    //     });
+
       this.blockUI.start();
-      this.eventService.create(event).subscribe(() => {
-        if (eventDialogResult.docUrl) {
-          this.eventMemberService.downloadDocData(eventDialogResult.docUrl).subscribe(() => {
-            this.blockUI.stop();
-            this.router.navigate(['/home']);
-          }, error => {
-            this.blockUI.stop();
-            this.showError('Ошибка добавления мероприятия.', error);
-          });
-        }
+      this.eventService.create(event).subscribe(createdEvent => {
+        this.importDataService.downloadDocData(createdEvent.id, eventDialogResult.docUrl).subscribe(() => {
+          this.blockUI.stop();
+          this.setLastEvent();
+        }, error => {
+          this.blockUI.stop();
+          this.showError('Ошибка добавления мероприятия.', error);
+        });
       }, error => {
         this.blockUI.stop();
         this.showError('Ошибка добавления мероприятия.', error);
       });
     });
-
   }
 
-  logout() {
+  shutdown() {
     this.confirmationService.openConfirmDialogWithPassword('завершить работу').subscribe(data => {
       if (!data) { return; }
+      if (!this.event) {
+        this.logout();
+        return;
+      }
       this.blockUI.start();
-      this.eventService.setCompleted(0, true).subscribe(() => {
-        this.authenticationService.logout();
-        this.router.navigate(['/login']).then(() => {
-          this.blockUI.stop();
-          this.snackBar.open('Благодарим, что были сегодня с нами ❤');
-        });
+      this.eventService.setCompleted(this.event.id, true).subscribe(() => {
+        this.logout();
       }, error => {
         this.blockUI.stop();
         this.showError('Ошибка завершения работы.', error);
       });
     });
+  }
+
+  private logout() {
+    this.event = null;
+    this.eventService.setCurrentEvent(null);
+    this.authenticationService.logout();
+    this.router.navigate(['/login']).then(() => {
+      this.blockUI.stop();
+      this.snackBar.open('Благодарим, что были сегодня с нами ❤');
+    });
+  }
+
+  private setLastEvent(navigate = true) {
+    this.blockUI.start();
+    this.eventService.getLastEvent()
+      .pipe(map(event => {
+        if (!event) { return; }
+        this.event = event;
+        this.eventService.setCurrentEvent(event);
+      }))
+      .subscribe(() => {
+        this.blockUI.stop();
+        if (navigate) {
+          this.drawer.close();
+          this.router.navigate(['/home']);
+        }
+      }, error => {
+        this.blockUI.stop();
+        if (error.status === 404) { return; }
+        this.showError('Ошибка установки мероприятия.', error);
+      });
   }
 
   private openDialog(event?: EventModel) {

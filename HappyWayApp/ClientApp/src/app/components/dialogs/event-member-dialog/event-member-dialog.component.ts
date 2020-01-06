@@ -27,8 +27,6 @@ export class EventMemberDialogComponent implements OnInit {
 
   submit(form: FormGroup) {
     const eventMember = form.value as EventMemberModel;
-    eventMember.id = this.eventMember.id;
-    eventMember.eventId = this.eventMember.eventId;
     this.dialogRef.close(eventMember);
   }
 }

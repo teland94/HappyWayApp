@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using HappyWayApp.Persistence;
 using HappyWayApp.Persistence.Entities;
 using HappyWayApp.ViewModels;
+using HappyWayApp.ViewModels.Request;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;

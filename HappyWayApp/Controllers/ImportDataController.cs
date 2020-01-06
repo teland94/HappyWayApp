@@ -9,6 +9,7 @@ using Google.Apis.Services;
 using Google.Apis.Sheets.v4;
 using Google.Apis.Util.Store;
 using HappyWayApp.Configuration;
+using HappyWayApp.DTOs;
 using HappyWayApp.Persistence;
 using HappyWayApp.Persistence.Entities;
 using HappyWayApp.ViewModels;
@@ -25,9 +26,6 @@ namespace HappyWayApp.Controllers
     [ApiController]
     public class ImportDataController : ControllerBase
     {
-        private static readonly string[] Scopes = { SheetsService.Scope.SpreadsheetsReadonly };
-        private const string ApplicationName = "HappyWay App";
-
         private readonly AppDbContext _context;
         private readonly GoogleSheetsSettings _googleSheetsSettings;
 
@@ -38,8 +36,8 @@ namespace HappyWayApp.Controllers
             _googleSheetsSettings = googleSheetsOptions.Value;
         }
 
-        [HttpGet("{spreadsheetId}")]
-        public async Task<IActionResult> Get(string spreadsheetId)
+        [HttpGet("{eventId}/{spreadsheetId}")]
+        public async Task<IActionResult> Get(int eventId, string spreadsheetId)
         {
             const string femaleRange = "A3:E";
             const string maleRange = "L3:P";
@@ -47,24 +45,20 @@ namespace HappyWayApp.Controllers
             var femaleMembers = await GetDocData(spreadsheetId, femaleRange);
             var maleMembers = await GetDocData(spreadsheetId, maleRange);
 
-            await AddMembersAsync(femaleMembers, Sex.Female);
-            await AddMembersAsync(maleMembers, Sex.Male);
+            await AddMembersAsync(femaleMembers, eventId, Sex.Female);
+            await AddMembersAsync(maleMembers, eventId, Sex.Male);
 
             return Ok();
         }
 
-        private async Task AddMembersAsync(IEnumerable<EventMemberDocInfo> docMembers, Sex sex)
+        private async Task AddMembersAsync(IEnumerable<EventMemberDocInfoDto> docMembers, int eventId, Sex sex)
         {
-            var lastEvent = await _context.Events
-                .OrderByDescending(e => e.Date)
-                .FirstOrDefaultAsync();
-
             foreach (var docMember in docMembers)
             {
                 var dbMember = await _context.EventMembers
                     .FirstOrDefaultAsync(m => m.Number == docMember.Number 
                                               && m.Sex == sex
-                                              && m.EventId == lastEvent.Id);
+                                              && m.EventId == eventId);
                 if (dbMember != null)
                 {
                     dbMember.Number = docMember.Number;
@@ -79,7 +73,7 @@ namespace HappyWayApp.Controllers
                         Name = docMember.Name.Trim(),
                         Sex = sex,
                         PhoneNumber = docMember.PhoneNumber.Trim(),
-                        EventId = lastEvent.Id
+                        EventId = eventId
                     };
                     await _context.EventMembers.AddAsync(member);
                 }
@@ -87,7 +81,7 @@ namespace HappyWayApp.Controllers
             await _context.SaveChangesAsync();
         }
 
-        private async Task<IEnumerable<EventMemberDocInfo>> GetDocData(string spreadsheetId, string range)
+        private async Task<IEnumerable<EventMemberDocInfoDto>> GetDocData(string spreadsheetId, string range)
         {
             var service = GetService(_googleSheetsSettings.ApiKey);
 
@@ -97,7 +91,7 @@ namespace HappyWayApp.Controllers
             var response = await request.ExecuteAsync();
             var values = response.Values;
 
-            var members = values.Select(row => new EventMemberDocInfo
+            var members = values.Select(row => new EventMemberDocInfoDto
             {
                 Number = Convert.ToInt32(row[2]),
                 Name = row[3].ToString(),

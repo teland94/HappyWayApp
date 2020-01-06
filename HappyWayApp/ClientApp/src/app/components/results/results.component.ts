@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { EventMemberService } from 'src/app/services/event-member.service';
 import { ResultMemberModel, EventMemberModel, ResultLikedMemberModel, Sex } from '../../models/event-member';
 import { DomSanitizer } from '@angular/platform-browser';
@@ -7,17 +7,19 @@ import { LikeModel } from '../../models/like.model';
 import { BlockUI, NgBlockUI } from 'ng-block-ui';
 import { MatSnackBar } from '@angular/material';
 import { map } from 'rxjs/operators';
-import { concat } from 'rxjs';
+import { concat, Subscription } from 'rxjs';
 import { ClipboardService } from 'ngx-clipboard';
 import { EventService } from 'src/app/services/event.service';
 import { EventModel } from 'src/app/models/event.model';
+import { getDateText } from '../../utilities';
+import { CdkTextareaAutosize } from '@angular/cdk/text-field';
 
 @Component({
   selector: 'app-results',
   templateUrl: './results.component.html',
   styleUrls: ['./results.component.css']
 })
-export class ResultsComponent implements OnInit {
+export class ResultsComponent implements OnInit, OnDestroy {
 
   private readonly matchedText = 'Здравствуйте, на "Быстрых свиданиях {{date}} в Арт-кафе «Пластилиновая ворона»" у Вас взаимные симпатии с:';
   private readonly nonMatchedText = 'Здравствуйте, на "Быстрых свиданиях {{date}} в Арт-кафе «Пластилиновая ворона»" у Вас симпатии, к сожалению, не совпали.';
@@ -34,6 +36,8 @@ https://www.facebook.com/happyway.club
 Наш инстаграм: http://instagram.com/happyway.date/`;
   private readonly thanksText = 'Спасибо, что были с нами)';
 
+  private eventChangesSubscription: Subscription;
+
   @BlockUI() blockUI: NgBlockUI;
 
   event: EventModel;
@@ -48,37 +52,15 @@ https://www.facebook.com/happyway.club
               private readonly clipboardService: ClipboardService) { }
 
   ngOnInit() {
-    concat(this.setLastEvent(), this.eventMemberService.sexChanges)
-    .subscribe(value => {
-      if (typeof value === 'undefined') { return; }
-      const sex = value as Sex;
-      this.blockUI.start();
-      this.eventMemberService.get().subscribe(data => {
-        this.members = data;
-        const sexMembers = data.filter(m => m.sex === sex);
-
-        this.resultMembers = [];
-        const setResultObs = sexMembers.map(m => this.getResultData(m));
-        concat(...setResultObs).subscribe(resultMember => {
-          this.resultMembers.push(resultMember);
-          this.blockUI.stop();
-        }, error => {
-          this.blockUI.stop();
-          console.log('Load members error', error);
-          this.snackBar.open('Ошибка загрузки результатов участников 💔');
-        });
-
-        this.blockUI.stop();
-      }, error => {
-        this.blockUI.stop();
-        console.log('Load members error', error);
-        this.snackBar.open('Ошибка загрузки участиков 💔');
-      });
+    this.eventChangesSubscription = this.eventService.eventChanges.subscribe(event => {
+      if (!event) { return; }
+      this.event = event;
+      this.load(event.id);
     });
   }
 
-  getLinesCount(str: string) {
-    return str.split(/\r\n|\r|\n/).length;
+  ngOnDestroy() {
+    this.eventChangesSubscription.unsubscribe();
   }
 
   getViberUrl(phoneNumber: string) {
@@ -105,18 +87,45 @@ https://www.facebook.com/happyway.club
     }));
   }
 
+  private load(eventId: number) {
+    this.eventMemberService.sexChanges.subscribe(sex => {
+      this.blockUI.start();
+      this.eventMemberService.get(eventId).subscribe(data => {
+        this.members = data;
+        const sexMembers = data.filter(m => m.sex === sex);
+
+        this.resultMembers = [];
+        const setResultObs = sexMembers.map(m => this.getResultData(m));
+        concat(...setResultObs).subscribe(resultMember => {
+          this.resultMembers.push(resultMember);
+          this.blockUI.stop();
+        }, error => {
+          this.blockUI.stop();
+          console.log('Load members error', error);
+          this.snackBar.open('Ошибка загрузки результатов участников 💔');
+        });
+
+        this.blockUI.stop();
+      }, error => {
+        this.blockUI.stop();
+        console.log('Load members error', error);
+        this.snackBar.open('Ошибка загрузки участиков 💔');
+      });
+    });
+  }
+
   private getResultText(member: EventMemberModel, likes: LikeModel[]) {
     const { matched, liked } = this.getResults(member, likes);
 
     let resText = '';
     if (matched && matched.length > 0) {
-      resText = `${this.matchedText.replace('{{date}}', this.getDateText(this.event.date))}\n\n`;
+      resText = `${this.matchedText.replace('{{date}}', getDateText(this.event.date))}\n\n`;
       const matchedMembers = this.getLikedMembers(matched);
       matchedMembers.forEach(m => {
         resText += `${this.getMemberText(m)}\n`;
       });
     } else {
-      resText = `${this.nonMatchedText.replace('{{date}}', this.getDateText(this.event.date))}\n`;
+      resText = `${this.nonMatchedText.replace('{{date}}', getDateText(this.event.date))}\n`;
     }
     if (liked && liked.length > 0) {
       resText += `\n${this.likedText}\n\n`;
@@ -158,29 +167,5 @@ https://www.facebook.com/happyway.club
       && !matched.some(m => m === l.sourceMemberId))
       .map(l => l.sourceMemberId);
     return { matched, liked };
-  }
-
-  private setLastEvent() {
-    return this.eventService.get()
-      .pipe(map(events => {
-        if (!events || events.length === 0) { return; }
-        const event = events[0];
-        if (event) {
-          event.date = new Date(event.date);
-        }
-        this.event = event;
-      }));
-  }
-
-  private getDateText(date: Date) {
-    let dd: number | string = date.getDate();
-    let mm: number | string = date.getMonth() + 1;
-    if (dd < 10) {
-      dd = '0' + dd;
-    }
-    if (mm < 10) {
-      mm = '0' + mm;
-    }
-    return `${dd}.${mm}`;
   }
 }

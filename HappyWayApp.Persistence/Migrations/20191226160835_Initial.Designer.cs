@@ -9,7 +9,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace HappyWayApp.Persistence.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20191225142423_Initial")]
+    [Migration("20191226160835_Initial")]
     partial class Initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -41,16 +41,6 @@ namespace HappyWayApp.Persistence.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("Events");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            Completed = false,
-                            Date = new DateTime(2019, 12, 25, 14, 24, 23, 211, DateTimeKind.Utc).AddTicks(1172),
-                            Name = "Основная группа",
-                            UserId = 1
-                        });
                 });
 
             modelBuilder.Entity("HappyWayApp.Persistence.Entities.EventMember", b =>

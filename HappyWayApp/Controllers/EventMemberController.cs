@@ -26,32 +26,18 @@ namespace HappyWayApp.Controllers
 
         // GET: api/EventMember
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<EventMember>>> GetEventMembers(int? eventId)
+        public async Task<ActionResult<IEnumerable<EventMember>>> GetEventMembers(int eventId)
         {
-            int eId;
-            if (eventId != null)
-            {
-                eId = eventId.Value;
-            }
-            else
-            {
-                var lastEvent = await _context.Events
-                    .OrderByDescending(e => e.Date)
-                    .FirstOrDefaultAsync();
-                eId = lastEvent.Id;
-            }
-
-            var members = await _context.EventMembers
-                .Where(m => m.EventId == eId)
-                .OrderBy(m => m.Number)
-                .ToListAsync();
+            var members = _context.EventMembers.Where(m => m.EventId == eventId);
 
             foreach (var eventMember in members)
             {
                 eventMember.Event = null;
             }
 
-            return members;
+            return await members
+                .OrderBy(m => m.Number)
+                .ToListAsync();
         }
 
         // GET: api/EventMember/5

@@ -3,8 +3,7 @@
     <mat-card-title>{{result.member.number}}. {{result.member.name}}
       <a href="javasript:void(0);" (click)="copy(result.member.phoneNumber)">({{result.member.phoneNumber}})</a></mat-card-title>
     <mat-card-content>
-      <textarea matInput #resultTextArea
-        [rows]="10" readonly>{{result.text}}</textarea>
+      <textarea matInput #resultTextArea cdkTextareaAutosize readonly>{{result.text}}</textarea>
     </mat-card-content>
     <mat-card-actions align="end">
       <button mat-icon-button [ngxClipboard]="resultTextArea">

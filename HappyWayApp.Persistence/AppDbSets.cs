@@ -99,17 +99,6 @@ namespace HappyWayApp.Persistence
                         RoleId = 2
                     }
                 );
-
-            modelBuilder.Entity<Event>()
-                .HasData(
-                    new Event
-                    {
-                        Id = 1,
-                        Date = DateTime.UtcNow,
-                        Name = "Основная группа",
-                        UserId = 1
-                    }
-                );
         }
     }
 }

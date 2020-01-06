@@ -1,6 +1,6 @@
-﻿namespace HappyWayApp.ViewModels
+﻿namespace HappyWayApp.DTOs
 {
-    public class EventMemberDocInfo
+    public class EventMemberDocInfoDto
     {
         public int Number { get; set; }
 

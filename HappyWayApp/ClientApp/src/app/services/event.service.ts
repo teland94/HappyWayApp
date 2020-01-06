@@ -11,15 +11,42 @@ export class EventService {
 
   private baseUrl = 'api/event';
 
+  private eventChanges$ = new BehaviorSubject<EventModel>(null);
+  eventChanges = this.eventChanges$.asObservable();
+
   constructor(private httpClient: HttpClient) {
   }
 
   get() {
-    return this.httpClient.get<EventModel[]>(this.baseUrl);
+    return this.httpClient.get<EventModel[]>(this.baseUrl)
+      .pipe(map(events => {
+        events.forEach(e => e.date = new Date(e.date));
+        return events;
+      }));
+  }
+
+  getById(id: number) {
+    return this.httpClient.get<EventModel>(this.baseUrl + '/' + id)
+      .pipe(map(e => {
+        e.date = new Date(e.date);
+        return e;
+      }));
+  }
+
+  getLastEvent() {
+    return this.httpClient.get<EventModel>(this.baseUrl + '/GetLastEvent')
+      .pipe(map(e => {
+        e.date = new Date(e.date);
+        return e;
+      }));
   }
 
   create(event: EventModel) {
-    return this.httpClient.post(this.baseUrl, event);
+    return this.httpClient.post<EventModel>(this.baseUrl, event)
+      .pipe(map(e => {
+        e.date = new Date(e.date);
+        return e;
+      }));
   }
 
   update(event: EventModel) {
@@ -32,5 +59,9 @@ export class EventService {
 
   delete(id: number) {
     return this.httpClient.delete(this.baseUrl + '/' + id);
+  }
+
+  setCurrentEvent(event: EventModel) {
+    this.eventChanges$.next(event);
   }
 }

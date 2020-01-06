@@ -7,7 +7,10 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using HappyWayApp.Persistence;
 using HappyWayApp.Persistence.Entities;
+using HappyWayApp.Persistence.Helpers;
 using HappyWayApp.ViewModels;
+using HappyWayApp.ViewModels.Request;
+using HappyWayApp.ViewModels.Response;
 using Microsoft.AspNetCore.Authorization;
 
 namespace HappyWayApp.Controllers
@@ -24,20 +27,62 @@ namespace HappyWayApp.Controllers
             _context = context;
         }
 
-        // GET: api/Event
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Event>>> GetEvents()
+        public async Task<ActionResult<IEnumerable<EventModel>>> GetEvents()
         {
-            return await _context.Events
+            var userId = Convert.ToInt32(User.Identity.Name);
+            var events = _context.Events.AsQueryable();
+            events = User.IsInRole(Constants.Strings.Roles.Admin) 
+                ? events.Include(u => u.User)
+                : events.Where(e => e.UserId == userId && !e.Completed);
+            return await events
                 .OrderByDescending(e => e.Date)
+                .Select(e => new EventModel
+                {
+                    Id = e.Id,
+                    Date = e.Date,
+                    Name = e.Name,
+                    Completed = e.Completed,
+                    User = e.User.DisplayName
+                })
                 .ToListAsync();
         }
 
-        // GET: api/Event/5
         [HttpGet("{id}")]
         public async Task<ActionResult<Event>> GetEvent(int id)
         {
+            var userId = Convert.ToInt32(User.Identity.Name);
             var @event = await _context.Events.FindAsync(id);
+
+            if (@event == null)
+            {
+                return NotFound();
+            }
+
+            if (userId != @event.UserId && !@event.Completed 
+                                        && !User.IsInRole(Constants.Strings.Roles.Admin))
+            {
+                return Forbid();
+            }
+
+            return @event;
+        }
+
+        [HttpGet(nameof(GetLastEvent))]
+        public async Task<ActionResult<Event>> GetLastEvent()
+        {
+            var userId = Convert.ToInt32(User.Identity.Name);
+
+            var query = _context.Events.Where(e => !e.Completed);
+
+            if (!User.IsInRole(Constants.Strings.Roles.Admin))
+            {
+                query = query.Where(e => e.UserId == userId);
+            }
+
+            var @event = await query
+                .OrderByDescending(e => e.Date)
+                .FirstOrDefaultAsync();
 
             if (@event == null)
             {
@@ -47,9 +92,6 @@ namespace HappyWayApp.Controllers
             return @event;
         }
 
-        // PUT: api/Event/5
-        // To protect from overposting attacks, please enable the specific properties you want to bind to, for
-        // more details see https://aka.ms/RazorPagesCRUD.
         [HttpPut("{id}")]
         public async Task<IActionResult> PutEvent(int id, Event @event)
         {
@@ -58,7 +100,17 @@ namespace HappyWayApp.Controllers
                 return BadRequest();
             }
 
+            var userId = Convert.ToInt32(User.Identity.Name);
+            var eventUserId = await _context.Events
+                .Select(e => e.UserId)
+                .FirstOrDefaultAsync(uId => uId == userId);
+            if (userId != eventUserId && !User.IsInRole(Constants.Strings.Roles.Admin))
+            {
+                return Forbid();
+            }
+
             _context.Entry(@event).State = EntityState.Modified;
+            _context.Entry(@event).Property(p => p.UserId).IsModified = false;
 
             try
             {
@@ -82,15 +134,11 @@ namespace HappyWayApp.Controllers
         [HttpPatch("SetCompleted/{id}")]
         public async Task<IActionResult> SetCompleted(int id, SetEventCompletedModel model)
         {
-            //var @event = await _context.Events.FindAsync(id);
-            //if (@event == null)
-            //{
-            //    return NotFound();
-            //}
-
-            var @event = await _context.Events
-                .OrderByDescending(e => e.Date)
-                .FirstOrDefaultAsync();
+            var @event = await _context.Events.FindAsync(id);
+            if (@event == null)
+            {
+                return NotFound();
+            }
 
             @event.Completed = model.Completed;
 
@@ -99,9 +147,6 @@ namespace HappyWayApp.Controllers
             return NoContent();
         }
 
-        // POST: api/Event
-        // To protect from overposting attacks, please enable the specific properties you want to bind to, for
-        // more details see https://aka.ms/RazorPagesCRUD.
         [HttpPost]
         public async Task<ActionResult<Event>> PostEvent(Event @event)
         {
@@ -112,7 +157,7 @@ namespace HappyWayApp.Controllers
             return CreatedAtAction("GetEvent", new { id = @event.Id }, @event);
         }
 
-        // DELETE: api/Event/5
+        [Authorize(Roles = Constants.Strings.Roles.Admin)]
         [HttpDelete("{id}")]
         public async Task<ActionResult<Event>> DeleteEvent(int id)
         {

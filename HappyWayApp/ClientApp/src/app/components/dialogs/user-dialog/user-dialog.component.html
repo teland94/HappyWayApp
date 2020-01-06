@@ -2,13 +2,13 @@
   <h1 mat-dialog-title>Хостес</h1>
   <mat-dialog-content>
     <div class="dialog-container">
-      <!--  fake fields are a workaround for chrome/opera autofill getting the wrong fields -->
       <mat-form-field>
-        <input matInput formControlName="username" placeholder="Имя" required autocomplete="nope">
+        <input matInput formControlName="username" placeholder="Имя пользователя" autocomplete="nope">
+        <mat-error app-validation-error [control]="form.get('username')" propertyName="Имя пользователя"></mat-error>
       </mat-form-field>
       <mat-form-field>
-        <input matInput type="password" formControlName="password" placeholder="Пароль" autocomplete="new-password"
-               [required]="!editMode">
+        <input matInput type="password" formControlName="password" placeholder="Пароль" autocomplete="new-password">
+        <mat-error app-validation-error [control]="form.get('password')" propertyName="Пароль"></mat-error>
       </mat-form-field>
       <mat-form-field>
         <input matInput formControlName="displayName" placeholder="ФИО">

@@ -19,7 +19,14 @@ import { HomeComponent } from './components/home/home.component';
 import { ResultsComponent } from './components/results/results.component';
 import { EventsComponent } from './components/events/events.component';
 import { SexSelectComponent } from './components/sex-select/sex-select.component';
-import { MAT_SNACK_BAR_DEFAULT_OPTIONS, MAT_DATE_LOCALE, DateAdapter } from '@angular/material';
+import { ValidationErrorComponent } from './components/validation-error/validation-error.component';
+import {
+  MAT_SNACK_BAR_DEFAULT_OPTIONS,
+  MAT_DATE_LOCALE,
+  DateAdapter,
+  ErrorStateMatcher,
+  ShowOnDirtyErrorStateMatcher
+} from '@angular/material';
 import { EventDialogComponent } from './components/dialogs/event-dialog/event-dialog.component';
 import { ConfirmationDialogComponent } from './components/dialogs/confirmation-dialog/confirmation-dialog.component';
 import { CustomDateAdapter } from './custom-date-adapter';
@@ -38,6 +45,7 @@ registerLocaleData(localeRu, 'ru');
     LayoutComponent,
     HomeComponent,
     SexSelectComponent,
+    ValidationErrorComponent,
     EventsComponent,
     EventDialogComponent,
     EventMemberDialogComponent,
@@ -73,6 +81,7 @@ registerLocaleData(localeRu, 'ru');
     { provide: DateAdapter, useClass: CustomDateAdapter },
     { provide: HTTP_INTERCEPTORS, useClass: JwtInterceptor, multi: true },
     { provide: HTTP_INTERCEPTORS, useClass: ErrorInterceptor, multi: true },
+    { provide: ErrorStateMatcher, useClass: ShowOnDirtyErrorStateMatcher }
   ],
   bootstrap: [AppComponent]
 })

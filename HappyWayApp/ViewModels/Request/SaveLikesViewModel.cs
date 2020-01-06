@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace HappyWayApp.ViewModels
+namespace HappyWayApp.ViewModels.Request
 {
     public class SaveLikesViewModel
     {

@@ -11,7 +11,7 @@ import { of } from 'rxjs';
 })
 export class ConfirmationService {
 
-  private readonly dialogWidth = '350px';
+  private readonly dialogWidth = '370px';
 
   private passwordDialogRef: MatDialogRef<PasswordPromptDialogComponent, any>;
 
