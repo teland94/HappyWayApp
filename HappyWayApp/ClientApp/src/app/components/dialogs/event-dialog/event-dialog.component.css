@@ -1,3 +1,7 @@
+.dialog-container {
+  overflow: hidden;
+}
+
 .dialog-container > * {
   width: 100%;
 }

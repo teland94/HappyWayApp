@@ -42,7 +42,10 @@ export class EventMembersComponent implements OnInit, OnDestroy {
       this.load(+id);
     } else {
       this.eventChangesSubscription = this.eventService.eventChanges.subscribe(event => {
-        if (!event) { return; }
+        if (!event) {
+          this.eventId = null;
+          return;
+        }
         this.eventId = event.id;
         this.load(event.id);
       });
@@ -58,6 +61,7 @@ export class EventMembersComponent implements OnInit, OnDestroy {
     this.blockUI.start();
     this.importDataService.downloadDocData(this.eventId, this.docUrl)
       .subscribe(() => {
+        this.docUrl = null;
         this.blockUI.stop();
         this.snackBar.open('Данные успешно загружены.');
         this.load(this.eventId);

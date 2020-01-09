@@ -1,24 +1,27 @@
-import { Component, OnInit } from '@angular/core';
+import {Component, OnDestroy, OnInit} from '@angular/core';
 import { EventService } from '../../services/event.service';
 import { EventModel } from '../../models/event.model';
-import { MatSnackBar, MatSnackBarConfig, MatDialog } from '@angular/material';
+import {MatSnackBar, MatSnackBarConfig, MatDialog, MatSlideToggleChange, MatRadioChange} from '@angular/material';
 import { EventDialogComponent, EventDialogData } from '../dialogs/event-dialog/event-dialog.component';
 import { Router } from '@angular/router';
-import { forkJoin } from 'rxjs';
+import {forkJoin, Subscription} from 'rxjs';
 import { DatabaseService } from '../../services/database.service';
 import { BlockUI, NgBlockUI } from 'ng-block-ui';
 import { ConfirmationService } from '../../services/confirmation.service';
 import { getDateWithTimeZoneOffsetHours } from '../../utilities';
 import { ImportDataService } from '../../services/import-data.service';
+import {map} from 'rxjs/operators';
 
 @Component({
   selector: 'app-events',
   templateUrl: './events.component.html',
   styleUrls: ['./events.component.css']
 })
-export class EventsComponent implements OnInit {
+export class EventsComponent implements OnInit, OnDestroy {
 
-  displayedColumns: string[] = ['name', 'date', 'user', 'edit', 'delete'];
+  private eventChangesSubscription: Subscription;
+
+  displayedColumns: string[] = ['name', 'date', 'user', 'active', 'edit', 'delete'];
   @BlockUI() blockUI: NgBlockUI;
 
   events: EventModel[];
@@ -34,7 +37,14 @@ export class EventsComponent implements OnInit {
               private readonly router: Router) { }
 
   ngOnInit() {
+    this.eventChangesSubscription = this.eventService.eventChanges.subscribe(event => {
+      this.currentEvent = event;
+    });
     this.load();
+  }
+
+  ngOnDestroy() {
+    this.eventChangesSubscription.unsubscribe();
   }
 
   edit(event: EventModel) {
@@ -57,7 +67,10 @@ export class EventsComponent implements OnInit {
       if (!data) { return; }
       this.eventService.delete(event.id)
         .subscribe(() => {
-          this.load();
+          this.events = this.events.filter(ev => ev.id !== event.id);
+          if (this.currentEvent && this.currentEvent.id === event.id) {
+            this.setLastEvent();
+          }
         }, error => {
           this.showError('Ошибка удаления мероприятия.', error);
         });
@@ -77,7 +90,8 @@ export class EventsComponent implements OnInit {
           this.load();
         }, error => {
           this.blockUI.stop();
-          this.showError('Ошибка добавления мероприятия.', error);
+          this.showError('Ошибка загрузки данных.', error);
+          this.load();
         });
       }, error => {
         this.blockUI.stop();
@@ -87,7 +101,27 @@ export class EventsComponent implements OnInit {
   }
 
   eventClick(event: EventModel) {
+    if (event.completed) { return; }
     this.router.navigate(['/event', event.id]);
+  }
+
+  eventToggle(change: MatSlideToggleChange, event: EventModel) {
+    this.eventService.setCompleted(event.id, !change.checked).subscribe(() => {
+      event.completed = !change.checked;
+      if (!this.currentEvent && !event.completed) {
+        this.eventService.setCurrentEvent(event);
+      }
+      if (event.completed) {
+        this.setLastEvent();
+      }
+    }, error => {
+      this.showError('Ошибка изменения статуса мероприятия.', error);
+    });
+  }
+
+  currentEventChange(change: MatRadioChange) {
+    const event = change.value;
+    this.eventService.setCurrentEvent(event);
   }
 
   private load() {
@@ -95,7 +129,14 @@ export class EventsComponent implements OnInit {
     forkJoin([this.eventService.get(), this.databaseService.getGroups()])
       .subscribe(([events, groups]) => {
         this.events = events;
-        this.setLastEvent();
+        if (this.currentEvent) {
+          this.currentEvent = events.find(ev => ev.id === this.currentEvent.id);
+        }
+        if (!this.currentEvent
+          || this.currentEvent.completed
+          || (this.currentEvent && this.events.findIndex(ev => !ev.completed) === -1)) {
+          this.setLastEvent();
+        }
         this.groups = groups;
         this.blockUI.stop();
       }, error => {
@@ -105,9 +146,12 @@ export class EventsComponent implements OnInit {
   }
 
   private setLastEvent() {
-    const event = this.events[0];
-    if (event) {
+    const nonCompletedEvents = this.events.filter(ev => !ev.completed);
+    if (nonCompletedEvents && nonCompletedEvents.length > 0) {
+      const event = nonCompletedEvents[0];
       this.eventService.setCurrentEvent(event);
+    } else {
+      this.eventService.setCurrentEvent(null);
     }
   }
 
@@ -116,8 +160,14 @@ export class EventsComponent implements OnInit {
       width: '370px',
       data: <EventDialogData>{
         event: event ? event : { },
-        groups: this.groups
+        groups: this.groups,
+        completedControlVisible: true,
+        eventActive: this.currentEvent && event && this.currentEvent.id === event.id
       }
+    });
+
+    dialogRef.componentInstance.onSetDefault.subscribe(ev => {
+      this.eventService.setCurrentEvent(ev);
     });
 
     return dialogRef.afterClosed();

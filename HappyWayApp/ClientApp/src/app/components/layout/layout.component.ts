@@ -46,7 +46,19 @@ export class LayoutComponent implements OnInit, AfterViewInit {
     });
     this.authenticationService.currentUser.subscribe(user => {
       if (!user) { return; }
-      this.setLastEvent(false);
+      this.eventService.getEventFromStorage()
+        .subscribe(event => {
+          this.event = event;
+          this.eventService.setCurrentEvent(event);
+          this.blockUI.stop();
+        }, error => {
+          this.blockUI.stop();
+          if (error.status === 403 || error.status === 404) {
+            this.setLastEvent();
+            return;
+          }
+          this.showError('Ошибка установки мероприятия.', error);
+        });
     });
   }
 
@@ -74,10 +86,11 @@ export class LayoutComponent implements OnInit, AfterViewInit {
       this.eventService.create(event).subscribe(createdEvent => {
         this.importDataService.downloadDocData(createdEvent.id, eventDialogResult.docUrl).subscribe(() => {
           this.blockUI.stop();
-          this.setLastEvent();
+          this.setLastEvent('/home');
         }, error => {
           this.blockUI.stop();
-          this.showError('Ошибка добавления мероприятия.', error);
+          this.setLastEvent('/event-members');
+          this.showError('Ошибка загрузки данных.', error);
         });
       }, error => {
         this.blockUI.stop();
@@ -113,19 +126,16 @@ export class LayoutComponent implements OnInit, AfterViewInit {
     });
   }
 
-  private setLastEvent(navigate = true) {
+  private setLastEvent(navigateCommand?: string) {
     this.blockUI.start();
     this.eventService.getLastEvent()
-      .pipe(map(event => {
-        if (!event) { return; }
+      .subscribe(event => {
         this.event = event;
         this.eventService.setCurrentEvent(event);
-      }))
-      .subscribe(() => {
         this.blockUI.stop();
-        if (navigate) {
+        if (navigateCommand) {
           this.drawer.close();
-          this.router.navigate(['/home']);
+          this.router.navigate([navigateCommand]);
         }
       }, error => {
         this.blockUI.stop();

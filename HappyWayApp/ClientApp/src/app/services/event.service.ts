@@ -1,8 +1,10 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { EventModel } from '../models/event.model';
-import { BehaviorSubject } from 'rxjs';
-import { map } from 'rxjs/operators';
+import {BehaviorSubject, of} from 'rxjs';
+import {catchError, map} from 'rxjs/operators';
+
+const CurrentEventIdKey = 'CurrentEventId';
 
 @Injectable({
   providedIn: 'root'
@@ -25,16 +27,21 @@ export class EventService {
       }));
   }
 
-  getById(id: number) {
-    return this.httpClient.get<EventModel>(this.baseUrl + '/' + id)
+  getEventFromStorage() {
+    const eventId = localStorage.getItem(CurrentEventIdKey);
+    return eventId ? this.getById(+eventId) : of(null);
+  }
+
+  getLastEvent() {
+    return this.httpClient.get<EventModel>(this.baseUrl + '/GetLastEvent')
       .pipe(map(e => {
         e.date = new Date(e.date);
         return e;
       }));
   }
 
-  getLastEvent() {
-    return this.httpClient.get<EventModel>(this.baseUrl + '/GetLastEvent')
+  getById(id: number) {
+    return this.httpClient.get<EventModel>(this.baseUrl + '/' + id)
       .pipe(map(e => {
         e.date = new Date(e.date);
         return e;
@@ -63,5 +70,10 @@ export class EventService {
 
   setCurrentEvent(event: EventModel) {
     this.eventChanges$.next(event);
+    if (event) {
+      localStorage.setItem(CurrentEventIdKey, event.id.toString());
+    } else {
+      localStorage.removeItem(CurrentEventIdKey);
+    }
   }
 }

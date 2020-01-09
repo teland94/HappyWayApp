@@ -3,4 +3,5 @@ export class EventModel {
   name: string;
   date: Date;
   userId: number;
+  completed: boolean;
 }

@@ -59,8 +59,8 @@ namespace HappyWayApp.Controllers
                 return NotFound();
             }
 
-            if (userId != @event.UserId && !@event.Completed 
-                                        && !User.IsInRole(Constants.Strings.Roles.Admin))
+            if (userId != @event.UserId && !User.IsInRole(Constants.Strings.Roles.Admin)
+                || @event.Completed)
             {
                 return Forbid();
             }

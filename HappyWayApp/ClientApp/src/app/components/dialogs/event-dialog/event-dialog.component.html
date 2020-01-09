@@ -20,10 +20,13 @@
         <input matInput type="url" formControlName="docUrl" placeholder="URL документа" required>
         <mat-error app-validation-error [control]="form.get('docUrl')" propertyName="URL документа"></mat-error>
       </mat-form-field>
+      <mat-slide-toggle *ngIf="completedControlVisible" formControlName="enabled">Включить</mat-slide-toggle>
     </div>
   </mat-dialog-content>
   <mat-dialog-actions>
     <button mat-button type="submit" [disabled]="!form.valid">OK</button>
     <button mat-button type="button" mat-dialog-close>Отмена</button>
+    <button mat-button *ngIf="editMode" type="button" [disabled]="eventActive || !form.get('enabled').value"
+            (click)="onDefaultButtonClick()">По-умолчанию</button>
   </mat-dialog-actions>
 </form>
