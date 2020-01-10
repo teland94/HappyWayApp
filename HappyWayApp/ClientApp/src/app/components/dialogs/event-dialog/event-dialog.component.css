@@ -5,3 +5,14 @@
 .dialog-container > * {
   width: 100%;
 }
+
+@media only screen and (max-width: 768px) {
+  .mat-dialog-actions .mat-button-base {
+    margin-left: 3px;
+  }
+
+  .mat-dialog-actions .mat-button {
+    padding: 0 6px;
+  }
+}
+
