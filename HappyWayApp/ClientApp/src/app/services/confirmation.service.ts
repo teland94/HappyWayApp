@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import {MatDialog, MatDialogRef, MatSnackBar, MatSnackBarConfig, MatSnackBarDismiss} from '@angular/material';
+import { MatDialog, MatDialogRef, MatSnackBar, MatSnackBarConfig, MatSnackBarDismiss } from '@angular/material';
 import { ConfirmationDialogComponent } from '../components/dialogs/confirmation-dialog/confirmation-dialog.component';
 import { PasswordPromptDialogComponent } from '../components/dialogs/password-prompt-dialog/password-prompt-dialog.component';
 import { AuthenticationService } from './authentication.service';
@@ -57,6 +57,9 @@ export class ConfirmationService {
 
   private checkPasswordErrorHandler(action: string) {
     return (err: any) => {
+      if (!err.error) {
+        throw err;
+      }
       return this.openRetryBar('Неверный пароль.')
        .pipe(
          flatMap((dismiss: MatSnackBarDismiss) => {

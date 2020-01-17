@@ -25,15 +25,17 @@ export class ResultsComponent implements OnInit, OnDestroy {
   private readonly nonMatchedText = 'Здравствуйте, на "Быстрых свиданиях {{date}} в Арт-кафе «Пластилиновая ворона»" у Вас симпатии, к сожалению, не совпали.';
   private readonly likedText = 'А также Вам проявили симпатию (Вы понравились), им Вы можете написать самостоятельно, т.к. у них Ваших контактов нет:';
 
-  private readonly endMatchedText = `Оцените, пожалуйста, наше мероприятие в GOOGLE
-https://local.google.com/place?id=13114540300414977696&use=srp
+  private readonly endMatchedText =
+`Оцените, пожалуйста, наше мероприятие в Google:
+https://g.page/HappywayKharkiv?share
 
 Или просто добавляйтесь в соц.сетях:
 Наша страничка facebook: https://www.facebook.com/happyway.club
 Наш инстаграм: http://instagram.com/happyway.date`;
-  private readonly endNonMatchedText = `Наша страничка в соц.сети:
+  private readonly endNonMatchedText =
+`Наша страничка в соц.сети:
 https://www.facebook.com/happyway.club
-Наш инстаграм: http://instagram.com/happyway.date/`;
+Наш инстаграм: http://instagram.com/happyway.date`;
   private readonly thanksText = 'Спасибо, что были с нами)';
 
   private eventChangesSubscription: Subscription;
@@ -74,6 +76,7 @@ https://www.facebook.com/happyway.club
 
   copy(text: string) {
     this.clipboardService.copyFromContent(text);
+    this.snackBar.open('Успешно скопировано ❤');
   }
 
   private getResultData(member: EventMemberModel) {

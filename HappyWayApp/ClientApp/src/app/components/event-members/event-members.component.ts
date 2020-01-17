@@ -88,6 +88,7 @@ export class EventMembersComponent implements OnInit, OnDestroy {
     this.openDialog(eventMember).subscribe(editedEventMember => {
       if (!editedEventMember) { return; }
       editedEventMember.id = eventMember.id;
+      editedEventMember.sex = eventMember.sex;
       editedEventMember.eventId = eventMember.eventId;
       this.eventMemberService.update(editedEventMember)
         .subscribe(() => {

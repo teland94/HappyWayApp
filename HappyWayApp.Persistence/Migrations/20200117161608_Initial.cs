@@ -129,12 +129,12 @@ namespace HappyWayApp.Persistence.Migrations
             migrationBuilder.InsertData(
                 table: "Users",
                 columns: new[] { "Id", "City", "DisplayName", "Password", "PhoneNumber", "RoleId", "Token", "Username" },
-                values: new object[] { 1, "Харьков", "Admin", "ALBUWwYxK+q96msCYfUWP9gOPcnIc8l6B44F24o/pjsvF2cfiTFE+aui/FRTSNFjZA==", "095 214 51 32", 1, null, "admin" });
+                values: new object[] { 1, "Харьков", "Admin", "AQAAAAEAACcQAAAAEDC0aBikkZoMAQ9jtYq7ByukhA9ydl1YN0K6sIvHN9HYg09X1qxMUO+jjQhgxImCAg==", "095 214 51 32", 1, null, "admin" });
 
             migrationBuilder.InsertData(
                 table: "Users",
                 columns: new[] { "Id", "City", "DisplayName", "Password", "PhoneNumber", "RoleId", "Token", "Username" },
-                values: new object[] { 2, "Харьков", "Normal", "AA4f7YH1rTdfWS5I0ec3M9keQwh8oL3pGzGu0vmQe2oodRHPRX1PP6aNssc2Ttz0XA==", "095 777 22 22", 2, null, "user" });
+                values: new object[] { 2, "Харьков", "Normal", "AQAAAAEAACcQAAAAEF2b5WTrHeYD99KTYodsb3E44gNLhSAvYOfEoVIxnxmUkmotABVzHbrnfXqDRB+4rg==", "095 777 22 22", 2, null, "user" });
 
             migrationBuilder.CreateIndex(
                 name: "IX_EventMembers_EventId",

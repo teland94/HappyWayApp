@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using HappyWayApp.Configuration;
 using HappyWayApp.DTOs;
+using HappyWayApp.Exceptions;
 using HappyWayApp.Persistence.Entities;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
@@ -35,15 +36,15 @@ namespace HappyWayApp.Services
 
     public class UserService : IUserService
     {
-        private readonly AuthSettings _appSettings;
+        private readonly AuthSettings _authSettings;
         private readonly AppDbContext _context;
         private readonly IPasswordHasher<User> _passwordHasher;
 
-        public UserService(IOptions<AuthSettings> appSettings,
+        public UserService(IOptions<AuthSettings> authOptions,
             AppDbContext context,
             IPasswordHasher<User> passwordHasher)
         {
-            _appSettings = appSettings.Value;
+            _authSettings = authOptions.Value;
             _context = context;
             _passwordHasher = passwordHasher;
         }
@@ -55,15 +56,15 @@ namespace HappyWayApp.Services
                 .SingleOrDefaultAsync(x => x.Username == username);
 
             if (user == null)
-                return null;
+                throw new NotFoundException(nameof(User), username);
 
-            var result = _passwordHasher.VerifyHashedPassword(null, user.Password, password);
+            var result = _passwordHasher.VerifyHashedPassword(null, user.Password, _authSettings.Salt + password);
 
             if (result == PasswordVerificationResult.Failed)
-                return null;
+                throw new InvalidOperationException();
 
             var tokenHandler = new JwtSecurityTokenHandler();
-            var key = Encoding.ASCII.GetBytes(_appSettings.Secret);
+            var key = Encoding.ASCII.GetBytes(_authSettings.Secret);
             var tokenDescriptor = new SecurityTokenDescriptor
             {
                 Subject = new ClaimsIdentity(new[] 
@@ -85,10 +86,10 @@ namespace HappyWayApp.Services
             var dbUser = await _context.Users.FindAsync(userId);
             if (dbUser == null)
             {
-                throw new InvalidOperationException("User not exists");
+                throw new NotFoundException(nameof(User), userId);
             }
 
-            var result = _passwordHasher.VerifyHashedPassword(null, dbUser.Password, password);
+            var result = _passwordHasher.VerifyHashedPassword(null, dbUser.Password, _authSettings.Salt + password);
             return result != PasswordVerificationResult.Failed;
         }
 
@@ -115,7 +116,7 @@ namespace HappyWayApp.Services
                 City = user.City,
                 DisplayName = user.DisplayName,
                 PhoneNumber = user.PhoneNumber,
-                Password = _passwordHasher.HashPassword(null, user.Password),
+                Password = _passwordHasher.HashPassword(null, _authSettings.Salt + user.Password),
                 Username = user.Username,
             });
             await _context.SaveChangesAsync();
@@ -138,7 +139,7 @@ namespace HappyWayApp.Services
             dbUser.PhoneNumber = user.PhoneNumber;
             if (!string.IsNullOrWhiteSpace(user.Password))
             {
-                dbUser.Password = _passwordHasher.HashPassword(null, user.Password);
+                dbUser.Password = _passwordHasher.HashPassword(null, _authSettings.Salt + user.Password);
             }
             dbUser.Username = user.Username;
 

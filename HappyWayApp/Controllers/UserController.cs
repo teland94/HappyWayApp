@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 using HappyWayApp.DTOs;
+using HappyWayApp.Exceptions;
 using HappyWayApp.Persistence.Helpers;
 using HappyWayApp.Services;
 using HappyWayApp.ViewModels;
@@ -26,28 +27,44 @@ namespace HappyWayApp.Controllers
         [HttpPost(nameof(Authenticate))]
         public async Task<IActionResult> Authenticate([FromBody]AuthenticateModel model)
         {
-            var user = await _userService.Authenticate(model.Username, model.Password);
-
-            if (user == null)
+            try
             {
+                var user = await _userService.Authenticate(model.Username, model.Password);
+
+                return Ok(user);
+            }
+            catch (InvalidOperationException e)
+            {
+                Console.WriteLine(e);
                 return BadRequest(new { message = "Неверный логин или пароль." });
             }
-
-            return Ok(user);
+            catch (NotFoundException e)
+            {
+                Console.WriteLine(e);
+                return NotFound();
+            }
         }
 
         [HttpPost(nameof(CheckPassword))]
         public async Task<IActionResult> CheckPassword([FromBody]CheckPasswordModel model)
         {
-            var currentUserId = Convert.ToInt32(User.Identity.Name);
-            var res = await _userService.CheckPassword(currentUserId, model.Password);
-
-            if (!res)
+            try
             {
-                return BadRequest(new { message = "Неверный пароль." });
-            }
+                var currentUserId = Convert.ToInt32(User.Identity.Name);
+                var res = await _userService.CheckPassword(currentUserId, model.Password);
 
-            return NoContent();
+                if (!res)
+                {
+                    return BadRequest(new { message = "Неверный пароль." });
+                }
+
+                return NoContent();
+            }
+            catch (NotFoundException e)
+            {
+                Console.WriteLine(e);
+                return NotFound();
+            }
         }
 
         [Authorize(Roles = Constants.Strings.Roles.Admin)]

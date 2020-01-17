@@ -113,16 +113,20 @@ export class LayoutComponent implements OnInit, AfterViewInit {
         this.blockUI.stop();
         this.showError('Ошибка завершения работы.', error);
       });
+    }, error => {
+      this.logout(false);
     });
   }
 
-  private logout() {
+  private logout(showMessage = true) {
     this.event = null;
     this.eventService.setCurrentEvent(null);
     this.authenticationService.logout();
     this.router.navigate(['/login']).then(() => {
       this.blockUI.stop();
-      this.snackBar.open('Благодарим, что были сегодня с нами ❤');
+      if (showMessage) {
+        this.snackBar.open('Благодарим, что были сегодня с нами ❤');
+      }
     });
   }
 
