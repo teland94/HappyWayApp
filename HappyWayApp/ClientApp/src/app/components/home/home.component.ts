@@ -52,10 +52,7 @@ export class HomeComponent implements OnInit, OnDestroy {
   }
 
   selectionChanged(event: StepperSelectionEvent) {
-    this.saveCurrentMember().subscribe(() => {
-    }, error => {
-      this.showError('Ошибка сохранения 💔', error);
-    });
+    this.save(false);
     const currentCardMember = this.cardMembers[event.selectedIndex];
     this.setLikedMembers(currentCardMember);
   }
@@ -91,9 +88,11 @@ export class HomeComponent implements OnInit, OnDestroy {
     this.currentCardMember.likedMembers.forEach(l => l.liked = !isAllLiked);
   }
 
-  save() {
+  save(showSuccessMessage = true) {
     this.saveCurrentMember().subscribe(() => {
-      this.snackBar.open('Успешно сохранено ❤');
+      if (showSuccessMessage) {
+        this.snackBar.open('Успешно сохранено ❤');
+      }
     }, error => {
       this.showError('Ошибка сохранения 💔', error);
     });

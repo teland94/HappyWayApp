@@ -5,14 +5,13 @@ import { DomSanitizer } from '@angular/platform-browser';
 import { LikeService } from 'src/app/services/like.service';
 import { LikeModel } from '../../models/like.model';
 import { BlockUI, NgBlockUI } from 'ng-block-ui';
-import { MatSnackBar } from '@angular/material';
+import { MatSnackBar, MatSnackBarConfig } from '@angular/material';
 import { map } from 'rxjs/operators';
 import { concat, Subscription } from 'rxjs';
 import { ClipboardService } from 'ngx-clipboard';
 import { EventService } from 'src/app/services/event.service';
 import { EventModel } from 'src/app/models/event.model';
 import { getDateText } from '../../utilities';
-import { CdkTextareaAutosize } from '@angular/cdk/text-field';
 
 @Component({
   selector: 'app-results',
@@ -104,15 +103,13 @@ https://www.facebook.com/happyway.club
           this.blockUI.stop();
         }, error => {
           this.blockUI.stop();
-          console.log('Load members error', error);
-          this.snackBar.open('Ошибка загрузки результатов участников 💔');
+          this.showError('Ошибка загрузки результатов участников 💔', error);
         });
 
         this.blockUI.stop();
       }, error => {
         this.blockUI.stop();
-        console.log('Load members error', error);
-        this.snackBar.open('Ошибка загрузки участиков 💔');
+        this.showError('Ошибка загрузки участиков 💔', error);
       });
     });
   }
@@ -170,5 +167,13 @@ https://www.facebook.com/happyway.club
       && !matched.some(m => m === l.sourceMemberId))
       .map(l => l.sourceMemberId);
     return { matched, liked };
+  }
+
+  private showError(errorText: string, error: any) {
+    console.log(error);
+    const config = new MatSnackBarConfig();
+    config.duration = 3000;
+    config.panelClass = ['error-panel'];
+    this.snackBar.open(errorText, null, config);
   }
 }

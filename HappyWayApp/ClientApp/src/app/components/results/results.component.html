@@ -6,12 +6,12 @@
       <textarea matInput #resultTextArea cdkTextareaAutosize readonly>{{result.text}}</textarea>
     </mat-card-content>
     <mat-card-actions align="end">
-      <button mat-icon-button [ngxClipboard]="resultTextArea">
+      <button mat-icon-button (click)="copy(resultTextArea.value)">
         <mat-icon svgIcon="copy"></mat-icon>
       </button>
       <div class="fill-remaining-space"></div>
       <a [href]="getViberUrl(result.member.phoneNumber)">
-        <button mat-icon-button [ngxClipboard]="resultTextArea">
+        <button mat-icon-button (click)="copy(resultTextArea.value)">
           <mat-icon svgIcon="viber"></mat-icon>
         </button>
       </a>
