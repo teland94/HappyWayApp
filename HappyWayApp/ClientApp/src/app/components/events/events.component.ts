@@ -55,6 +55,9 @@ export class EventsComponent implements OnInit, OnDestroy {
       editedEvent.date = getDateWithTimeZoneOffsetHours(editedEvent.date);
       this.eventService.update(editedEvent)
         .subscribe(() => {
+          if (eventDialogResult.eventActive) {
+            this.eventService.setCurrentEvent(editedEvent);
+          }
           this.load();
         }, error => {
           this.showError('Ошибка редактирования мероприятия.', error);
@@ -85,6 +88,9 @@ export class EventsComponent implements OnInit, OnDestroy {
 
       this.blockUI.start();
       this.eventService.create(event).subscribe(createdEvent => {
+        if (eventDialogResult.eventActive) {
+          this.eventService.setCurrentEvent(createdEvent);
+        }
         this.importDataService.downloadDocData(createdEvent.id, eventDialogResult.docUrl).subscribe(() => {
           this.blockUI.stop();
           this.load();
@@ -164,10 +170,6 @@ export class EventsComponent implements OnInit, OnDestroy {
         completedControlVisible: true,
         eventActive: this.currentEvent && event && this.currentEvent.id === event.id
       }
-    });
-
-    dialogRef.componentInstance.onSetDefault.subscribe(ev => {
-      this.eventService.setCurrentEvent(ev);
     });
 
     return dialogRef.afterClosed();

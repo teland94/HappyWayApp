@@ -57,7 +57,7 @@ export class ConfirmationService {
 
   private checkPasswordErrorHandler(action: string) {
     return (err: any) => {
-      if (!err.error) {
+      if (err.status) {
         throw err;
       }
       return this.openRetryBar('Неверный пароль.')

@@ -6,6 +6,7 @@ import {EventModel} from '../../../models/event.model';
 export class EventDialogResult {
   event: EventModel;
   docUrl: string;
+  eventActive: boolean;
 }
 
 export class EventDialogData {
@@ -49,7 +50,7 @@ export class EventDialogComponent {
   submit(form: FormGroup) {
     const { date, name, docUrl, enabled } = form.value;
     const event = <EventModel>{ date, name, completed: !enabled };
-    this.dialogRef.close(<EventDialogResult>{ event, docUrl });
+    this.dialogRef.close(<EventDialogResult>{ event, docUrl, eventActive: this.eventActive });
   }
 
   onDefaultButtonClick() {
