@@ -28,6 +28,7 @@ export class LayoutComponent implements OnInit, AfterViewInit {
   event: EventModel;
   currentUser: UserModel;
   groups: string[];
+  date = new Date();
 
   constructor(private readonly router: Router,
               private readonly authenticationService: AuthenticationService,

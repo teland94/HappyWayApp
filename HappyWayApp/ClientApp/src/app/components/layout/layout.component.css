@@ -2,6 +2,12 @@
   height: 100%;
 }
 
+.sidenav-content {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
 .sidenav {
   width: 270px;
   box-shadow: 3px 0 6px rgba(0,0,0,.24);
@@ -18,7 +24,16 @@
 }
 
 main {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
   margin: 5px;
+}
+
+footer {
+  text-align: center;
+  font-size: small;
+  flex: 0 0 auto;
 }
 
 .nav-caption {
@@ -69,22 +84,3 @@ main {
   }
 }
 
-@media only screen and (max-width: 1200px) {
-  .mat-toolbar {
-    height: 56px;
-  }
-
-  main {
-    height: calc(100% - 66px);
-  }
-}
-
-@media only screen and (min-width: 1200px) {
-  .mat-toolbar {
-    height: 64px;
-  }
-
-  main {
-    height: calc(100% - 74px);
-  }
-}
