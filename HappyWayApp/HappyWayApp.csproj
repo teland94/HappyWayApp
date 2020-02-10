@@ -34,16 +34,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Remove="HappyWayApp.db" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Content Include="HappyWayApp.db">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\HappyWayApp.Persistence\HappyWayApp.Persistence.csproj" />
   </ItemGroup>
 

@@ -86,10 +86,10 @@ export class LayoutComponent implements OnInit, AfterViewInit {
       this.eventService.create(event).subscribe(createdEvent => {
         this.importDataService.downloadDocData(createdEvent.id, eventDialogResult.docUrl).subscribe(() => {
           this.blockUI.stop();
-          this.setLastEvent('/home');
+          this.setLastEvent(createdEvent, '/home');
         }, error => {
           this.blockUI.stop();
-          this.setLastEvent('/event-members');
+          this.setLastEvent(createdEvent, '/event-members');
           this.showError('Ошибка загрузки данных.', error);
         });
       }, error => {
@@ -111,6 +111,9 @@ export class LayoutComponent implements OnInit, AfterViewInit {
         this.logout();
       }, error => {
         this.blockUI.stop();
+        if (error.status === 404) {
+          this.logout(false);
+        }
         this.showError('Ошибка завершения работы.', error);
       });
     }, error => {
@@ -130,22 +133,31 @@ export class LayoutComponent implements OnInit, AfterViewInit {
     });
   }
 
-  private setLastEvent(navigateCommand?: string) {
-    this.blockUI.start();
-    this.eventService.getLastEvent()
-      .subscribe(event => {
-        this.event = event;
-        this.eventService.setCurrentEvent(event);
-        this.blockUI.stop();
-        if (navigateCommand) {
-          this.drawer.close();
-          this.router.navigate([navigateCommand]);
-        }
-      }, error => {
-        this.blockUI.stop();
-        if (error.status === 404) { return; }
-        this.showError('Ошибка установки мероприятия.', error);
-      });
+  private setLastEvent(event?: EventModel, navigateCommand?: string) {
+    if (event) {
+      this.event = event;
+      this.eventService.setCurrentEvent(event);
+      if (navigateCommand) {
+        this.drawer.close();
+        this.router.navigate([navigateCommand]);
+      }
+    } else {
+      this.blockUI.start();
+      this.eventService.getLastEvent()
+        .subscribe(ev => {
+          this.event = ev;
+          this.eventService.setCurrentEvent(event);
+          this.blockUI.stop();
+          if (navigateCommand) {
+            this.drawer.close();
+            this.router.navigate([navigateCommand]);
+          }
+        }, error => {
+          this.blockUI.stop();
+          if (error.status === 404) { return; }
+          this.showError('Ошибка установки мероприятия.', error);
+        });
+    }
   }
 
   private openDialog(event?: EventModel) {

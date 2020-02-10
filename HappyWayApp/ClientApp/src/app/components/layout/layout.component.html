@@ -51,16 +51,22 @@
   </mat-sidenav>
   <mat-sidenav-content>
     <mat-toolbar color="primary">
-      <button
-        type="button"
-        aria-label="Toggle sidenav"
-        mat-icon-button
-        (click)="drawer.toggle()">
+      <button type="button"
+              aria-label="Toggle sidenav"
+              mat-icon-button
+              (click)="drawer.toggle()">
         <mat-icon aria-label="Side nav toggle icon">menu</mat-icon>
       </button>
       <div class="app-title">Happy Way <mat-icon>favorite</mat-icon></div>
       <span class="fill-remaining-space"></span>
       <app-sex-select *ngIf="loggedIn"></app-sex-select>
+      <button class="layout-button" mat-button (click)="shutdown()">
+        <mat-icon>power_off</mat-icon>
+        <span class="nav-caption">Завершить работу</span>
+      </button>
+      <button class="layout-small-button" mat-icon-button (click)="shutdown()">
+        <mat-icon>power_off</mat-icon>
+      </button>
     </mat-toolbar>
     <main>
       <router-outlet></router-outlet>

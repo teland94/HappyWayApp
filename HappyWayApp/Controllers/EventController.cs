@@ -37,6 +37,7 @@ namespace HappyWayApp.Controllers
                 : events.Where(e => e.UserId == userId && !e.Completed);
             return await events
                 .OrderByDescending(e => e.Date)
+                .ThenByDescending(e => e.Id)
                 .Select(e => new EventModel
                 {
                     Id = e.Id,
@@ -82,6 +83,7 @@ namespace HappyWayApp.Controllers
 
             var @event = await query
                 .OrderByDescending(e => e.Date)
+                .ThenByDescending(e => e.Id)
                 .FirstOrDefaultAsync();
 
             if (@event == null)

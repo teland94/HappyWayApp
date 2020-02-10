@@ -18,9 +18,15 @@
   min-width: 10ch;
 }
 
+.sex-control .mat-select-panel .mat-optgroup-label, .mat-select-panel .mat-option {
+  font-size: 16px !important;
+}
+
 .sex-label {
   display: flex;
   align-items: center;
+  font-size: 14px;
+  font-weight: 500;
 }
 
 @media only screen and (max-width: 768px) {

@@ -72,7 +72,7 @@ export class EventsComponent implements OnInit, OnDestroy {
         .subscribe(() => {
           this.events = this.events.filter(ev => ev.id !== event.id);
           if (this.currentEvent && this.currentEvent.id === event.id) {
-            this.setLastEvent();
+            this.checkEvent(this.currentEvent);
           }
         }, error => {
           this.showError('Ошибка удаления мероприятия.', error);
@@ -138,17 +138,20 @@ export class EventsComponent implements OnInit, OnDestroy {
         if (this.currentEvent) {
           this.currentEvent = events.find(ev => ev.id === this.currentEvent.id);
         }
-        if (!this.currentEvent
-          || this.currentEvent.completed
-          || (this.currentEvent && this.events.findIndex(ev => !ev.completed) === -1)) {
-          this.setLastEvent();
-        }
+        this.checkEvent(this.currentEvent);
         this.groups = groups;
         this.blockUI.stop();
       }, error => {
         this.blockUI.stop();
         this.showError('Ошибка загрузки мероприятий.', error);
     });
+  }
+
+  private checkEvent(event: EventModel) {
+    if (!event || !this.events) { return; }
+    if (event.completed || !this.events.some(e => e.id === event.id)) {
+      this.eventService.setCurrentEvent(null);
+    }
   }
 
   private setLastEvent() {
