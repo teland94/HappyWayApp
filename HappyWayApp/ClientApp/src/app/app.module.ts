@@ -20,13 +20,8 @@ import { ResultsComponent } from './components/results/results.component';
 import { EventsComponent } from './components/events/events.component';
 import { SexSelectComponent } from './components/sex-select/sex-select.component';
 import { ValidationErrorComponent } from './components/validation-error/validation-error.component';
-import {
-  MAT_SNACK_BAR_DEFAULT_OPTIONS,
-  MAT_DATE_LOCALE,
-  DateAdapter,
-  ErrorStateMatcher,
-  ShowOnDirtyErrorStateMatcher
-} from '@angular/material';
+import { MAT_DATE_LOCALE, DateAdapter, ErrorStateMatcher, ShowOnDirtyErrorStateMatcher } from '@angular/material/core';
+import { MAT_SNACK_BAR_DEFAULT_OPTIONS } from '@angular/material/snack-bar';
 import { EventDialogComponent } from './components/dialogs/event-dialog/event-dialog.component';
 import { ConfirmationDialogComponent } from './components/dialogs/confirmation-dialog/confirmation-dialog.component';
 import { CustomDateAdapter } from './custom-date-adapter';

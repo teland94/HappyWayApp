@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
-import { MatDialog, MatDialogRef, MatSnackBar, MatSnackBarConfig, MatSnackBarDismiss } from '@angular/material';
+import { MatDialog, MatDialogRef } from '@angular/material/dialog';
+import { MatSnackBar, MatSnackBarConfig, MatSnackBarDismiss } from '@angular/material/snack-bar';
 import { ConfirmationDialogComponent } from '../components/dialogs/confirmation-dialog/confirmation-dialog.component';
 import { PasswordPromptDialogComponent } from '../components/dialogs/password-prompt-dialog/password-prompt-dialog.component';
 import { AuthenticationService } from './authentication.service';

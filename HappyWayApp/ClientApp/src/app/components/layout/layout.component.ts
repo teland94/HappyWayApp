@@ -1,5 +1,8 @@
 import { AfterViewInit, Component, ViewChild, OnInit } from '@angular/core';
-import { MatDrawer, MatDatepickerInputEvent, MatDialog, MatSnackBarConfig, MatSnackBar } from '@angular/material';
+import { MatDatepickerInputEvent } from '@angular/material/datepicker';
+import { MatDialog } from '@angular/material/dialog';
+import { MatDrawer } from '@angular/material/sidenav';
+import { MatSnackBarConfig, MatSnackBar } from '@angular/material/snack-bar';
 import { Router } from '@angular/router';
 import { FormControl, Validators } from '@angular/forms';
 import { EventService } from '../../services/event.service';
@@ -22,7 +25,7 @@ import { ImportDataService } from '../../services/import-data.service';
 })
 export class LayoutComponent implements OnInit, AfterViewInit {
 
-  @ViewChild('drawer', { static: false }) drawer: MatDrawer;
+  @ViewChild('drawer') drawer: MatDrawer;
   @BlockUI() blockUI: NgBlockUI;
 
   event: EventModel;

@@ -1,5 +1,6 @@
 import {Component, OnDestroy, OnInit} from '@angular/core';
-import { MatSnackBar, MatSnackBarConfig, MatDialog } from '@angular/material';
+import { MatDialog } from '@angular/material/dialog';
+import { MatSnackBar, MatSnackBarConfig } from '@angular/material/snack-bar';
 import { EventMemberModel } from '../../models/event-member';
 import { EventMemberService } from '../../services/event-member.service';
 import { BlockUI, NgBlockUI } from 'ng-block-ui';

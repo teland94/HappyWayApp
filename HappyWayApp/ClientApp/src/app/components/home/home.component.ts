@@ -1,7 +1,8 @@
 import {Component, OnDestroy, OnInit, ViewChild, ViewEncapsulation} from '@angular/core';
 import { EventMemberService } from 'src/app/services/event-member.service';
 import { EventMemberCardModel, Sex, CardLikedMember, EventMemberModel } from '../../models/event-member';
-import { MatHorizontalStepper, MatSnackBar, MatStepper, MatSnackBarConfig } from '@angular/material';
+import { MatSnackBar, MatSnackBarConfig } from '@angular/material/snack-bar';
+import { MatHorizontalStepper, MatStepper } from '@angular/material/stepper';
 import { StepperSelectionEvent } from '@angular/cdk/stepper';
 import { LikeService } from 'src/app/services/like.service';
 import { LikeModel, SaveLikeModel } from '../../models/like.model';
@@ -27,7 +28,7 @@ export class HomeComponent implements OnInit, OnDestroy {
   cardMembers: EventMemberCardModel[];
   currentCardMember: EventMemberCardModel;
 
-  @ViewChild(MatHorizontalStepper, { static: false }) set matStepper(stepper: MatHorizontalStepper) {
+  @ViewChild(MatHorizontalStepper) set matStepper(stepper: MatHorizontalStepper) {
     if (!stepper) { return; }
     this.stepper = stepper;
     this.stepper._getIndicatorType = () => 'number';

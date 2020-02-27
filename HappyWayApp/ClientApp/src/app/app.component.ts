@@ -1,5 +1,6 @@
 import {AfterViewInit, Component, ViewChild} from '@angular/core';
-import {MatDrawer, MatIconRegistry} from '@angular/material';
+import { MatIconRegistry } from '@angular/material/icon';
+import { MatDrawer } from '@angular/material/sidenav';
 import {DomSanitizer} from '@angular/platform-browser';
 import {Router} from '@angular/router';
 

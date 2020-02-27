@@ -1,7 +1,10 @@
 import {Component, OnDestroy, OnInit} from '@angular/core';
 import { EventService } from '../../services/event.service';
 import { EventModel } from '../../models/event.model';
-import {MatSnackBar, MatSnackBarConfig, MatDialog, MatSlideToggleChange, MatRadioChange} from '@angular/material';
+import { MatDialog } from '@angular/material/dialog';
+import { MatRadioChange } from '@angular/material/radio';
+import { MatSlideToggleChange } from '@angular/material/slide-toggle';
+import { MatSnackBar, MatSnackBarConfig } from '@angular/material/snack-bar';
 import { EventDialogComponent, EventDialogData } from '../dialogs/event-dialog/event-dialog.component';
 import { Router } from '@angular/router';
 import {forkJoin, Subscription} from 'rxjs';

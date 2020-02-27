@@ -1,7 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { UserService } from '../../services/user.service';
 import { UserModel, Role } from '../../models/user.model';
-import { MatDialog, MatSnackBar, MatSnackBarConfig } from '@angular/material';
+import { MatDialog } from '@angular/material/dialog';
+import { MatSnackBar, MatSnackBarConfig } from '@angular/material/snack-bar';
 import { UserDialogComponent, UserDialogData } from '../dialogs/user-dialog/user-dialog.component';
 import { BlockUI, NgBlockUI } from 'ng-block-ui';
 import { DatabaseService } from '../../services/database.service';

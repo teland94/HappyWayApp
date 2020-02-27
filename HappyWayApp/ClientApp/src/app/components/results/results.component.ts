@@ -5,7 +5,7 @@ import { DomSanitizer } from '@angular/platform-browser';
 import { LikeService } from 'src/app/services/like.service';
 import { LikeModel } from '../../models/like.model';
 import { BlockUI, NgBlockUI } from 'ng-block-ui';
-import { MatSnackBar, MatSnackBarConfig } from '@angular/material';
+import { MatSnackBar, MatSnackBarConfig } from '@angular/material/snack-bar';
 import { map } from 'rxjs/operators';
 import { concat, Subscription } from 'rxjs';
 import { ClipboardService } from 'ngx-clipboard';
