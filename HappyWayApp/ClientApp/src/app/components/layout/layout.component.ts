@@ -81,26 +81,18 @@ export class LayoutComponent implements OnInit, AfterViewInit {
   }
 
   createEvent() {
-    this.openDialog().subscribe(eventDialogResult => {
-      if (!eventDialogResult) { return; }
-      const event = eventDialogResult.event;
-      event.date = getDateWithTimeZoneOffsetHours(event.date);
-
-      this.blockUI.start();
-      this.eventService.create(event).subscribe(createdEvent => {
-        this.importDataService.downloadDocData(createdEvent.id, eventDialogResult.docUrl).subscribe(() => {
-          this.blockUI.stop();
-          this.setLastEvent(createdEvent, '/home');
-        }, error => {
-          this.blockUI.stop();
-          this.setLastEvent(createdEvent, '/event-members');
-          this.showError('Ошибка загрузки данных.', error);
-        });
+    if (this.event && !this.event.completed) {
+      this.eventService.setCompleted(this.event.id, true).subscribe(() => {
+        this.openDialogAndCreateEvent();
       }, error => {
-        this.blockUI.stop();
-        this.showError('Ошибка добавления мероприятия.', error);
+        console.log(error);
+        if (error.status === 404) {
+          this.openDialogAndCreateEvent();
+        }
       });
-    });
+    } else {
+      this.openDialogAndCreateEvent();
+    }
   }
 
   shutdown() {
@@ -122,6 +114,29 @@ export class LayoutComponent implements OnInit, AfterViewInit {
       });
     }, error => {
       this.logout(false);
+    });
+  }
+
+  private openDialogAndCreateEvent() {
+    this.openDialog().subscribe(eventDialogResult => {
+      if (!eventDialogResult) { return; }
+      const event = eventDialogResult.event;
+      event.date = getDateWithTimeZoneOffsetHours(event.date);
+
+      this.blockUI.start();
+      this.eventService.create(event).subscribe(createdEvent => {
+        this.importDataService.downloadDocData(createdEvent.id, eventDialogResult.docUrl).subscribe(() => {
+          this.blockUI.stop();
+          this.setLastEvent(createdEvent, '/home');
+        }, error => {
+          this.blockUI.stop();
+          this.setLastEvent(createdEvent, '/event-members');
+          this.showError('Ошибка загрузки данных.', error);
+        });
+      }, error => {
+        this.blockUI.stop();
+        this.showError('Ошибка добавления мероприятия.', error);
+      });
     });
   }
 

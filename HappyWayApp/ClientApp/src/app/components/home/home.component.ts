@@ -30,8 +30,10 @@ export class HomeComponent implements OnInit, OnDestroy {
 
   @ViewChild(MatHorizontalStepper) set matStepper(stepper: MatHorizontalStepper) {
     if (!stepper) { return; }
-    this.stepper = stepper;
-    this.stepper._getIndicatorType = () => 'number';
+    setTimeout(() => {
+      this.stepper = stepper;
+      this.stepper._getIndicatorType = () => 'number';
+    });
   }
 
   constructor(private readonly eventService: EventService,

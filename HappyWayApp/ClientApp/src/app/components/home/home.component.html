@@ -36,7 +36,7 @@
       </table>
     </mat-step>
   </mat-horizontal-stepper>
-  <div style="margin-top: 5px;">
+  <div *ngIf="stepper" style="margin-top: 5px;">
     <button mat-icon-button (click)="goBack()" [disabled]="stepper?.selectedIndex === 0">
       <mat-icon>navigate_before</mat-icon>
     </button>
