@@ -1,4 +1,4 @@
-import {Component, OnDestroy, OnInit} from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { EventService } from '../../services/event.service';
 import { EventModel } from '../../models/event.model';
 import { MatDialog } from '@angular/material/dialog';
@@ -7,13 +7,12 @@ import { MatSlideToggleChange } from '@angular/material/slide-toggle';
 import { MatSnackBar, MatSnackBarConfig } from '@angular/material/snack-bar';
 import { EventDialogComponent, EventDialogData } from '../dialogs/event-dialog/event-dialog.component';
 import { Router } from '@angular/router';
-import {forkJoin, Subscription} from 'rxjs';
+import { forkJoin, Subscription } from 'rxjs';
 import { DatabaseService } from '../../services/database.service';
-import { BlockUI, NgBlockUI } from 'ng-block-ui';
 import { ConfirmationService } from '../../services/confirmation.service';
 import { getDateWithTimeZoneOffsetHours } from '../../utilities';
 import { ImportDataService } from '../../services/import-data.service';
-import {map} from 'rxjs/operators';
+import { ProgressSpinnerService } from '../../services/progress-spinner.service';
 
 @Component({
   selector: 'app-events',
@@ -25,7 +24,6 @@ export class EventsComponent implements OnInit, OnDestroy {
   private eventChangesSubscription: Subscription;
 
   displayedColumns: string[] = ['name', 'date', 'user', 'active', 'edit', 'delete'];
-  @BlockUI() blockUI: NgBlockUI;
 
   events: EventModel[];
   groups: string[];
@@ -37,7 +35,8 @@ export class EventsComponent implements OnInit, OnDestroy {
               private readonly confirmationService: ConfirmationService,
               private readonly snackBar: MatSnackBar,
               private readonly dialog: MatDialog,
-              private readonly router: Router) { }
+              private readonly router: Router,
+              private readonly progressSpinnerService: ProgressSpinnerService) { }
 
   ngOnInit() {
     this.eventChangesSubscription = this.eventService.eventChanges.subscribe(event => {
@@ -89,21 +88,21 @@ export class EventsComponent implements OnInit, OnDestroy {
       const event = eventDialogResult.event;
       event.date = getDateWithTimeZoneOffsetHours(event.date);
 
-      this.blockUI.start();
+      this.progressSpinnerService.start();
       this.eventService.create(event).subscribe(createdEvent => {
         if (eventDialogResult.eventActive) {
           this.eventService.setCurrentEvent(createdEvent);
         }
         this.importDataService.downloadDocData(createdEvent.id, eventDialogResult.docUrl).subscribe(() => {
-          this.blockUI.stop();
+          this.progressSpinnerService.stop();
           this.load();
         }, error => {
-          this.blockUI.stop();
+          this.progressSpinnerService.stop();
           this.showError('Ошибка загрузки данных.', error);
           this.load();
         });
       }, error => {
-        this.blockUI.stop();
+        this.progressSpinnerService.stop();
         this.showError('Ошибка добавления мероприятия.', error);
       });
     });
@@ -134,7 +133,7 @@ export class EventsComponent implements OnInit, OnDestroy {
   }
 
   private load() {
-    this.blockUI.start();
+    this.progressSpinnerService.start();
     forkJoin([this.eventService.get(), this.databaseService.getGroups()])
       .subscribe(([events, groups]) => {
         this.events = events;
@@ -143,9 +142,9 @@ export class EventsComponent implements OnInit, OnDestroy {
         }
         this.checkEvent(this.currentEvent);
         this.groups = groups;
-        this.blockUI.stop();
+        this.progressSpinnerService.stop();
       }, error => {
-        this.blockUI.stop();
+        this.progressSpinnerService.stop();
         this.showError('Ошибка загрузки мероприятий.', error);
     });
   }

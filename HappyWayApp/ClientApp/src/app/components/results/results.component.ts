@@ -1,17 +1,17 @@
-import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { EventMemberService } from 'src/app/services/event-member.service';
 import { ResultMemberModel, EventMemberModel, ResultLikedMemberModel, Sex } from '../../models/event-member';
 import { DomSanitizer } from '@angular/platform-browser';
 import { LikeService } from 'src/app/services/like.service';
 import { LikeModel } from '../../models/like.model';
-import { BlockUI, NgBlockUI } from 'ng-block-ui';
 import { MatSnackBar, MatSnackBarConfig } from '@angular/material/snack-bar';
 import { map } from 'rxjs/operators';
 import { concat, Subscription } from 'rxjs';
-import { ClipboardService } from 'ngx-clipboard';
 import { EventService } from 'src/app/services/event.service';
 import { EventModel } from 'src/app/models/event.model';
 import { getDateText } from '../../utilities';
+import { ProgressSpinnerService } from '../../services/progress-spinner.service';
+import { Clipboard } from '@angular/cdk/clipboard';
 
 @Component({
   selector: 'app-results',
@@ -39,8 +39,6 @@ https://www.facebook.com/happyway.club
 
   private eventChangesSubscription: Subscription;
 
-  @BlockUI() blockUI: NgBlockUI;
-
   event: EventModel;
   members: EventMemberModel[];
   resultMembers: ResultMemberModel[];
@@ -50,7 +48,8 @@ https://www.facebook.com/happyway.club
               private readonly likeService: LikeService,
               private readonly sanitizer: DomSanitizer,
               private readonly snackBar: MatSnackBar,
-              private readonly clipboardService: ClipboardService) { }
+              private readonly clipboard: Clipboard,
+              private readonly progressSpinnerService: ProgressSpinnerService) { }
 
   ngOnInit() {
     this.eventChangesSubscription = this.eventService.eventChanges.subscribe(event => {
@@ -74,12 +73,12 @@ https://www.facebook.com/happyway.club
   }
 
   copy(text: string) {
-    this.clipboardService.copyFromContent(text);
+    this.clipboard.copy(text);
     this.snackBar.open('Успешно скопировано ❤');
   }
 
   private getResultData(member: EventMemberModel) {
-    this.blockUI.start();
+    this.progressSpinnerService.start();
     return this.likeService.getAllByMember(member.id).pipe(map(likes => {
       const result = <ResultMemberModel>{
         member: member,
@@ -91,7 +90,7 @@ https://www.facebook.com/happyway.club
 
   private load(eventId: number) {
     this.eventMemberService.sexChanges.subscribe(sex => {
-      this.blockUI.start();
+      this.progressSpinnerService.start();
       this.eventMemberService.get(eventId).subscribe(data => {
         this.members = data;
         const sexMembers = data.filter(m => m.sex === sex);
@@ -100,15 +99,15 @@ https://www.facebook.com/happyway.club
         const setResultObs = sexMembers.map(m => this.getResultData(m));
         concat(...setResultObs).subscribe(resultMember => {
           this.resultMembers.push(resultMember);
-          this.blockUI.stop();
+          this.progressSpinnerService.stop();
         }, error => {
-          this.blockUI.stop();
+          this.progressSpinnerService.stop();
           this.showError('Ошибка загрузки результатов участников 💔', error);
         });
 
-        this.blockUI.stop();
+        this.progressSpinnerService.stop();
       }, error => {
-        this.blockUI.stop();
+        this.progressSpinnerService.stop();
         this.showError('Ошибка загрузки участиков 💔', error);
       });
     });

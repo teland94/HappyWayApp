@@ -4,12 +4,12 @@ import { UserModel, Role } from '../../models/user.model';
 import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar, MatSnackBarConfig } from '@angular/material/snack-bar';
 import { UserDialogComponent, UserDialogData } from '../dialogs/user-dialog/user-dialog.component';
-import { BlockUI, NgBlockUI } from 'ng-block-ui';
 import { DatabaseService } from '../../services/database.service';
 import { forkJoin } from 'rxjs';
 import { Area } from '../../models/area.model';
 import { AuthenticationService } from '../../services/authentication.service';
 import { ConfirmationService } from '../../services/confirmation.service';
+import { ProgressSpinnerService } from '../../services/progress-spinner.service';
 
 @Component({
   selector: 'app-users',
@@ -25,14 +25,14 @@ export class UsersComponent implements OnInit {
   role = Role;
 
   displayedColumns: string[] = ['username', 'displayName', 'city', 'phoneNumber', 'edit', 'delete'];
-  @BlockUI() blockUI: NgBlockUI;
 
   constructor(private readonly userService: UserService,
               private readonly authenticationService: AuthenticationService,
               private readonly confirmationService: ConfirmationService,
               private readonly databaseService: DatabaseService,
               private readonly snackBar: MatSnackBar,
-              private readonly dialog: MatDialog) { }
+              private readonly dialog: MatDialog,
+              private readonly progressSpinnerService: ProgressSpinnerService) { }
 
   ngOnInit() {
     this.load();
@@ -77,14 +77,14 @@ export class UsersComponent implements OnInit {
   }
 
   private load() {
-    this.blockUI.start();
+    this.progressSpinnerService.start();
     forkJoin([this.userService.getAll(), this.databaseService.getAreas()])
       .subscribe(([users, areas]) => {
         this.users = users;
         this.cities = this.getCities(areas);
-        this.blockUI.stop();
+        this.progressSpinnerService.stop();
       }, error => {
-        this.blockUI.stop();
+        this.progressSpinnerService.stop();
         this.showError('Ошибка загрузки пользователей.', error);
       });
   }

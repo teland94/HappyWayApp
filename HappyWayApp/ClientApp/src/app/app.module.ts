@@ -6,8 +6,6 @@ import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { RouterModule } from '@angular/router';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { AppMaterialModule } from '../material.module';
-import { ClipboardModule } from 'ngx-clipboard';
-import { BlockUIModule } from 'ng-block-ui';
 import localeRu from '@angular/common/locales/ru';
 import { appRoutingModule } from './app.routing';
 import { UsersComponent } from './components/users/users.component';
@@ -31,6 +29,8 @@ import { UserDialogComponent } from './components/dialogs/user-dialog/user-dialo
 import { LoginComponent } from './components/login/login.component';
 import { JwtInterceptor } from './interceptors/jwt.interceptor';
 import { ErrorInterceptor } from './interceptors/error.interceptor';
+import { ProgressSpinnerComponent } from './components/progress-spinner/progress-spinner.component';
+import { PROGRESS_SPINNER_CONFIG } from './services/progress-spinner.service';
 
 registerLocaleData(localeRu, 'ru');
 
@@ -50,14 +50,16 @@ registerLocaleData(localeRu, 'ru');
     EventMembersComponent,
     LoginComponent,
     UsersComponent,
-    PasswordPromptDialogComponent
+    PasswordPromptDialogComponent,
+    ProgressSpinnerComponent
   ],
   entryComponents: [
     EventDialogComponent,
     EventMemberDialogComponent,
     ConfirmationDialogComponent,
     UserDialogComponent,
-    PasswordPromptDialogComponent
+    PasswordPromptDialogComponent,
+    ProgressSpinnerComponent
   ],
   imports: [
     BrowserModule.withServerTransition({ appId: 'ng-cli-universal' }),
@@ -66,17 +68,16 @@ registerLocaleData(localeRu, 'ru');
     BrowserAnimationsModule,
     AppMaterialModule,
     ReactiveFormsModule,
-    ClipboardModule,
-    BlockUIModule.forRoot(),
     appRoutingModule
   ],
   providers: [
-    { provide: MAT_SNACK_BAR_DEFAULT_OPTIONS, useValue: {duration: 3000, panelClass: 'info-panel'} },
+    { provide: MAT_SNACK_BAR_DEFAULT_OPTIONS, useValue: { duration: 3000, panelClass: 'info-panel' } },
     { provide: LOCALE_ID, useValue: 'ru' },
     { provide: DateAdapter, useClass: CustomDateAdapter },
     { provide: HTTP_INTERCEPTORS, useClass: JwtInterceptor, multi: true },
     { provide: HTTP_INTERCEPTORS, useClass: ErrorInterceptor, multi: true },
-    { provide: ErrorStateMatcher, useClass: ShowOnDirtyErrorStateMatcher }
+    { provide: ErrorStateMatcher, useClass: ShowOnDirtyErrorStateMatcher },
+    { provide: PROGRESS_SPINNER_CONFIG, useValue: { delayStart: 400, delayStop: 700 }}
   ],
   bootstrap: [AppComponent]
 })

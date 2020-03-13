@@ -1,22 +1,18 @@
 import { AfterViewInit, Component, ViewChild, OnInit } from '@angular/core';
-import { MatDatepickerInputEvent } from '@angular/material/datepicker';
 import { MatDialog } from '@angular/material/dialog';
 import { MatDrawer } from '@angular/material/sidenav';
 import { MatSnackBarConfig, MatSnackBar } from '@angular/material/snack-bar';
 import { Router } from '@angular/router';
-import { FormControl, Validators } from '@angular/forms';
 import { EventService } from '../../services/event.service';
 import { AuthenticationService } from '../../services/authentication.service';
 import { Role, UserModel } from '../../models/user.model';
 import { EventModel } from '../../models/event.model';
 import { EventDialogComponent, EventDialogData } from '../dialogs/event-dialog/event-dialog.component';
 import { getDateWithTimeZoneOffsetHours } from '../../utilities';
-import { concat } from 'rxjs';
 import { DatabaseService } from '../../services/database.service';
-import { BlockUI, NgBlockUI } from 'ng-block-ui';
 import { ConfirmationService } from '../../services/confirmation.service';
-import { map } from 'rxjs/operators';
 import { ImportDataService } from '../../services/import-data.service';
+import { ProgressSpinnerService } from '../../services/progress-spinner.service';
 
 @Component({
   selector: 'app-layout',
@@ -26,7 +22,6 @@ import { ImportDataService } from '../../services/import-data.service';
 export class LayoutComponent implements OnInit, AfterViewInit {
 
   @ViewChild('drawer') drawer: MatDrawer;
-  @BlockUI() blockUI: NgBlockUI;
 
   event: EventModel;
   currentUser: UserModel;
@@ -40,7 +35,8 @@ export class LayoutComponent implements OnInit, AfterViewInit {
               private readonly snackBar: MatSnackBar,
               private readonly eventService: EventService,
               private readonly databaseService: DatabaseService,
-              private readonly importDataService: ImportDataService) {
+              private readonly importDataService: ImportDataService,
+              private readonly progressSpinnerService: ProgressSpinnerService) {
     this.authenticationService.currentUser.subscribe(x => this.currentUser = x);
   }
 
@@ -54,9 +50,9 @@ export class LayoutComponent implements OnInit, AfterViewInit {
         .subscribe(event => {
           this.event = event;
           this.eventService.setCurrentEvent(event);
-          this.blockUI.stop();
+          this.progressSpinnerService.stop();
         }, error => {
-          this.blockUI.stop();
+          this.progressSpinnerService.stop();
           if (error.status === 403 || error.status === 404) {
             this.setLastEvent();
             return;
@@ -102,11 +98,11 @@ export class LayoutComponent implements OnInit, AfterViewInit {
         this.logout();
         return;
       }
-      this.blockUI.start();
+      this.progressSpinnerService.start();
       this.eventService.setCompleted(this.event.id, true).subscribe(() => {
         this.logout();
       }, error => {
-        this.blockUI.stop();
+        this.progressSpinnerService.stop();
         if (error.status === 404) {
           this.logout(false);
         }
@@ -123,18 +119,18 @@ export class LayoutComponent implements OnInit, AfterViewInit {
       const event = eventDialogResult.event;
       event.date = getDateWithTimeZoneOffsetHours(event.date);
 
-      this.blockUI.start();
+      this.progressSpinnerService.start();
       this.eventService.create(event).subscribe(createdEvent => {
         this.importDataService.downloadDocData(createdEvent.id, eventDialogResult.docUrl).subscribe(() => {
-          this.blockUI.stop();
+          this.progressSpinnerService.stop();
           this.setLastEvent(createdEvent, '/home');
         }, error => {
-          this.blockUI.stop();
+          this.progressSpinnerService.stop();
           this.setLastEvent(createdEvent, '/event-members');
           this.showError('Ошибка загрузки данных.', error);
         });
       }, error => {
-        this.blockUI.stop();
+        this.progressSpinnerService.stop();
         this.showError('Ошибка добавления мероприятия.', error);
       });
     });
@@ -145,7 +141,7 @@ export class LayoutComponent implements OnInit, AfterViewInit {
     this.eventService.setCurrentEvent(null);
     this.authenticationService.logout();
     this.router.navigate(['/login']).then(() => {
-      this.blockUI.stop();
+      this.progressSpinnerService.stop();
       if (showMessage) {
         this.snackBar.open('Благодарим, что были сегодня с нами ❤');
       }
@@ -161,18 +157,18 @@ export class LayoutComponent implements OnInit, AfterViewInit {
         this.router.navigate([navigateCommand]);
       }
     } else {
-      this.blockUI.start();
+      this.progressSpinnerService.start();
       this.eventService.getLastEvent()
         .subscribe(ev => {
           this.event = ev;
           this.eventService.setCurrentEvent(event);
-          this.blockUI.stop();
+          this.progressSpinnerService.stop();
           if (navigateCommand) {
             this.drawer.close();
             this.router.navigate([navigateCommand]);
           }
         }, error => {
-          this.blockUI.stop();
+          this.progressSpinnerService.stop();
           if (error.status === 404) { return; }
           this.showError('Ошибка установки мероприятия.', error);
         });

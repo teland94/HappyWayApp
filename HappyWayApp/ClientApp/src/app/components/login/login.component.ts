@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AuthenticationService } from '../../services/authentication.service';
-import { BlockUI, NgBlockUI } from 'ng-block-ui';
+import { ProgressSpinnerService } from '../../services/progress-spinner.service';
 
 @Component({
   selector: 'app-login',
@@ -17,14 +17,11 @@ export class LoginComponent implements OnInit {
   returnUrl: string;
   error = '';
 
-  @BlockUI() blockUI: NgBlockUI;
-
-  constructor(
-    private formBuilder: FormBuilder,
-    private route: ActivatedRoute,
-    private router: Router,
-    private authenticationService: AuthenticationService
-  ) {
+  constructor(private readonly formBuilder: FormBuilder,
+              private readonly route: ActivatedRoute,
+              private readonly router: Router,
+              private readonly authenticationService: AuthenticationService,
+              private readonly progressSpinnerService: ProgressSpinnerService) {
     // redirect to home if already logged in
     if (this.authenticationService.currentUserValue) {
       this.router.navigate(['/']);
@@ -52,12 +49,12 @@ export class LoginComponent implements OnInit {
       return;
     }
 
-    this.blockUI.start();
+    this.progressSpinnerService.start();
     this.authenticationService.login(this.f.username.value, this.f.password.value)
       .subscribe(
         data => {
           this.router.navigate([this.returnUrl]);
-          this.blockUI.stop();
+          this.progressSpinnerService.stop();
         },
         error => {
           if (error.message) {
@@ -66,7 +63,7 @@ export class LoginComponent implements OnInit {
             console.log(error);
             this.error = 'Неизвестная ошибка.';
           }
-          this.blockUI.stop();
+          this.progressSpinnerService.stop();
         });
   }
 }

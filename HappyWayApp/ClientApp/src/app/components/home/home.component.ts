@@ -1,14 +1,14 @@
-import {Component, OnDestroy, OnInit, ViewChild, ViewEncapsulation} from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
 import { EventMemberService } from 'src/app/services/event-member.service';
 import { EventMemberCardModel, Sex, CardLikedMember, EventMemberModel } from '../../models/event-member';
 import { MatSnackBar, MatSnackBarConfig } from '@angular/material/snack-bar';
 import { MatHorizontalStepper, MatStepper } from '@angular/material/stepper';
 import { StepperSelectionEvent } from '@angular/cdk/stepper';
 import { LikeService } from 'src/app/services/like.service';
-import { LikeModel, SaveLikeModel } from '../../models/like.model';
-import { BlockUI, NgBlockUI } from 'ng-block-ui';
-import {of, Subscription} from 'rxjs';
-import {EventService} from '../../services/event.service';
+import { SaveLikeModel } from '../../models/like.model';
+import { of, Subscription } from 'rxjs';
+import { EventService } from '../../services/event.service';
+import { ProgressSpinnerService } from '../../services/progress-spinner.service';
 
 @Component({
   selector: 'app-home',
@@ -23,7 +23,6 @@ export class HomeComponent implements OnInit, OnDestroy {
   stepper: MatStepper;
 
   displayedColumns: string[] = ['number', 'liked', 'name'];
-  @BlockUI() blockUI: NgBlockUI;
 
   cardMembers: EventMemberCardModel[];
   currentCardMember: EventMemberCardModel;
@@ -39,9 +38,8 @@ export class HomeComponent implements OnInit, OnDestroy {
   constructor(private readonly eventService: EventService,
               private readonly eventMemberService: EventMemberService,
               private readonly likeService: LikeService,
-              private readonly snackBar: MatSnackBar) {
-
-  }
+              private readonly snackBar: MatSnackBar,
+              private readonly progressSpinnerService: ProgressSpinnerService) { }
 
   ngOnInit() {
     this.eventChangesSubscription = this.eventService.eventChanges.subscribe(event => {
@@ -103,16 +101,16 @@ export class HomeComponent implements OnInit, OnDestroy {
 
   private load(eventId: number) {
     this.eventMemberService.sexChanges.subscribe(sex => {
-      this.blockUI.start();
+      this.progressSpinnerService.start();
       this.cardMembers = [];
       this.eventMemberService.get(eventId).subscribe(data => {
         this.setCardMembers(data, sex);
         if (this.cardMembers && this.cardMembers.length > 0) {
           this.setLikedMembers(this.cardMembers[0]);
         }
-        this.blockUI.stop();
+        this.progressSpinnerService.stop();
       }, error => {
-        this.blockUI.stop();
+        this.progressSpinnerService.stop();
         this.showError('Ошибка загрузки участников 💔', error);
       });
     });

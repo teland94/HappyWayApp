@@ -1,15 +1,15 @@
-import {Component, OnDestroy, OnInit} from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar, MatSnackBarConfig } from '@angular/material/snack-bar';
 import { EventMemberModel } from '../../models/event-member';
 import { EventMemberService } from '../../services/event-member.service';
-import { BlockUI, NgBlockUI } from 'ng-block-ui';
 import { EventMemberDialogComponent } from '../dialogs/event-member-dialog/event-member-dialog.component';
 import { ActivatedRoute } from '@angular/router';
 import { ConfirmationService } from '../../services/confirmation.service';
 import { EventService } from '../../services/event.service';
 import { Subscription } from 'rxjs';
 import { ImportDataService } from '../../services/import-data.service';
+import { ProgressSpinnerService } from '../../services/progress-spinner.service';
 
 @Component({
   selector: 'app-event-members',
@@ -26,15 +26,14 @@ export class EventMembersComponent implements OnInit, OnDestroy {
   docUrl: string;
   eventMembers: EventMemberModel[];
 
-  @BlockUI() blockUI: NgBlockUI;
-
   constructor(private readonly eventService: EventService,
               private readonly importDataService: ImportDataService,
               private readonly eventMemberService: EventMemberService,
               private readonly confirmationService: ConfirmationService,
               private readonly snackBar: MatSnackBar,
               private readonly dialog: MatDialog,
-              private readonly route: ActivatedRoute) { }
+              private readonly route: ActivatedRoute,
+              private readonly progressSpinnerService: ProgressSpinnerService) { }
 
   ngOnInit() {
     const id = this.route.snapshot.paramMap.get('id');
@@ -59,27 +58,27 @@ export class EventMembersComponent implements OnInit, OnDestroy {
   }
 
   downloadDocData() {
-    this.blockUI.start();
+    this.progressSpinnerService.start();
     this.importDataService.downloadDocData(this.eventId, this.docUrl)
       .subscribe(() => {
         this.docUrl = null;
-        this.blockUI.stop();
+        this.progressSpinnerService.stop();
         this.snackBar.open('Данные успешно загружены.');
         this.load(this.eventId);
       }, error => {
-        this.blockUI.stop();
+        this.progressSpinnerService.stop();
         this.showError('Ошибка загрузки данных.', error);
       });
   }
 
   private load(eventId: number) {
-    this.blockUI.start();
+    this.progressSpinnerService.start();
     this.eventMemberService.sexChanges.subscribe(sex => {
       this.eventMemberService.get(eventId).subscribe(data => {
         this.eventMembers = data.filter(m => m.sex === sex);
-        this.blockUI.stop();
+        this.progressSpinnerService.stop();
       }, error => {
-        this.blockUI.stop();
+        this.progressSpinnerService.stop();
         this.showError('Ошибка загрузки участников.', error);
       });
     });
