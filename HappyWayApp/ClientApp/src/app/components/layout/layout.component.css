@@ -23,9 +23,17 @@
   padding-left: 6px;
 }
 
+.toolbar-fixed-top {
+  position: sticky;
+  top: 0;
+  left: 0;
+  z-index: 2;
+  flex-shrink: 0;
+}
+
 main {
   display: flex;
-  flex: 1;
+  flex: 1 0 auto;
   flex-direction: column;
   margin: 5px;
 }
@@ -33,7 +41,11 @@ main {
 footer {
   text-align: center;
   font-size: small;
-  flex: 0 0 auto;
+  flex-shrink: 0;
+  position: sticky;
+  left: 0;
+  bottom: 0;
+  background-color: #303030;
 }
 
 .nav-caption {
@@ -43,10 +55,6 @@ footer {
 
 .mat-button, .mat-icon-button {
   margin-left: 5px;
-}
-
-::ng-deep .block-ui-spinner {
-  top: 50% !important;
 }
 
 .hide {
@@ -83,4 +91,3 @@ footer {
     display: none;
   }
 }
-

@@ -50,7 +50,7 @@
     </mat-nav-list>
   </mat-sidenav>
   <mat-sidenav-content class="sidenav-content">
-    <mat-toolbar color="primary">
+    <mat-toolbar color="primary" class="toolbar-fixed-top">
       <button type="button"
               aria-label="Toggle sidenav"
               mat-icon-button
@@ -73,8 +73,8 @@
     <main>
       <router-outlet></router-outlet>
     </main>
-    <mat-divider></mat-divider>
     <footer>
+      <mat-divider></mat-divider>
       Copyright &copy; {{date | date: 'yyyy'}} Happy Way. Все права защищены.
     </footer>
   </mat-sidenav-content>

@@ -13,13 +13,14 @@ import { ConfirmationService } from '../../services/confirmation.service';
 import { getDateWithTimeZoneOffsetHours } from '../../utilities';
 import { ImportDataService } from '../../services/import-data.service';
 import { ProgressSpinnerService } from '../../services/progress-spinner.service';
+import { BaseComponent } from '../base/base.component';
 
 @Component({
   selector: 'app-events',
   templateUrl: './events.component.html',
   styleUrls: ['./events.component.css']
 })
-export class EventsComponent implements OnInit, OnDestroy {
+export class EventsComponent extends BaseComponent implements OnInit, OnDestroy {
 
   private eventChangesSubscription: Subscription;
 
@@ -33,10 +34,12 @@ export class EventsComponent implements OnInit, OnDestroy {
               private readonly importDataService: ImportDataService,
               private readonly databaseService: DatabaseService,
               private readonly confirmationService: ConfirmationService,
-              private readonly snackBar: MatSnackBar,
+              protected readonly snackBar: MatSnackBar,
               private readonly dialog: MatDialog,
               private readonly router: Router,
-              private readonly progressSpinnerService: ProgressSpinnerService) { }
+              private readonly progressSpinnerService: ProgressSpinnerService) {
+    super(snackBar);
+  }
 
   ngOnInit() {
     this.eventChangesSubscription = this.eventService.eventChanges.subscribe(event => {
@@ -178,13 +181,5 @@ export class EventsComponent implements OnInit, OnDestroy {
     });
 
     return dialogRef.afterClosed();
-  }
-
-  private showError(errorText: string, error: any) {
-    console.log(error);
-    const config = new MatSnackBarConfig();
-    config.duration = 3000;
-    config.panelClass = ['error-panel'];
-    this.snackBar.open(errorText, null, config);
   }
 }

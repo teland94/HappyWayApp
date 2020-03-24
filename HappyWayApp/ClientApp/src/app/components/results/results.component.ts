@@ -12,13 +12,14 @@ import { EventModel } from 'src/app/models/event.model';
 import { getDateText } from '../../utilities';
 import { ProgressSpinnerService } from '../../services/progress-spinner.service';
 import { Clipboard } from '@angular/cdk/clipboard';
+import { BaseComponent } from '../base/base.component';
 
 @Component({
   selector: 'app-results',
   templateUrl: './results.component.html',
   styleUrls: ['./results.component.css']
 })
-export class ResultsComponent implements OnInit, OnDestroy {
+export class ResultsComponent extends BaseComponent implements OnInit, OnDestroy {
 
   private readonly matchedText = 'Здравствуйте, на "Быстрых свиданиях {{date}} в Арт-кафе «Пластилиновая ворона»" у Вас взаимные симпатии с:';
   private readonly nonMatchedText = 'Здравствуйте, на "Быстрых свиданиях {{date}} в Арт-кафе «Пластилиновая ворона»" у Вас симпатии, к сожалению, не совпали.';
@@ -47,9 +48,11 @@ https://www.facebook.com/happyway.club
               private readonly eventMemberService: EventMemberService,
               private readonly likeService: LikeService,
               private readonly sanitizer: DomSanitizer,
-              private readonly snackBar: MatSnackBar,
+              protected readonly snackBar: MatSnackBar,
               private readonly clipboard: Clipboard,
-              private readonly progressSpinnerService: ProgressSpinnerService) { }
+              private readonly progressSpinnerService: ProgressSpinnerService) {
+    super(snackBar);
+  }
 
   ngOnInit() {
     this.eventChangesSubscription = this.eventService.eventChanges.subscribe(event => {
@@ -166,13 +169,5 @@ https://www.facebook.com/happyway.club
       && !matched.some(m => m === l.sourceMemberId))
       .map(l => l.sourceMemberId);
     return { matched, liked };
-  }
-
-  private showError(errorText: string, error: any) {
-    console.log(error);
-    const config = new MatSnackBarConfig();
-    config.duration = 3000;
-    config.panelClass = ['error-panel'];
-    this.snackBar.open(errorText, null, config);
   }
 }

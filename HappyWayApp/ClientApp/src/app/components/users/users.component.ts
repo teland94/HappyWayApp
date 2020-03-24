@@ -10,13 +10,14 @@ import { Area } from '../../models/area.model';
 import { AuthenticationService } from '../../services/authentication.service';
 import { ConfirmationService } from '../../services/confirmation.service';
 import { ProgressSpinnerService } from '../../services/progress-spinner.service';
+import { BaseComponent } from '../base/base.component';
 
 @Component({
   selector: 'app-users',
   templateUrl: './users.component.html',
   styleUrls: ['./users.component.css']
 })
-export class UsersComponent implements OnInit {
+export class UsersComponent extends BaseComponent implements OnInit {
 
   users: UserModel[] = [];
 
@@ -30,9 +31,11 @@ export class UsersComponent implements OnInit {
               private readonly authenticationService: AuthenticationService,
               private readonly confirmationService: ConfirmationService,
               private readonly databaseService: DatabaseService,
-              private readonly snackBar: MatSnackBar,
+              protected readonly snackBar: MatSnackBar,
               private readonly dialog: MatDialog,
-              private readonly progressSpinnerService: ProgressSpinnerService) { }
+              private readonly progressSpinnerService: ProgressSpinnerService) {
+    super(snackBar);
+  }
 
   ngOnInit() {
     this.load();
@@ -112,13 +115,5 @@ export class UsersComponent implements OnInit {
     });
 
     return dialogRef.afterClosed();
-  }
-
-  private showError(errorText: string, error: any) {
-    console.log(error);
-    const config = new MatSnackBarConfig();
-    config.duration = 3000;
-    config.panelClass = ['error-panel'];
-    this.snackBar.open(errorText, null, config);
   }
 }

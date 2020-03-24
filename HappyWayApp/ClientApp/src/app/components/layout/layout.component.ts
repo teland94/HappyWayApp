@@ -13,13 +13,14 @@ import { DatabaseService } from '../../services/database.service';
 import { ConfirmationService } from '../../services/confirmation.service';
 import { ImportDataService } from '../../services/import-data.service';
 import { ProgressSpinnerService } from '../../services/progress-spinner.service';
+import { BaseComponent } from '../base/base.component';
 
 @Component({
   selector: 'app-layout',
   templateUrl: './layout.component.html',
   styleUrls: ['./layout.component.css']
 })
-export class LayoutComponent implements OnInit, AfterViewInit {
+export class LayoutComponent extends BaseComponent implements OnInit, AfterViewInit {
 
   @ViewChild('drawer') drawer: MatDrawer;
 
@@ -32,11 +33,12 @@ export class LayoutComponent implements OnInit, AfterViewInit {
               private readonly authenticationService: AuthenticationService,
               private readonly confirmationService: ConfirmationService,
               private readonly dialog: MatDialog,
-              private readonly snackBar: MatSnackBar,
+              protected readonly snackBar: MatSnackBar,
               private readonly eventService: EventService,
               private readonly databaseService: DatabaseService,
               private readonly importDataService: ImportDataService,
               private readonly progressSpinnerService: ProgressSpinnerService) {
+    super(snackBar);
     this.authenticationService.currentUser.subscribe(x => this.currentUser = x);
   }
 
@@ -48,17 +50,17 @@ export class LayoutComponent implements OnInit, AfterViewInit {
       if (!user) { return; }
       this.eventService.getEventFromStorage()
         .subscribe(event => {
-          this.event = event;
           this.eventService.setCurrentEvent(event);
           this.progressSpinnerService.stop();
         }, error => {
           this.progressSpinnerService.stop();
-          if (error.status === 403 || error.status === 404) {
-            this.setLastEvent();
-            return;
-          }
+          if (error.status === 403 || error.status === 404) { return; }
           this.showError('Ошибка установки мероприятия.', error);
         });
+    });
+    this.eventService.eventChanges.subscribe(event => {
+      if (!event) { return; }
+      this.event = event;
     });
   }
 
@@ -123,10 +125,10 @@ export class LayoutComponent implements OnInit, AfterViewInit {
       this.eventService.create(event).subscribe(createdEvent => {
         this.importDataService.downloadDocData(createdEvent.id, eventDialogResult.docUrl).subscribe(() => {
           this.progressSpinnerService.stop();
-          this.setLastEvent(createdEvent, '/home');
+          this.setCurrentEvent(createdEvent, '/home');
         }, error => {
           this.progressSpinnerService.stop();
-          this.setLastEvent(createdEvent, '/event-members');
+          this.setCurrentEvent(createdEvent, '/event-members');
           this.showError('Ошибка загрузки данных.', error);
         });
       }, error => {
@@ -148,7 +150,7 @@ export class LayoutComponent implements OnInit, AfterViewInit {
     });
   }
 
-  private setLastEvent(event?: EventModel, navigateCommand?: string) {
+  private setCurrentEvent(event?: EventModel, navigateCommand?: string) {
     if (event) {
       this.event = event;
       this.eventService.setCurrentEvent(event);
@@ -185,13 +187,5 @@ export class LayoutComponent implements OnInit, AfterViewInit {
     });
 
     return dialogRef.afterClosed();
-  }
-
-  private showError(errorText: string, error: any) {
-    console.log(error);
-    const config = new MatSnackBarConfig();
-    config.duration = 3000;
-    config.panelClass = ['error-panel'];
-    this.snackBar.open(errorText, null, config);
   }
 }

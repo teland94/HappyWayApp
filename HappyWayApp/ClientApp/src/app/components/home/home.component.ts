@@ -9,6 +9,7 @@ import { SaveLikeModel } from '../../models/like.model';
 import { of, Subscription } from 'rxjs';
 import { EventService } from '../../services/event.service';
 import { ProgressSpinnerService } from '../../services/progress-spinner.service';
+import { BaseComponent } from '../base/base.component';
 
 @Component({
   selector: 'app-home',
@@ -16,7 +17,7 @@ import { ProgressSpinnerService } from '../../services/progress-spinner.service'
   styleUrls: ['./home.component.css'],
   encapsulation: ViewEncapsulation.None
 })
-export class HomeComponent implements OnInit, OnDestroy {
+export class HomeComponent extends BaseComponent implements OnInit, OnDestroy {
 
   private eventChangesSubscription: Subscription;
 
@@ -38,8 +39,10 @@ export class HomeComponent implements OnInit, OnDestroy {
   constructor(private readonly eventService: EventService,
               private readonly eventMemberService: EventMemberService,
               private readonly likeService: LikeService,
-              private readonly snackBar: MatSnackBar,
-              private readonly progressSpinnerService: ProgressSpinnerService) { }
+              protected readonly snackBar: MatSnackBar,
+              private readonly progressSpinnerService: ProgressSpinnerService) {
+    super(snackBar);
+  }
 
   ngOnInit() {
     this.eventChangesSubscription = this.eventService.eventChanges.subscribe(event => {
@@ -158,13 +161,5 @@ export class HomeComponent implements OnInit, OnDestroy {
 
   private getOppositeSex(sex: Sex) {
     return sex === Sex.Male ? Sex.Female : Sex.Male;
-  }
-
-  private showError(errorText: string, error: any) {
-    console.log(error);
-    const config = new MatSnackBarConfig();
-    config.duration = 3000;
-    config.panelClass = ['error-panel'];
-    this.snackBar.open(errorText, null, config);
   }
 }

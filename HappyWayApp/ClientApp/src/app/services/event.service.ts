@@ -4,7 +4,7 @@ import { EventModel } from '../models/event.model';
 import {BehaviorSubject, of} from 'rxjs';
 import {catchError, map} from 'rxjs/operators';
 
-const CurrentEventIdKey = 'CurrentEventId';
+const CurrentEventIdKey = 'currentEventId';
 
 @Injectable({
   providedIn: 'root'

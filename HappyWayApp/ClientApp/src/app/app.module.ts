@@ -12,6 +12,7 @@ import { UsersComponent } from './components/users/users.component';
 import { PasswordPromptDialogComponent } from './components/dialogs/password-prompt-dialog/password-prompt-dialog.component';
 
 import { AppComponent } from './app.component';
+import { BaseComponent } from './components/base/base.component';
 import { LayoutComponent } from './components/layout/layout.component';
 import { HomeComponent } from './components/home/home.component';
 import { ResultsComponent } from './components/results/results.component';
@@ -37,6 +38,7 @@ registerLocaleData(localeRu, 'ru');
 @NgModule({
   declarations: [
     AppComponent,
+    BaseComponent,
     LayoutComponent,
     HomeComponent,
     SexSelectComponent,

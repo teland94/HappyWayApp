@@ -10,13 +10,14 @@ import { EventService } from '../../services/event.service';
 import { Subscription } from 'rxjs';
 import { ImportDataService } from '../../services/import-data.service';
 import { ProgressSpinnerService } from '../../services/progress-spinner.service';
+import { BaseComponent } from '../base/base.component';
 
 @Component({
   selector: 'app-event-members',
   templateUrl: './event-members.component.html',
   styleUrls: ['./event-members.component.css']
 })
-export class EventMembersComponent implements OnInit, OnDestroy {
+export class EventMembersComponent extends BaseComponent implements OnInit, OnDestroy {
 
   private eventChangesSubscription: Subscription;
 
@@ -30,10 +31,12 @@ export class EventMembersComponent implements OnInit, OnDestroy {
               private readonly importDataService: ImportDataService,
               private readonly eventMemberService: EventMemberService,
               private readonly confirmationService: ConfirmationService,
-              private readonly snackBar: MatSnackBar,
+              protected readonly snackBar: MatSnackBar,
               private readonly dialog: MatDialog,
               private readonly route: ActivatedRoute,
-              private readonly progressSpinnerService: ProgressSpinnerService) { }
+              private readonly progressSpinnerService: ProgressSpinnerService) {
+    super(snackBar);
+  }
 
   ngOnInit() {
     const id = this.route.snapshot.paramMap.get('id');
@@ -118,13 +121,5 @@ export class EventMembersComponent implements OnInit, OnDestroy {
     });
 
     return dialogRef.afterClosed();
-  }
-
-  private showError(errorText: string, error: any) {
-    console.log(error);
-    const config = new MatSnackBarConfig();
-    config.duration = 3000;
-    config.panelClass = ['error-panel'];
-    this.snackBar.open(errorText, null, config);
   }
 }
