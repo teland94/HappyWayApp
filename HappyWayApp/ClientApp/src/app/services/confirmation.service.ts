@@ -4,7 +4,7 @@ import { MatSnackBar, MatSnackBarConfig, MatSnackBarDismiss } from '@angular/mat
 import { ConfirmationDialogComponent } from '../components/dialogs/confirmation-dialog/confirmation-dialog.component';
 import { PasswordPromptDialogComponent } from '../components/dialogs/password-prompt-dialog/password-prompt-dialog.component';
 import { AuthenticationService } from './authentication.service';
-import { catchError, flatMap, map } from 'rxjs/operators';
+import { catchError, switchMap, map } from 'rxjs/operators';
 import { of } from 'rxjs';
 
 @Injectable({
@@ -23,7 +23,7 @@ export class ConfirmationService {
   openConfirmDialogWithPassword(action: string) {
     return this.openConfirmDialog(action)
       .pipe(
-          flatMap(confirmResult => {
+        switchMap(confirmResult => {
             if (!confirmResult) { return of(false); }
             return this.openPasswordPromptDialog(action);
           })
@@ -45,7 +45,7 @@ export class ConfirmationService {
     });
     return this.passwordDialogRef.afterClosed()
       .pipe(
-        flatMap(passwordResult => {
+        switchMap(passwordResult => {
           if (!passwordResult) { return of(false); }
           return this.authenticationService.checkPassword(passwordResult)
             .pipe(
@@ -63,7 +63,7 @@ export class ConfirmationService {
       }
       return this.openRetryBar('Неверный пароль.')
        .pipe(
-         flatMap((dismiss: MatSnackBarDismiss) => {
+         switchMap((dismiss: MatSnackBarDismiss) => {
           if (dismiss.dismissedByAction) {
             return this.openPasswordPromptDialog(action);
           } else {
