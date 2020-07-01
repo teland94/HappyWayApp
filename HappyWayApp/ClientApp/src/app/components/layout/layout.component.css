@@ -42,9 +42,6 @@ footer {
   text-align: center;
   font-size: small;
   flex-shrink: 0;
-  position: sticky;
-  left: 0;
-  bottom: 0;
   background-color: #303030;
 }
 
