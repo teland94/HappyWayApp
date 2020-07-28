@@ -10,12 +10,11 @@ import { Router } from '@angular/router';
 import { forkJoin, Subscription } from 'rxjs';
 import { DatabaseService } from '../../services/database.service';
 import { ConfirmationService } from '../../services/confirmation.service';
-import { getDateWithTimeZoneOffsetHours } from '../../utilities';
 import { ImportDataService } from '../../services/import-data.service';
 import { ProgressSpinnerService } from '../../services/progress-spinner.service';
 import { BaseComponent } from '../base/base.component';
-import {EventPlaceViewModel} from "../../models/event-place.model";
-import {EventPlaceViewService} from "../../services/event-place-view.service";
+import { EventPlaceViewModel } from '../../models/event-place.model';
+import { EventPlaceViewService } from '../../services/event-place-view.service';
 
 @Component({
   selector: 'app-events',
@@ -61,7 +60,6 @@ export class EventsComponent extends BaseComponent implements OnInit, OnDestroy 
       if (!eventDialogResult) { return; }
       const editedEvent = eventDialogResult.event;
       editedEvent.id = event.id;
-      editedEvent.date = getDateWithTimeZoneOffsetHours(editedEvent.date);
       this.eventService.update(editedEvent)
         .subscribe(() => {
           if (eventDialogResult.eventActive) {
@@ -93,7 +91,6 @@ export class EventsComponent extends BaseComponent implements OnInit, OnDestroy 
     this.openDialog().subscribe(eventDialogResult => {
       if (!eventDialogResult) { return; }
       const event = eventDialogResult.event;
-      event.date = getDateWithTimeZoneOffsetHours(event.date);
 
       this.progressSpinnerService.start();
       this.eventService.create(event).subscribe(createdEvent => {

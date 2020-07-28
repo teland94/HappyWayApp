@@ -8,15 +8,13 @@ import { AuthenticationService } from '../../services/authentication.service';
 import { Role, UserModel } from '../../models/user.model';
 import { EventModel } from '../../models/event.model';
 import { EventDialogComponent, EventDialogData } from '../dialogs/event-dialog/event-dialog.component';
-import { getDateWithTimeZoneOffsetHours } from '../../utilities';
 import { DatabaseService } from '../../services/database.service';
 import { ConfirmationService } from '../../services/confirmation.service';
 import { ImportDataService } from '../../services/import-data.service';
 import { ProgressSpinnerService } from '../../services/progress-spinner.service';
 import { BaseComponent } from '../base/base.component';
-import {EventPlaceService} from "../../services/event-place.service";
-import {EventPlaceViewModel} from "../../models/event-place.model";
-import {EventPlaceViewService} from "../../services/event-place-view.service";
+import { EventPlaceViewModel } from '../../models/event-place.model';
+import { EventPlaceViewService } from '../../services/event-place-view.service';
 
 @Component({
   selector: 'app-layout',
@@ -39,7 +37,6 @@ export class LayoutComponent extends BaseComponent implements OnInit, AfterViewI
               private readonly dialog: MatDialog,
               protected readonly snackBar: MatSnackBar,
               private readonly eventService: EventService,
-              private readonly eventPlaceService: EventPlaceService,
               private readonly eventPlaceViewService: EventPlaceViewService,
               private readonly databaseService: DatabaseService,
               private readonly importDataService: ImportDataService,
@@ -128,7 +125,6 @@ export class LayoutComponent extends BaseComponent implements OnInit, AfterViewI
     this.openDialog().subscribe(eventDialogResult => {
       if (!eventDialogResult) { return; }
       const event = eventDialogResult.event;
-      event.date = getDateWithTimeZoneOffsetHours(event.date);
 
       this.progressSpinnerService.start();
       this.eventService.create(event).subscribe(createdEvent => {

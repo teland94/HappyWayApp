@@ -2,8 +2,9 @@ import {Component, EventEmitter, Inject} from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import {FormBuilder, FormControl, FormGroup, Validators} from '@angular/forms';
 import {EventModel} from '../../../models/event.model';
-import {EventPlaceViewModel} from "../../../models/event-place.model";
-import {CustomValidators} from "../../../custom-validators";
+import {EventPlaceViewModel} from '../../../models/event-place.model';
+import {CustomValidators} from '../../../custom-validators';
+import {getNowDateWithoutTime} from '../../../utilities';
 
 export class EventDialogResult {
   event: EventModel;
@@ -42,7 +43,7 @@ export class EventDialogComponent {
     this.form = this.fb.group({
       name: this.fb.control(name, Validators.required),
       eventPlaceId: this.fb.control(eventPlaceId, Validators.required),
-      date: this.fb.control(date ? date : new Date(), Validators.required),
+      date: this.fb.control(date ? date : getNowDateWithoutTime(), Validators.required),
       enabled: this.fb.control(completed ? !completed : true)
     });
     this.groups = this.data.groups;

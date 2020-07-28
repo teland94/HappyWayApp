@@ -1,20 +1,20 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
-import { EventMemberService } from 'src/app/services/event-member.service';
-import { ResultMemberModel, EventMemberModel, ResultLikedMemberModel, Sex } from '../../models/event-member';
-import { DomSanitizer } from '@angular/platform-browser';
-import { LikeService } from 'src/app/services/like.service';
-import { LikeModel } from '../../models/like.model';
-import { MatSnackBar, MatSnackBarConfig } from '@angular/material/snack-bar';
-import { map } from 'rxjs/operators';
-import { concat, Subscription } from 'rxjs';
-import { EventService } from 'src/app/services/event.service';
-import { EventModel } from 'src/app/models/event.model';
-import { getDateText } from '../../utilities';
-import { ProgressSpinnerService } from '../../services/progress-spinner.service';
-import { Clipboard } from '@angular/cdk/clipboard';
-import { BaseComponent } from '../base/base.component';
-import { EventPlaceViewModel } from "../../models/event-place.model";
-import { EventPlaceViewService } from "../../services/event-place-view.service";
+import {Component, OnDestroy, OnInit} from '@angular/core';
+import {EventMemberService} from 'src/app/services/event-member.service';
+import {EventMemberModel, ResultLikedMemberModel, ResultMemberModel} from '../../models/event-member';
+import {DomSanitizer} from '@angular/platform-browser';
+import {LikeService} from 'src/app/services/like.service';
+import {LikeModel} from '../../models/like.model';
+import {MatSnackBar} from '@angular/material/snack-bar';
+import {map} from 'rxjs/operators';
+import {concat, Subscription} from 'rxjs';
+import {EventService} from 'src/app/services/event.service';
+import {EventModel} from 'src/app/models/event.model';
+import {getDateText} from '../../utilities';
+import {ProgressSpinnerService} from '../../services/progress-spinner.service';
+import {Clipboard} from '@angular/cdk/clipboard';
+import {BaseComponent} from '../base/base.component';
+import {EventPlaceViewModel} from '../../models/event-place.model';
+import {EventPlaceViewService} from '../../services/event-place-view.service';
 
 @Component({
   selector: 'app-results',
@@ -123,11 +123,10 @@ export class ResultsComponent extends BaseComponent implements OnInit, OnDestroy
   private getResultData(member: EventMemberModel) {
     this.progressSpinnerService.start();
     return this.likeService.getAllByMember(member.id).pipe(map(likes => {
-      const result = <ResultMemberModel>{
+      return <ResultMemberModel>{
         member: member,
         text: this.getResultText(member, likes)
       };
-      return result;
     }));
   }
 

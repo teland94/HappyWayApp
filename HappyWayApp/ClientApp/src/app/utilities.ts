@@ -1,8 +1,6 @@
-export function getDateWithTimeZoneOffsetHours(date: Date) {
-  const resDate = new Date(date);
-  const currentTimeZoneOffsetInHours = resDate.getTimezoneOffset() / -60;
-  resDate.setHours(resDate.getHours() + currentTimeZoneOffsetInHours);
-  return resDate;
+export function getDateWithTimeZoneOffset(date: Date) {
+  return new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate(), date.getHours(), date.getMinutes(),
+    date.getSeconds()));
 }
 
 export function getDateText(date: Date) {
@@ -15,4 +13,10 @@ export function getDateText(date: Date) {
     mm = '0' + mm;
   }
   return `${dd}.${mm}`;
+}
+
+export function getNowDateWithoutTime() {
+  const nowDate = new Date();
+  nowDate.setHours(0, 0, 0, 0);
+  return nowDate;
 }

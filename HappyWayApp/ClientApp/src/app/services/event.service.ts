@@ -1,8 +1,9 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { EventModel } from '../models/event.model';
-import {BehaviorSubject, of} from 'rxjs';
-import {catchError, map} from 'rxjs/operators';
+import { BehaviorSubject, of } from 'rxjs';
+import { map } from 'rxjs/operators';
+import { getDateWithTimeZoneOffset } from '../utilities';
 
 const CurrentEventIdKey = 'currentEventId';
 
@@ -49,6 +50,7 @@ export class EventService {
   }
 
   create(event: EventModel) {
+    event.date = getDateWithTimeZoneOffset(event.date);
     return this.httpClient.post<EventModel>(this.baseUrl, event)
       .pipe(map(e => {
         e.date = new Date(e.date);
@@ -57,6 +59,7 @@ export class EventService {
   }
 
   update(event: EventModel) {
+    event.date = getDateWithTimeZoneOffset(event.date);
     return this.httpClient.put(this.baseUrl + '/' + event.id, event);
   }
 
