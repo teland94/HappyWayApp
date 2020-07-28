@@ -1,7 +1,9 @@
-import {Component, EventEmitter, Inject, ViewEncapsulation} from '@angular/core';
+import {Component, EventEmitter, Inject} from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
-import {FormBuilder, FormGroup, Validators} from '@angular/forms';
+import {FormBuilder, FormControl, FormGroup, Validators} from '@angular/forms';
 import {EventModel} from '../../../models/event.model';
+import {EventPlaceViewModel} from "../../../models/event-place.model";
+import {CustomValidators} from "../../../custom-validators";
 
 export class EventDialogResult {
   event: EventModel;
@@ -12,6 +14,7 @@ export class EventDialogResult {
 export class EventDialogData {
   event: EventModel;
   groups: string[];
+  eventPlaces: EventPlaceViewModel[];
   completedControlVisible: boolean;
   eventActive: boolean;
 }
@@ -25,6 +28,7 @@ export class EventDialogComponent {
 
   form: FormGroup;
   groups: string[];
+  eventPlaces: EventPlaceViewModel[];
   editMode: boolean;
   completedControlVisible: boolean;
   eventActive: boolean;
@@ -34,22 +38,26 @@ export class EventDialogComponent {
   constructor(private readonly dialogRef: MatDialogRef<EventDialogComponent>,
     @Inject(MAT_DIALOG_DATA) private data: EventDialogData,
     private readonly fb: FormBuilder) {
-    const { id, name, date, completed } = this.data.event;
+    const { id, name, date, completed, eventPlaceId } = this.data.event;
     this.form = this.fb.group({
-      name: this.fb.control(name),
-      date: this.fb.control(date ? date : new Date()),
-      docUrl: this.fb.control(''),
+      name: this.fb.control(name, Validators.required),
+      eventPlaceId: this.fb.control(eventPlaceId, Validators.required),
+      date: this.fb.control(date ? date : new Date(), Validators.required),
       enabled: this.fb.control(completed ? !completed : true)
     });
     this.groups = this.data.groups;
+    this.eventPlaces = this.data.eventPlaces;
     this.editMode = !!id;
     this.completedControlVisible = this.data.completedControlVisible;
     this.eventActive = this.data.eventActive;
+    if (!this.editMode) {
+      this.form.addControl('docUrl', new FormControl('', [Validators.required, CustomValidators.url]));
+    }
   }
 
   submit(form: FormGroup) {
-    const { date, name, docUrl, enabled } = form.value;
-    const event = <EventModel>{ date, name, completed: !enabled };
+    const { date, name, eventPlaceId, docUrl, enabled } = form.value;
+    const event = <EventModel>{ date, name, eventPlaceId, completed: !enabled };
     this.dialogRef.close(<EventDialogResult>{ event, docUrl, eventActive: this.eventActive });
   }
 

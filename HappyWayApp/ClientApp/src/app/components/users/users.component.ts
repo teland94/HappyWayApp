@@ -25,7 +25,7 @@ export class UsersComponent extends BaseComponent implements OnInit {
   currentUser: UserModel;
   role = Role;
 
-  displayedColumns: string[] = ['username', 'displayName', 'city', 'phoneNumber', 'edit', 'delete'];
+  displayedColumns: string[] = ['username', 'displayName', 'phoneNumber', 'edit', 'delete'];
 
   constructor(private readonly userService: UserService,
               private readonly authenticationService: AuthenticationService,

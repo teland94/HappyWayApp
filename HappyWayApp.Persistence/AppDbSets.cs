@@ -3,6 +3,7 @@ using HappyWayApp.Persistence.Configuration;
 using HappyWayApp.Persistence.Entities;
 using HappyWayApp.Persistence.Helpers;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
 namespace HappyWayApp.Persistence
@@ -19,6 +20,7 @@ namespace HappyWayApp.Persistence
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             optionsBuilder.UseSqlite(DatabaseSettings.Value.ConnectionString);
+            optionsBuilder.UseLoggerFactory(MyLoggerFactory);
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -37,6 +39,20 @@ namespace HappyWayApp.Persistence
                 .HasOne(pt => pt.User)
                 .WithMany(p => p.Events)
                 .HasForeignKey(pt => pt.UserId);
+
+            modelBuilder.Entity<Event>()
+                .HasOne(pt => pt.EventPlace)
+                .WithMany(p => p.Events)
+                .HasForeignKey(pt => pt.EventPlaceId);
+
+            modelBuilder.Entity<City>().Property(p => p.Name).IsRequired();
+
+            modelBuilder.Entity<EventPlace>().Property(p => p.Name).IsRequired();
+
+            modelBuilder.Entity<EventPlace>()
+                .HasOne(pt => pt.City)
+                .WithMany(p => p.EventPlaces)
+                .HasForeignKey(pt => pt.CityId);
 
             modelBuilder.Entity<EventMember>()
                 .HasOne(pt => pt.Event)
@@ -82,7 +98,6 @@ namespace HappyWayApp.Persistence
                     {
                         Id = 1, 
                         DisplayName = "Admin", 
-                        City = "Харьков",
                         PhoneNumber = "095 214 51 32",
                         Username = "admin",
                         Password = "AQAAAAEAACcQAAAAEDC0aBikkZoMAQ9jtYq7ByukhA9ydl1YN0K6sIvHN9HYg09X1qxMUO+jjQhgxImCAg==",
@@ -92,13 +107,46 @@ namespace HappyWayApp.Persistence
                     {
                         Id = 2,
                         DisplayName = "Normal", 
-                        City = "Харьков",
                         PhoneNumber = "095 777 22 22",
                         Username = "user", 
                         Password = "AQAAAAEAACcQAAAAEF2b5WTrHeYD99KTYodsb3E44gNLhSAvYOfEoVIxnxmUkmotABVzHbrnfXqDRB+4rg==",
                         RoleId = 2
                     }
                 );
+
+            modelBuilder.Entity<City>()
+                .HasData(
+                    new City
+                    {
+                        Id = 1,
+                        Name = "Харьков",
+                        NameGenitive = "Харькове"
+                    },
+                    new City
+                    {
+                        Id = 2,
+                        Name = "Днепр",
+                        NameGenitive = "Днепре"
+                    }
+                );
+
+            modelBuilder.Entity<EventPlace>()
+                .HasData(
+                    new EventPlace
+                    {
+                        Id = 1,
+                        Name = "Trattoria \"Paparazzi\"",
+                        GoogleUrl = "https://g.page/HappywayKharkiv?share",
+                        FacebookUrl = "https://www.facebook.com/happyway.club",
+                        InstagramUrl = "http://instagram.com/happyway.date",
+                        CityId = 1
+                    }
+                );
         }
+
+        public static readonly ILoggerFactory MyLoggerFactory = LoggerFactory.Create(builder =>
+        {
+            builder.AddDebug();
+        });
     }
 }

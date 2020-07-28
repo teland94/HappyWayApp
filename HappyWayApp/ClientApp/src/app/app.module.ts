@@ -10,7 +10,6 @@ import localeRu from '@angular/common/locales/ru';
 import { appRoutingModule } from './app.routing';
 import { UsersComponent } from './components/users/users.component';
 import { PasswordPromptDialogComponent } from './components/dialogs/password-prompt-dialog/password-prompt-dialog.component';
-
 import { AppComponent } from './app.component';
 import { BaseComponent } from './components/base/base.component';
 import { LayoutComponent } from './components/layout/layout.component';
@@ -32,6 +31,8 @@ import { JwtInterceptor } from './interceptors/jwt.interceptor';
 import { ErrorInterceptor } from './interceptors/error.interceptor';
 import { ProgressSpinnerComponent } from './components/progress-spinner/progress-spinner.component';
 import { PROGRESS_SPINNER_CONFIG } from './services/progress-spinner.service';
+import { EventPlacesComponent } from "./components/event-places/event-places.component";
+import { EventPlaceDialogComponent } from "./components/dialogs/event-place-dialog/event-place-dialog.component";
 
 registerLocaleData(localeRu, 'ru');
 
@@ -53,7 +54,9 @@ registerLocaleData(localeRu, 'ru');
     LoginComponent,
     UsersComponent,
     PasswordPromptDialogComponent,
-    ProgressSpinnerComponent
+    ProgressSpinnerComponent,
+    EventPlacesComponent,
+    EventPlaceDialogComponent
   ],
   entryComponents: [
     EventDialogComponent,

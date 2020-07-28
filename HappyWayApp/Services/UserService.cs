@@ -113,7 +113,6 @@ namespace HappyWayApp.Services
             var dbUser = _context.Users.Add(new User
             {
                 RoleId = 2,
-                City = user.City,
                 DisplayName = user.DisplayName,
                 PhoneNumber = user.PhoneNumber,
                 Password = _passwordHasher.HashPassword(null, _authSettings.Salt + user.Password),
@@ -134,7 +133,6 @@ namespace HappyWayApp.Services
                 throw new InvalidOperationException("User not exists");
             }
 
-            dbUser.City = user.City;
             dbUser.DisplayName = user.DisplayName;
             dbUser.PhoneNumber = user.PhoneNumber;
             if (!string.IsNullOrWhiteSpace(user.Password))
@@ -192,7 +190,6 @@ namespace HappyWayApp.Services
                 Role = user.Role.Name,
                 Token = user.Token,
                 DisplayName = user.DisplayName,
-                City = user.City,
                 PhoneNumber = user.PhoneNumber
             };
             return userDto;

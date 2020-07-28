@@ -1,6 +1,6 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { EventService } from '../../services/event.service';
-import { EventModel } from '../../models/event.model';
+import {EventModel, EventViewModel} from '../../models/event.model';
 import { MatDialog } from '@angular/material/dialog';
 import { MatRadioChange } from '@angular/material/radio';
 import { MatSlideToggleChange } from '@angular/material/slide-toggle';
@@ -14,6 +14,8 @@ import { getDateWithTimeZoneOffsetHours } from '../../utilities';
 import { ImportDataService } from '../../services/import-data.service';
 import { ProgressSpinnerService } from '../../services/progress-spinner.service';
 import { BaseComponent } from '../base/base.component';
+import {EventPlaceViewModel} from "../../models/event-place.model";
+import {EventPlaceViewService} from "../../services/event-place-view.service";
 
 @Component({
   selector: 'app-events',
@@ -24,13 +26,15 @@ export class EventsComponent extends BaseComponent implements OnInit, OnDestroy 
 
   private eventChangesSubscription: Subscription;
 
-  displayedColumns: string[] = ['name', 'date', 'user', 'active', 'edit', 'delete'];
+  displayedColumns: string[] = ['name', 'eventPlace', 'date', 'user', 'active', 'edit', 'delete'];
 
-  events: EventModel[];
+  events: EventViewModel[];
   groups: string[];
+  eventPlaces: EventPlaceViewModel[];
   currentEvent: EventModel;
 
   constructor(private readonly eventService: EventService,
+              private readonly eventPlaceViewService: EventPlaceViewService,
               private readonly importDataService: ImportDataService,
               private readonly databaseService: DatabaseService,
               private readonly confirmationService: ConfirmationService,
@@ -137,14 +141,18 @@ export class EventsComponent extends BaseComponent implements OnInit, OnDestroy 
 
   private load() {
     this.progressSpinnerService.start();
-    forkJoin([this.eventService.get(), this.databaseService.getGroups()])
-      .subscribe(([events, groups]) => {
-        this.events = events;
+    forkJoin([this.eventService.get(), this.databaseService.getGroups(), this.eventPlaceViewService.getEventPlaces()])
+      .subscribe(([events, groups, eventPlaces]) => {
+        this.events = events.map(e => {
+          const eventPlace = eventPlaces.find(ep => ep.id === e.eventPlaceId);
+          return new EventViewModel(e, eventPlace);
+        });
         if (this.currentEvent) {
           this.currentEvent = events.find(ev => ev.id === this.currentEvent.id);
         }
         this.checkEvent(this.currentEvent);
         this.groups = groups;
+        this.eventPlaces = eventPlaces;
         this.progressSpinnerService.stop();
       }, error => {
         this.progressSpinnerService.stop();
@@ -175,6 +183,7 @@ export class EventsComponent extends BaseComponent implements OnInit, OnDestroy 
       data: <EventDialogData>{
         event: event ? event : { },
         groups: this.groups,
+        eventPlaces: this.eventPlaces,
         completedControlVisible: true,
         eventActive: this.currentEvent && event && this.currentEvent.id === event.id
       }

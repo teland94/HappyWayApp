@@ -2,7 +2,7 @@
 
 /* Provide sufficient contrast against white background */
 a {
-  color: #0366d6;
+  color: #1cbdd7;
 }
 
 code {
@@ -53,4 +53,14 @@ tr.mat-row {
   margin-left: 0;
 }
 
+.mat-header-cell:first-of-type, .mat-cell:first-of-type {
+  padding-left: 24px !important;
+}
 
+.mat-header-cell, .mat-cell {
+  padding: 5px 5px 5px 0 !important;
+}
+
+.scrollable-grid {
+  overflow: auto;
+}

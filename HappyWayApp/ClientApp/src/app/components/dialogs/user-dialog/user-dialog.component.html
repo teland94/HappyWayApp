@@ -14,9 +14,6 @@
         <input matInput formControlName="displayName" placeholder="ФИО">
       </mat-form-field>
       <mat-form-field>
-        <input matInput formControlName="city" placeholder="Город" [matAutocomplete]="auto">
-      </mat-form-field>
-      <mat-form-field>
         <input matInput formControlName="phoneNumber" placeholder="Номер телефона">
       </mat-form-field>
     </div>
@@ -26,9 +23,3 @@
     <button mat-button type="button" mat-dialog-close>Отмена</button>
   </mat-dialog-actions>
 </form>
-
-<mat-autocomplete #auto="matAutocomplete">
-  <mat-option *ngFor="let city of filteredCities" [value]="city">
-    {{ city }}
-  </mat-option>
-</mat-autocomplete>

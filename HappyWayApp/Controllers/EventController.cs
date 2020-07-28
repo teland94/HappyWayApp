@@ -44,6 +44,7 @@ namespace HappyWayApp.Controllers
                     Date = e.Date,
                     Name = e.Name,
                     Completed = e.Completed,
+                    EventPlaceId = e.EventPlaceId,
                     User = e.User.DisplayName
                 })
                 .ToListAsync();

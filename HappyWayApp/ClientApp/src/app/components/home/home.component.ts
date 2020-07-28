@@ -20,6 +20,7 @@ import { BaseComponent } from '../base/base.component';
 export class HomeComponent extends BaseComponent implements OnInit, OnDestroy {
 
   private eventChangesSubscription: Subscription;
+  private sexChangesSubscription: Subscription;
 
   stepper: MatStepper;
 
@@ -53,6 +54,9 @@ export class HomeComponent extends BaseComponent implements OnInit, OnDestroy {
 
   ngOnDestroy() {
     this.eventChangesSubscription.unsubscribe();
+    if (this.sexChangesSubscription) {
+      this.sexChangesSubscription.unsubscribe();
+    }
   }
 
   selectionChanged(event: StepperSelectionEvent) {
@@ -103,7 +107,7 @@ export class HomeComponent extends BaseComponent implements OnInit, OnDestroy {
   }
 
   private load(eventId: number) {
-    this.eventMemberService.sexChanges.subscribe(sex => {
+    this.sexChangesSubscription = this.eventMemberService.sexChanges.subscribe(sex => {
       this.progressSpinnerService.start();
       this.cardMembers = [];
       this.eventMemberService.get(eventId).subscribe(data => {

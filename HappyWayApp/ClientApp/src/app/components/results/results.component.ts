@@ -13,6 +13,8 @@ import { getDateText } from '../../utilities';
 import { ProgressSpinnerService } from '../../services/progress-spinner.service';
 import { Clipboard } from '@angular/cdk/clipboard';
 import { BaseComponent } from '../base/base.component';
+import { EventPlaceViewModel } from "../../models/event-place.model";
+import { EventPlaceViewService } from "../../services/event-place-view.service";
 
 @Component({
   selector: 'app-results',
@@ -21,30 +23,33 @@ import { BaseComponent } from '../base/base.component';
 })
 export class ResultsComponent extends BaseComponent implements OnInit, OnDestroy {
 
-  private readonly matchedText = 'Здравствуйте, на "Быстрых свиданиях {{date}} в Арт-кафе «Пластилиновая ворона»" у Вас взаимные симпатии с:';
-  private readonly nonMatchedText = 'Здравствуйте, на "Быстрых свиданиях {{date}} в Арт-кафе «Пластилиновая ворона»" у Вас симпатии, к сожалению, не совпали.';
+  private readonly matchedText = 'Здравствуйте, на "Быстрых свиданиях {{date}} в {{eventPlace}}" в {{city}} у Вас взаимные симпатии с:';
+  private readonly nonMatchedText = 'Здравствуйте, на "Быстрых свиданиях {{date}} в {{eventPlace}}" в {{city}} у Вас симпатии, к сожалению, не совпали.';
   private readonly likedText = 'А также Вам проявили симпатию (Вы понравились), им Вы можете написать самостоятельно, т.к. у них Ваших контактов нет:';
 
   private readonly endMatchedText =
 `Оцените, пожалуйста, наше мероприятие в Google:
-https://g.page/HappywayKharkiv?share
+{{googleUrl}}
 
 Или просто добавляйтесь в соц.сетях:
-Наша страничка facebook: https://www.facebook.com/happyway.club
-Наш инстаграм: http://instagram.com/happyway.date`;
+Наша страничка facebook: {{facebookUrl}}
+Наш инстаграм: {{instagramUrl}}`;
   private readonly endNonMatchedText =
 `Наша страничка в соц.сети:
-https://www.facebook.com/happyway.club
-Наш инстаграм: http://instagram.com/happyway.date`;
+{{facebookUrl}}
+Наш инстаграм: {{instagramUrl}}`;
   private readonly thanksText = 'Спасибо, что были с нами)';
 
   private eventChangesSubscription: Subscription;
+  private sexChangesSubscription: Subscription;
 
   event: EventModel;
+  eventPlace: EventPlaceViewModel;
   members: EventMemberModel[];
   resultMembers: ResultMemberModel[];
 
   constructor(private readonly eventService: EventService,
+              private readonly eventPlaceViewService: EventPlaceViewService,
               private readonly eventMemberService: EventMemberService,
               private readonly likeService: LikeService,
               private readonly sanitizer: DomSanitizer,
@@ -64,6 +69,9 @@ https://www.facebook.com/happyway.club
 
   ngOnDestroy() {
     this.eventChangesSubscription.unsubscribe();
+    if (this.sexChangesSubscription) {
+      this.sexChangesSubscription.unsubscribe();
+    }
   }
 
   getViberUrl(phoneNumber: string) {
@@ -80,6 +88,38 @@ https://www.facebook.com/happyway.club
     this.snackBar.open('Успешно скопировано ❤');
   }
 
+  private load(eventId: number) {
+    this.eventPlaceViewService.getEventPlace(this.event.eventPlaceId).subscribe(data => {
+      this.eventPlace = data;
+
+      this.sexChangesSubscription = this.eventMemberService.sexChanges.subscribe(sex => {
+        this.progressSpinnerService.start();
+        this.eventMemberService.get(eventId).subscribe(data => {
+          this.members = data;
+          const sexMembers = data.filter(m => m.sex === sex);
+
+          this.resultMembers = [];
+          const setResultObs = sexMembers.map(m => this.getResultData(m));
+          concat(...setResultObs).subscribe(resultMember => {
+            this.resultMembers.push(resultMember);
+            this.progressSpinnerService.stop();
+          }, error => {
+            this.progressSpinnerService.stop();
+            this.showError('Ошибка загрузки результатов участников 💔', error);
+          });
+
+          this.progressSpinnerService.stop();
+        }, error => {
+          this.progressSpinnerService.stop();
+          this.showError('Ошибка загрузки участиков 💔', error);
+        });
+      }, error => {
+        this.progressSpinnerService.stop();
+        this.showError('Ошибка загрузки мест мероприятий 💔', error);
+      });
+    });
+  }
+
   private getResultData(member: EventMemberModel) {
     this.progressSpinnerService.start();
     return this.likeService.getAllByMember(member.id).pipe(map(likes => {
@@ -91,43 +131,24 @@ https://www.facebook.com/happyway.club
     }));
   }
 
-  private load(eventId: number) {
-    this.eventMemberService.sexChanges.subscribe(sex => {
-      this.progressSpinnerService.start();
-      this.eventMemberService.get(eventId).subscribe(data => {
-        this.members = data;
-        const sexMembers = data.filter(m => m.sex === sex);
-
-        this.resultMembers = [];
-        const setResultObs = sexMembers.map(m => this.getResultData(m));
-        concat(...setResultObs).subscribe(resultMember => {
-          this.resultMembers.push(resultMember);
-          this.progressSpinnerService.stop();
-        }, error => {
-          this.progressSpinnerService.stop();
-          this.showError('Ошибка загрузки результатов участников 💔', error);
-        });
-
-        this.progressSpinnerService.stop();
-      }, error => {
-        this.progressSpinnerService.stop();
-        this.showError('Ошибка загрузки участиков 💔', error);
-      });
-    });
-  }
-
   private getResultText(member: EventMemberModel, likes: LikeModel[]) {
     const { matched, liked } = this.getResults(member, likes);
 
     let resText = '';
     if (matched && matched.length > 0) {
-      resText = `${this.matchedText.replace('{{date}}', getDateText(this.event.date))}\n\n`;
+      resText = `${this.matchedText.replace('{{date}}', getDateText(this.event.date))
+        .replace('{{eventPlace}}', this.eventPlace.name)
+        .replace('""', '"')
+        .replace('{{city}}', this.eventPlace.city.nameGenitive)}\n\n`;
       const matchedMembers = this.getLikedMembers(matched);
       matchedMembers.forEach(m => {
         resText += `${this.getMemberText(m)}\n`;
       });
     } else {
-      resText = `${this.nonMatchedText.replace('{{date}}', getDateText(this.event.date))}\n`;
+      resText = `${this.nonMatchedText.replace('{{date}}', getDateText(this.event.date))
+        .replace('{{eventPlace}}', this.eventPlace.name)
+        .replace('""', '"')
+        .replace('{{city}}', this.eventPlace.city.nameGenitive)}\n`;
     }
     if (liked && liked.length > 0) {
       resText += `\n${this.likedText}\n\n`;
@@ -137,9 +158,14 @@ https://www.facebook.com/happyway.club
       });
     }
     if (matched && matched.length > 0) {
-      resText += `\n${this.endMatchedText}\n`;
+      resText += `\n${this.endMatchedText
+        .replace('{{googleUrl}}', this.eventPlace.googleUrl)
+        .replace('{{facebookUrl}}', this.eventPlace.facebookUrl)
+        .replace('{{instagramUrl}}', this.eventPlace.instagramUrl)}\n`;
     } else {
-      resText += `\n${this.endNonMatchedText}\n`;
+      resText += `\n${this.endNonMatchedText
+        .replace('{{facebookUrl}}', this.eventPlace.facebookUrl)
+        .replace('{{instagramUrl}}', this.eventPlace.instagramUrl)}\n`;
     }
     resText += `\n${this.thanksText}`;
     return resText;

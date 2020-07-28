@@ -5,39 +5,41 @@
   <div class="table-controls">
     <button mat-raised-button (click)="downloadDocData()" [disabled]="!docUrl">Загрузить</button>
   </div>
-  <table mat-table *ngIf="eventMembers && eventMembers.length > 0" [dataSource]="eventMembers" class="mat-elevation-z8">
-    <ng-container matColumnDef="number">
-      <th mat-header-cell *matHeaderCellDef>№</th>
-      <td mat-cell *matCellDef="let member">{{member.number}}</td>
-    </ng-container>
-    <ng-container matColumnDef="name">
-      <th mat-header-cell *matHeaderCellDef>Имя</th>
-      <td mat-cell *matCellDef="let member">{{member.name}}</td>
-    </ng-container>
-    <ng-container matColumnDef="phoneNumber">
-      <th mat-header-cell *matHeaderCellDef>Номер телефона</th>
-      <td mat-cell *matCellDef="let member">{{member.phoneNumber}}</td>
-    </ng-container>
-    <ng-container matColumnDef="edit">
-      <th mat-header-cell *matHeaderCellDef></th>
-      <td mat-cell *matCellDef="let member">
-        <button mat-icon-button (click)="edit(member)">
-          <mat-icon>edit</mat-icon>
-        </button>
-      </td>
-    </ng-container>
-    <ng-container matColumnDef="delete">
-      <th mat-header-cell *matHeaderCellDef></th>
-      <td mat-cell *matCellDef="let member">
-        <button mat-icon-button (click)="delete(member)">
-          <mat-icon>delete</mat-icon>
-        </button>
-      </td>
-    </ng-container>
+  <div class="scrollable-grid">
+    <table mat-table *ngIf="eventMembers && eventMembers.length > 0" [dataSource]="eventMembers" class="mat-elevation-z8">
+      <ng-container matColumnDef="number">
+        <th mat-header-cell *matHeaderCellDef>№</th>
+        <td mat-cell *matCellDef="let member">{{member.number}}</td>
+      </ng-container>
+      <ng-container matColumnDef="name">
+        <th mat-header-cell *matHeaderCellDef>Имя</th>
+        <td mat-cell *matCellDef="let member">{{member.name}}</td>
+      </ng-container>
+      <ng-container matColumnDef="phoneNumber">
+        <th mat-header-cell *matHeaderCellDef>Номер телефона</th>
+        <td mat-cell *matCellDef="let member">{{member.phoneNumber}}</td>
+      </ng-container>
+      <ng-container matColumnDef="edit">
+        <th mat-header-cell *matHeaderCellDef></th>
+        <td mat-cell *matCellDef="let member">
+          <button mat-icon-button (click)="edit(member)">
+            <mat-icon>edit</mat-icon>
+          </button>
+        </td>
+      </ng-container>
+      <ng-container matColumnDef="delete">
+        <th mat-header-cell *matHeaderCellDef></th>
+        <td mat-cell *matCellDef="let member">
+          <button mat-icon-button (click)="delete(member)">
+            <mat-icon>delete</mat-icon>
+          </button>
+        </td>
+      </ng-container>
 
-    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-    <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
-  </table>
+      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+    </table>
+  </div>
 </ng-container>
 <ng-container *ngIf="!eventId">
   <span>Нет данных о текущем мероприятии.</span>

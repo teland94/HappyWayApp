@@ -13,6 +13,10 @@ namespace HappyWayApp.Persistence
 
         public DbSet<EventMember> EventMembers { get; set; }
 
+        public DbSet<City> Cities { get; set; }
+
+        public DbSet<EventPlace> EventPlaces { get; set; }
+
         public DbSet<Like> Likes { get; set; }
     }
 }

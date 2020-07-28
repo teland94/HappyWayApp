@@ -1,0 +1,52 @@
+<div class="table-controls">
+  <button mat-raised-button (click)="add()">Добавить</button>
+</div>
+<div class="scrollable-grid">
+  <table mat-table *ngIf="eventPlaces && eventPlaces.length > 0" [dataSource]="eventPlaces" class="mat-elevation-z8">
+    <ng-container matColumnDef="city">
+      <th mat-header-cell *matHeaderCellDef>Город</th>
+      <td mat-cell *matCellDef="let eventPlace">{{eventPlace.city.name}}</td>
+    </ng-container>
+    <ng-container matColumnDef="name">
+      <th mat-header-cell *matHeaderCellDef>Название</th>
+      <td mat-cell *matCellDef="let eventPlace">{{eventPlace.name}}</td>
+    </ng-container>
+    <ng-container matColumnDef="googleUrl">
+      <th mat-header-cell *matHeaderCellDef>Google - ссылка</th>
+      <td mat-cell *matCellDef="let eventPlace">
+        <a [href]="eventPlace.googleUrl" target="_blank">{{eventPlace.googleUrl}}</a>
+      </td>
+    </ng-container>
+    <ng-container matColumnDef="facebookUrl">
+      <th mat-header-cell *matHeaderCellDef>Facebook - ссылка</th>
+      <td mat-cell *matCellDef="let eventPlace">
+        <a [href]="eventPlace.facebookUrl" target="_blank">{{eventPlace.facebookUrl}}</a>
+      </td>
+    </ng-container>
+    <ng-container matColumnDef="instagramUrl">
+      <th mat-header-cell *matHeaderCellDef>Instagram - ссылка</th>
+      <td mat-cell *matCellDef="let eventPlace">
+        <a [href]="eventPlace.instagramUrl" target="_blank">{{eventPlace.instagramUrl}}</a>
+      </td>
+    </ng-container>
+    <ng-container matColumnDef="edit">
+      <th mat-header-cell *matHeaderCellDef></th>
+      <td mat-cell *matCellDef="let eventPlace">
+        <button mat-icon-button (click)="edit(eventPlace)">
+          <mat-icon>edit</mat-icon>
+        </button>
+      </td>
+    </ng-container>
+    <ng-container matColumnDef="delete">
+      <th mat-header-cell *matHeaderCellDef></th>
+      <td mat-cell *matCellDef="let eventPlace">
+        <button mat-icon-button (click)="delete(eventPlace)">
+          <mat-icon>delete</mat-icon>
+        </button>
+      </td>
+    </ng-container>
+
+    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+    <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+  </table>
+</div>

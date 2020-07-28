@@ -14,7 +14,39 @@ namespace HappyWayApp.Persistence.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "3.1.0");
+                .HasAnnotation("ProductVersion", "3.1.5");
+
+            modelBuilder.Entity("HappyWayApp.Persistence.Entities.City", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("NameGenitive")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Cities");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Name = "Харьков",
+                            NameGenitive = "Харькове"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            Name = "Днепр",
+                            NameGenitive = "Днепре"
+                        });
+                });
 
             modelBuilder.Entity("HappyWayApp.Persistence.Entities.Event", b =>
                 {
@@ -28,6 +60,9 @@ namespace HappyWayApp.Persistence.Migrations
                     b.Property<DateTime>("Date")
                         .HasColumnType("TEXT");
 
+                    b.Property<int>("EventPlaceId")
+                        .HasColumnType("INTEGER");
+
                     b.Property<string>("Name")
                         .HasColumnType("TEXT");
 
@@ -35,6 +70,8 @@ namespace HappyWayApp.Persistence.Migrations
                         .HasColumnType("INTEGER");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("EventPlaceId");
 
                     b.HasIndex("UserId");
 
@@ -74,6 +111,46 @@ namespace HappyWayApp.Persistence.Migrations
                     b.HasIndex("EventId");
 
                     b.ToTable("EventMembers");
+                });
+
+            modelBuilder.Entity("HappyWayApp.Persistence.Entities.EventPlace", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("CityId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("FacebookUrl")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("GoogleUrl")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("InstagramUrl")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CityId");
+
+                    b.ToTable("EventPlaces");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            CityId = 1,
+                            FacebookUrl = "https://www.facebook.com/happyway.club",
+                            GoogleUrl = "https://g.page/HappywayKharkiv?share",
+                            InstagramUrl = "http://instagram.com/happyway.date",
+                            Name = "Trattoria \"Paparazzi\""
+                        });
                 });
 
             modelBuilder.Entity("HappyWayApp.Persistence.Entities.Like", b =>
@@ -124,9 +201,6 @@ namespace HappyWayApp.Persistence.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
-                    b.Property<string>("City")
-                        .HasColumnType("TEXT");
-
                     b.Property<string>("DisplayName")
                         .HasColumnType("TEXT");
 
@@ -157,7 +231,6 @@ namespace HappyWayApp.Persistence.Migrations
                         new
                         {
                             Id = 1,
-                            City = "Харьков",
                             DisplayName = "Admin",
                             Password = "AQAAAAEAACcQAAAAEDC0aBikkZoMAQ9jtYq7ByukhA9ydl1YN0K6sIvHN9HYg09X1qxMUO+jjQhgxImCAg==",
                             PhoneNumber = "095 214 51 32",
@@ -167,7 +240,6 @@ namespace HappyWayApp.Persistence.Migrations
                         new
                         {
                             Id = 2,
-                            City = "Харьков",
                             DisplayName = "Normal",
                             Password = "AQAAAAEAACcQAAAAEF2b5WTrHeYD99KTYodsb3E44gNLhSAvYOfEoVIxnxmUkmotABVzHbrnfXqDRB+4rg==",
                             PhoneNumber = "095 777 22 22",
@@ -178,6 +250,12 @@ namespace HappyWayApp.Persistence.Migrations
 
             modelBuilder.Entity("HappyWayApp.Persistence.Entities.Event", b =>
                 {
+                    b.HasOne("HappyWayApp.Persistence.Entities.EventPlace", "EventPlace")
+                        .WithMany("Events")
+                        .HasForeignKey("EventPlaceId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("HappyWayApp.Persistence.Entities.User", "User")
                         .WithMany("Events")
                         .HasForeignKey("UserId")
@@ -190,6 +268,15 @@ namespace HappyWayApp.Persistence.Migrations
                     b.HasOne("HappyWayApp.Persistence.Entities.Event", "Event")
                         .WithMany("EventMembers")
                         .HasForeignKey("EventId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("HappyWayApp.Persistence.Entities.EventPlace", b =>
+                {
+                    b.HasOne("HappyWayApp.Persistence.Entities.City", "City")
+                        .WithMany("EventPlaces")
+                        .HasForeignKey("CityId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });

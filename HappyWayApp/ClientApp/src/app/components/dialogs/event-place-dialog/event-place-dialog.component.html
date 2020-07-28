@@ -1,0 +1,35 @@
+<form [formGroup]="form" (ngSubmit)="submit(form)">
+  <h1 mat-dialog-title>Место мероприятий</h1>
+  <mat-dialog-content>
+    <mat-form-field>
+      <input matInput formControlName="city" placeholder="Город" [matAutocomplete]="auto" required>
+      <mat-error app-validation-error [control]="form.get('city')" propertyName="Город"></mat-error>
+    </mat-form-field>
+    <mat-form-field>
+      <input matInput formControlName="name" placeholder="Название" required>
+      <mat-error app-validation-error [control]="form.get('name')" propertyName="Название"></mat-error>
+    </mat-form-field>
+    <mat-form-field>
+      <input matInput type="url" formControlName="googleUrl" placeholder="Google - ссылка" required>
+      <mat-error app-validation-error [control]="form.get('googleUrl')" propertyName="Google - ссылка"></mat-error>
+    </mat-form-field>
+    <mat-form-field>
+      <input matInput type="url" formControlName="facebookUrl" placeholder="Facebook - ссылка" required>
+      <mat-error app-validation-error [control]="form.get('facebookUrl')" propertyName="Facebook - ссылка"></mat-error>
+    </mat-form-field>
+    <mat-form-field>
+      <input matInput type="url" formControlName="instagramUrl" placeholder="Instagram - ссылка" required>
+      <mat-error app-validation-error [control]="form.get('instagramUrl')" propertyName="Instagram - ссылка"></mat-error>
+    </mat-form-field>
+  </mat-dialog-content>
+  <mat-dialog-actions>
+    <button mat-button type="submit" [disabled]="!form.valid">OK</button>
+    <button mat-button type="button" mat-dialog-close>Отмена</button>
+  </mat-dialog-actions>
+</form>
+
+<mat-autocomplete #auto="matAutocomplete" [displayWith]="displayCity">
+  <mat-option *ngFor="let city of cities" [value]="city">
+    {{ city.name }}
+  </mat-option>
+</mat-autocomplete>

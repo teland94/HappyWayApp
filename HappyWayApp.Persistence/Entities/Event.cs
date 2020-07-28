@@ -15,5 +15,8 @@ namespace HappyWayApp.Persistence.Entities
 
         public int UserId { get; set; }
         public User User { get; set; }
+
+        public int EventPlaceId { get; set; }
+        public EventPlace EventPlace { get; set; }
     }
 }

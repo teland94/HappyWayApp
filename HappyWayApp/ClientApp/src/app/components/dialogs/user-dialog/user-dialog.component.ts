@@ -22,12 +22,11 @@ export class UserDialogComponent implements OnInit {
   constructor(private readonly dialogRef: MatDialogRef<UserDialogComponent>,
               @Inject(MAT_DIALOG_DATA) private data: UserDialogData,
               private readonly fb: FormBuilder) {
-    const { username, displayName, city, phoneNumber } = this.data.user;
+    const { username, displayName, phoneNumber } = this.data.user;
     this.form = this.fb.group({
       username: this.fb.control(username, Validators.required),
       password: this.fb.control('', Validators.minLength(8)),
       displayName: this.fb.control(displayName),
-      city: this.fb.control(city),
       phoneNumber: this.fb.control(phoneNumber)
     });
     this.editMode = !!this.data.user.id;

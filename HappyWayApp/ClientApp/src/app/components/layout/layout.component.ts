@@ -14,6 +14,9 @@ import { ConfirmationService } from '../../services/confirmation.service';
 import { ImportDataService } from '../../services/import-data.service';
 import { ProgressSpinnerService } from '../../services/progress-spinner.service';
 import { BaseComponent } from '../base/base.component';
+import {EventPlaceService} from "../../services/event-place.service";
+import {EventPlaceViewModel} from "../../models/event-place.model";
+import {EventPlaceViewService} from "../../services/event-place-view.service";
 
 @Component({
   selector: 'app-layout',
@@ -25,6 +28,7 @@ export class LayoutComponent extends BaseComponent implements OnInit, AfterViewI
   @ViewChild('drawer') drawer: MatDrawer;
 
   event: EventModel;
+  eventPlaces: EventPlaceViewModel[];
   currentUser: UserModel;
   groups: string[];
   date = new Date();
@@ -35,6 +39,8 @@ export class LayoutComponent extends BaseComponent implements OnInit, AfterViewI
               private readonly dialog: MatDialog,
               protected readonly snackBar: MatSnackBar,
               private readonly eventService: EventService,
+              private readonly eventPlaceService: EventPlaceService,
+              private readonly eventPlaceViewService: EventPlaceViewService,
               private readonly databaseService: DatabaseService,
               private readonly importDataService: ImportDataService,
               private readonly progressSpinnerService: ProgressSpinnerService) {
@@ -48,6 +54,9 @@ export class LayoutComponent extends BaseComponent implements OnInit, AfterViewI
     });
     this.authenticationService.currentUser.subscribe(user => {
       if (!user) { return; }
+      this.eventPlaceViewService.getEventPlaces().subscribe(data => {
+        this.eventPlaces = data;
+      });
       this.eventService.getEventFromStorage()
         .subscribe(event => {
           this.eventService.setCurrentEvent(event);
@@ -182,7 +191,8 @@ export class LayoutComponent extends BaseComponent implements OnInit, AfterViewI
       width: '370px',
       data: <EventDialogData>{
         event: event ? event : { },
-        groups: this.groups
+        groups: this.groups,
+        eventPlaces: this.eventPlaces,
       }
     });
 

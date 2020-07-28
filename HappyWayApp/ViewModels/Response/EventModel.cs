@@ -12,6 +12,8 @@ namespace HappyWayApp.ViewModels.Response
 
         public bool Completed { get; set; }
 
+        public int EventPlaceId { get; set; }
+
         public string User { get; set; }
     }
 }

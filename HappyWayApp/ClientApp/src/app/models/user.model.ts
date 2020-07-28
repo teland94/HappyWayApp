@@ -3,7 +3,6 @@ export class UserModel {
   username: string;
   password: string;
   displayName: string;
-  city: string;
   phoneNumber: string;
   role: Role;
   token?: string;

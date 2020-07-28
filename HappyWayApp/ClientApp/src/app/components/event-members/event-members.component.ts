@@ -20,6 +20,7 @@ import { BaseComponent } from '../base/base.component';
 export class EventMembersComponent extends BaseComponent implements OnInit, OnDestroy {
 
   private eventChangesSubscription: Subscription;
+  private sexChangesSubscription: Subscription;
 
   displayedColumns: string[] = ['number', 'name', 'phoneNumber', 'edit', 'delete'];
 
@@ -56,8 +57,12 @@ export class EventMembersComponent extends BaseComponent implements OnInit, OnDe
   }
 
   ngOnDestroy() {
-    if (!this.eventChangesSubscription) { return; }
-    this.eventChangesSubscription.unsubscribe();
+    if (this.eventChangesSubscription) {
+      this.eventChangesSubscription.unsubscribe();
+    }
+    if (this.sexChangesSubscription) {
+      this.sexChangesSubscription.unsubscribe();
+    }
   }
 
   downloadDocData() {
@@ -76,7 +81,7 @@ export class EventMembersComponent extends BaseComponent implements OnInit, OnDe
 
   private load(eventId: number) {
     this.progressSpinnerService.start();
-    this.eventMemberService.sexChanges.subscribe(sex => {
+    this.sexChangesSubscription = this.eventMemberService.sexChanges.subscribe(sex => {
       this.eventMemberService.get(eventId).subscribe(data => {
         this.eventMembers = data.filter(m => m.sex === sex);
         this.progressSpinnerService.stop();
