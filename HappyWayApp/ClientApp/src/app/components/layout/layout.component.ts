@@ -134,7 +134,11 @@ export class LayoutComponent extends BaseComponent implements OnInit, AfterViewI
         }, error => {
           this.progressSpinnerService.stop();
           this.setCurrentEvent(createdEvent, '/event-members');
-          this.showError('Ошибка загрузки данных.', error);
+          let errorText = 'Ошибка загрузки данных.';
+          if (error.status === 422) {
+            errorText += ` Отсутствует ${error.displayParamName}.`;
+          }
+          this.showError(errorText, error);
         });
       }, error => {
         this.progressSpinnerService.stop();

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
 using Google.Apis.Auth.OAuth2;
@@ -10,6 +11,7 @@ using Google.Apis.Sheets.v4;
 using Google.Apis.Util.Store;
 using HappyWayApp.Configuration;
 using HappyWayApp.DTOs;
+using HappyWayApp.Extensions;
 using HappyWayApp.Persistence;
 using HappyWayApp.Persistence.Entities;
 using HappyWayApp.ViewModels;
@@ -39,14 +41,21 @@ namespace HappyWayApp.Controllers
         [HttpGet("{eventId}/{spreadsheetId}")]
         public async Task<IActionResult> Get(int eventId, string spreadsheetId)
         {
-            const string femaleRange = "A3:E";
-            const string maleRange = "L3:P";
+            const string femaleRange = "C3:E";
+            const string maleRange = "N3:P";
 
-            var femaleMembers = await GetDocData(spreadsheetId, femaleRange);
-            var maleMembers = await GetDocData(spreadsheetId, maleRange);
+            try
+            {
+                var femaleMembers = await GetDocData(spreadsheetId, femaleRange);
+                var maleMembers = await GetDocData(spreadsheetId, maleRange);
 
-            await AddMembersAsync(femaleMembers, eventId, Sex.Female);
-            await AddMembersAsync(maleMembers, eventId, Sex.Male);
+                await AddMembersAsync(femaleMembers, eventId, Sex.Female);
+                await AddMembersAsync(maleMembers, eventId, Sex.Male);
+            }
+            catch (ArgumentNullException e)
+            {
+                return StatusCode((int)HttpStatusCode.UnprocessableEntity, new { Status = HttpStatusCode.UnprocessableEntity, e.Message, e.ParamName });
+            }
 
             return Ok();
         }
@@ -91,14 +100,30 @@ namespace HappyWayApp.Controllers
             var response = await request.ExecuteAsync();
             var values = response.Values;
 
-            var members = values.Select(row => new EventMemberDocInfoDto
+            var members = values.Select(row =>
             {
-                Number = Convert.ToInt32(row[2]),
-                Name = row[3].ToString(),
-                PhoneNumber = row[4].ToString()
+                var dto = new EventMemberDocInfoDto();
+
+                CheckEmpty(row.ElementAtOrDefault(0), nameof(dto.Number));
+                CheckEmpty(row.ElementAtOrDefault(1), nameof(dto.Name));
+                CheckEmpty(row.ElementAtOrDefault(2), nameof(dto.PhoneNumber));
+
+                dto.Number = Convert.ToInt32(row[0]);
+                dto.Name = row[1].ToString();
+                dto.PhoneNumber = row[2].ToString();
+
+                return dto;
             });
 
             return members;
+        }
+
+        private void CheckEmpty(object obj, string paramName)
+        {
+            if (obj == null || string.IsNullOrWhiteSpace(obj.ToString()))
+            {
+                throw new ArgumentNullException(paramName.FirstCharToLower());
+            }
         }
 
         private SheetsService GetService(string apiKey)

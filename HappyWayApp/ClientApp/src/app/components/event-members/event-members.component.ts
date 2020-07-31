@@ -75,7 +75,11 @@ export class EventMembersComponent extends BaseComponent implements OnInit, OnDe
         this.load(this.eventId);
       }, error => {
         this.progressSpinnerService.stop();
-        this.showError('Ошибка загрузки данных.', error);
+        let errorText = 'Ошибка загрузки данных.';
+        if (error.status === 422) {
+          errorText += ` Отсутствует ${error.displayParamName}.`;
+        }
+        this.showError(errorText, error);
       });
   }
 
