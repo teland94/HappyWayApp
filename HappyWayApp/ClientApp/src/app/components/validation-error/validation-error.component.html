@@ -4,7 +4,7 @@
 <span *ngIf="control.hasError('minlength')">
   Поле "{{propertyName}}" содержит минимум {{control.errors.minlength.requiredLength}} символов.
 </span>
-<span *ngIf="control.hasError('url')">
+<span *ngIf="control.hasError('url') || control.hasError('fullUrl')">
   Поле "{{propertyName}}" - неверный URL.
 </span>
 <span *ngIf="control.hasError('email')">

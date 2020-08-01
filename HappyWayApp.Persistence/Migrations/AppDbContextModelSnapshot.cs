@@ -153,6 +153,43 @@ namespace HappyWayApp.Persistence.Migrations
                         });
                 });
 
+            modelBuilder.Entity("HappyWayApp.Persistence.Entities.Group", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Groups");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Name = "Основная группа (Д. 24-38, М. 27-41)"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            Name = "Молодежная группа (Д. 18-27, М. 18-29)"
+                        },
+                        new
+                        {
+                            Id = 3,
+                            Name = "Старшая группа (Д. 35-42, М. 36-47)"
+                        },
+                        new
+                        {
+                            Id = 4,
+                            Name = "Старшая+ группа (Д. 40-47, М. 45-59)"
+                        });
+                });
+
             modelBuilder.Entity("HappyWayApp.Persistence.Entities.Like", b =>
                 {
                     b.Property<int>("SourceMemberId")

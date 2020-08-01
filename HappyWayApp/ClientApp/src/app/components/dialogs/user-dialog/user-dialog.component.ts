@@ -31,7 +31,7 @@ export class UserDialogComponent implements OnInit {
     });
     this.editMode = !!this.data.user.id;
     if (!this.editMode) {
-      this.form.get('password').setValidators(Validators.required);
+      this.form.get('password').setValidators([Validators.required, Validators.minLength(8)]);
     }
   }
 

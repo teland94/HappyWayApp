@@ -1,0 +1,29 @@
+<div class="table-controls">
+  <button mat-raised-button (click)="add()">Добавить</button>
+</div>
+<div class="scrollable-grid">
+  <table mat-table *ngIf="groups && groups.length > 0" [dataSource]="groups" class="mat-elevation-z8">
+    <ng-container matColumnDef="name">
+      <th mat-header-cell *matHeaderCellDef>Название</th>
+      <td mat-cell *matCellDef="let group">{{group.name}}</td>
+    </ng-container>
+    <ng-container matColumnDef="edit">
+      <th mat-header-cell *matHeaderCellDef></th>
+      <td mat-cell *matCellDef="let group">
+        <button mat-icon-button (click)="edit(group)">
+          <mat-icon>edit</mat-icon>
+        </button>
+      </td>
+    </ng-container>
+    <ng-container matColumnDef="delete">
+      <th mat-header-cell *matHeaderCellDef></th>
+      <td mat-cell *matCellDef="let group">
+        <button mat-icon-button (click)="delete(group)">
+          <mat-icon>delete</mat-icon>
+        </button>
+      </td>
+    </ng-container>
+    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+    <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+  </table>
+</div>

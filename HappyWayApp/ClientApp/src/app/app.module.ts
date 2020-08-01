@@ -33,6 +33,8 @@ import { ProgressSpinnerComponent } from './components/progress-spinner/progress
 import { PROGRESS_SPINNER_CONFIG } from './services/progress-spinner.service';
 import { EventPlacesComponent } from "./components/event-places/event-places.component";
 import { EventPlaceDialogComponent } from "./components/dialogs/event-place-dialog/event-place-dialog.component";
+import { GroupsComponent } from "./components/groups/groups.component";
+import { GroupDialogComponent } from "./components/dialogs/group-dialog/group-dialog.component";
 
 registerLocaleData(localeRu, 'ru');
 
@@ -56,7 +58,9 @@ registerLocaleData(localeRu, 'ru');
     PasswordPromptDialogComponent,
     ProgressSpinnerComponent,
     EventPlacesComponent,
-    EventPlaceDialogComponent
+    EventPlaceDialogComponent,
+    GroupsComponent,
+    GroupDialogComponent
   ],
   entryComponents: [
     EventDialogComponent,

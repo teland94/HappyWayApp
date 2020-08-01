@@ -8,12 +8,14 @@ import {EventMembersComponent} from './components/event-members/event-members.co
 import {ResultsComponent} from './components/results/results.component';
 import {UsersComponent} from './components/users/users.component';
 import {EventPlacesComponent} from "./components/event-places/event-places.component";
+import {GroupsComponent} from "./components/groups/groups.component";
 
 const routes: Routes = [
   { path: '', redirectTo: 'home', pathMatch: 'full' },
   { path: 'login', component: LoginComponent },
   { path: 'users', component: UsersComponent, canActivate: [AuthGuard], data: { roles: [Role.Admin] } },
   { path: 'home', component: HomeComponent, canActivate: [AuthGuard] },
+  { path: 'groups', component: GroupsComponent, canActivate: [AuthGuard], data: { roles: [Role.Admin] } },
   { path: 'events', component: EventsComponent, canActivate: [AuthGuard], data: { roles: [Role.Admin] } },
   { path: 'event/:id', component: EventMembersComponent, canActivate: [AuthGuard], data: { roles: [Role.Admin] } },
   { path: 'event-members', component: EventMembersComponent, canActivate: [AuthGuard] },

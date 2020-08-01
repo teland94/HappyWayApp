@@ -10,8 +10,8 @@
       </mat-form-field>
       <mat-form-field>
         <mat-select formControlName="name" placeholder="Название" required cdkFocusInitial>
-          <mat-option *ngFor="let group of groups" [value]="group">
-            {{group}}
+          <mat-option *ngFor="let group of groups" [value]="group.name">
+            {{group.name}}
           </mat-option>
         </mat-select>
         <mat-error app-validation-error [control]="form.get('name')" propertyName="Название"></mat-error>

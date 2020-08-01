@@ -8,8 +8,6 @@ import {ConfirmationService} from "../../services/confirmation.service";
 import {EventPlaceDialogComponent} from "../dialogs/event-place-dialog/event-place-dialog.component";
 import {MatDialog} from "@angular/material/dialog";
 import {CityService} from "../../services/city.service";
-import {CityModel} from "../../models/city.model";
-import {map, switchMap} from "rxjs/operators";
 import {EventPlaceViewService} from "../../services/event-place-view.service";
 
 @Component({

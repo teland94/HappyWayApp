@@ -35,6 +35,8 @@ namespace HappyWayApp.Persistence
 
             modelBuilder.Entity<Role>().Property(p => p.Name).IsRequired();
 
+            modelBuilder.Entity<Group>().Property(p => p.Name).IsRequired();
+
             modelBuilder.Entity<Event>()
                 .HasOne(pt => pt.User)
                 .WithMany(p => p.Events)
@@ -111,6 +113,30 @@ namespace HappyWayApp.Persistence
                         Username = "user", 
                         Password = "AQAAAAEAACcQAAAAEF2b5WTrHeYD99KTYodsb3E44gNLhSAvYOfEoVIxnxmUkmotABVzHbrnfXqDRB+4rg==",
                         RoleId = 2
+                    }
+                );
+
+            modelBuilder.Entity<Group>()
+                .HasData(
+                    new Group
+                    {
+                        Id = 1,
+                        Name = "Основная группа (Д. 24-38, М. 27-41)"
+                    },
+                    new Group
+                    {
+                        Id = 2,
+                        Name = "Молодежная группа (Д. 18-27, М. 18-29)"
+                    },
+                    new Group
+                    {
+                        Id = 3,
+                        Name = "Старшая группа (Д. 35-42, М. 36-47)"
+                    }, 
+                    new Group
+                    {
+                        Id = 4,
+                        Name = "Старшая+ группа (Д. 40-57, М. 45-59)"
                     }
                 );
 

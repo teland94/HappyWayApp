@@ -5,6 +5,7 @@ import {EventModel} from '../../../models/event.model';
 import {EventPlaceViewModel} from '../../../models/event-place.model';
 import {CustomValidators} from '../../../custom-validators';
 import {getNowDateWithoutTime} from '../../../utilities';
+import {GroupModel} from "../../../models/group.model";
 
 export class EventDialogResult {
   event: EventModel;
@@ -14,7 +15,7 @@ export class EventDialogResult {
 
 export class EventDialogData {
   event: EventModel;
-  groups: string[];
+  groups: GroupModel[];
   eventPlaces: EventPlaceViewModel[];
   completedControlVisible: boolean;
   eventActive: boolean;
@@ -28,7 +29,7 @@ export class EventDialogData {
 export class EventDialogComponent {
 
   form: FormGroup;
-  groups: string[];
+  groups: GroupModel[];
   eventPlaces: EventPlaceViewModel[];
   editMode: boolean;
   completedControlVisible: boolean;

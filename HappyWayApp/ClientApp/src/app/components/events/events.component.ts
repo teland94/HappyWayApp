@@ -15,6 +15,8 @@ import { ProgressSpinnerService } from '../../services/progress-spinner.service'
 import { BaseComponent } from '../base/base.component';
 import { EventPlaceViewModel } from '../../models/event-place.model';
 import { EventPlaceViewService } from '../../services/event-place-view.service';
+import { GroupModel } from "../../models/group.model";
+import { GroupService } from "../../services/group.service";
 
 @Component({
   selector: 'app-events',
@@ -28,11 +30,12 @@ export class EventsComponent extends BaseComponent implements OnInit, OnDestroy 
   displayedColumns: string[] = ['name', 'eventPlace', 'date', 'user', 'active', 'edit', 'delete'];
 
   events: EventViewModel[];
-  groups: string[];
+  groups: GroupModel[];
   eventPlaces: EventPlaceViewModel[];
   currentEvent: EventModel;
 
-  constructor(private readonly eventService: EventService,
+  constructor(private readonly groupService: GroupService,
+              private readonly eventService: EventService,
               private readonly eventPlaceViewService: EventPlaceViewService,
               private readonly importDataService: ImportDataService,
               private readonly databaseService: DatabaseService,
@@ -102,7 +105,11 @@ export class EventsComponent extends BaseComponent implements OnInit, OnDestroy 
           this.load();
         }, error => {
           this.progressSpinnerService.stop();
-          this.showError('Ошибка загрузки данных.', error);
+          let errorText = 'Ошибка загрузки данных.';
+          if (error.status === 422) {
+            errorText += ` Отсутствует ${error.displayParamName}.`;
+          }
+          this.showError(errorText, error);
           this.load();
         });
       }, error => {
@@ -138,7 +145,7 @@ export class EventsComponent extends BaseComponent implements OnInit, OnDestroy 
 
   private load() {
     this.progressSpinnerService.start();
-    forkJoin([this.eventService.get(), this.databaseService.getGroups(), this.eventPlaceViewService.getEventPlaces()])
+    forkJoin([this.eventService.get(), this.groupService.get(), this.eventPlaceViewService.getEventPlaces()])
       .subscribe(([events, groups, eventPlaces]) => {
         this.events = events.map(e => {
           const eventPlace = eventPlaces.find(ep => ep.id === e.eventPlaceId);

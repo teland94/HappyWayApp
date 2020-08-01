@@ -22,6 +22,19 @@ namespace HappyWayApp.Persistence.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Groups",
+                columns: table => new
+                {
+                    Id = table.Column<int>(nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
+                    Name = table.Column<string>(nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Groups", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Roles",
                 columns: table => new
                 {
@@ -170,6 +183,26 @@ namespace HappyWayApp.Persistence.Migrations
                 values: new object[] { 2, "Днепр", "Днепре" });
 
             migrationBuilder.InsertData(
+                table: "Groups",
+                columns: new[] { "Id", "Name" },
+                values: new object[] { 1, "Основная группа (Д. 24-38, М. 27-41)" });
+
+            migrationBuilder.InsertData(
+                table: "Groups",
+                columns: new[] { "Id", "Name" },
+                values: new object[] { 2, "Молодежная группа (Д. 18-27, М. 18-29)" });
+
+            migrationBuilder.InsertData(
+                table: "Groups",
+                columns: new[] { "Id", "Name" },
+                values: new object[] { 3, "Старшая группа (Д. 35-42, М. 36-47)" });
+
+            migrationBuilder.InsertData(
+                table: "Groups",
+                columns: new[] { "Id", "Name" },
+                values: new object[] { 4, "Старшая+ группа (Д. 40-47, М. 45-59)" });
+
+            migrationBuilder.InsertData(
                 table: "Roles",
                 columns: new[] { "Id", "Name" },
                 values: new object[] { 1, "Admin" });
@@ -227,6 +260,9 @@ namespace HappyWayApp.Persistence.Migrations
 
         protected override void Down(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.DropTable(
+                name: "Groups");
+
             migrationBuilder.DropTable(
                 name: "Likes");
 

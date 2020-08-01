@@ -7,6 +7,10 @@
     <mat-toolbar color="primary">Меню</mat-toolbar>
     <mat-nav-list>
       <ng-container *ngIf="isAdmin">
+        <a mat-list-item routerLink="/groups">
+          <mat-icon>groups</mat-icon>
+          <span class="nav-caption">Группы</span>
+        </a>
         <a mat-list-item routerLink="/events">
           <mat-icon>event</mat-icon>
           <span class="nav-caption">Мероприятия</span>
@@ -79,7 +83,7 @@
     </main>
     <footer>
       <mat-divider></mat-divider>
-      Copyright &copy; {{date | date: 'yyyy'}} Happy Way. Все права защищены.
+      Copyright &#169; {{date | date: 'yyyy'}} Happy Way. Все права защищены.
     </footer>
   </mat-sidenav-content>
 </mat-sidenav-container>

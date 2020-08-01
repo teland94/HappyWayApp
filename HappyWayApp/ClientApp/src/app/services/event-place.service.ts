@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpParams } from "@angular/common/http";
-import { EventPlaceModel } from "../models/event-place.model";
+import { HttpClient } from '@angular/common/http';
+import { EventPlaceModel } from '../models/event-place.model';
 
 @Injectable({
   providedIn: 'root'

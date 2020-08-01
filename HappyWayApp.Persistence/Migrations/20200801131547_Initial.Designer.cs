@@ -9,7 +9,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace HappyWayApp.Persistence.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20200717002657_Initial")]
+    [Migration("20200801131547_Initial")]
     partial class Initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -152,6 +152,43 @@ namespace HappyWayApp.Persistence.Migrations
                             GoogleUrl = "https://g.page/HappywayKharkiv?share",
                             InstagramUrl = "http://instagram.com/happyway.date",
                             Name = "Trattoria \"Paparazzi\""
+                        });
+                });
+
+            modelBuilder.Entity("HappyWayApp.Persistence.Entities.Group", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Groups");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Name = "Основная группа (Д. 24-38, М. 27-41)"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            Name = "Молодежная группа (Д. 18-27, М. 18-29)"
+                        },
+                        new
+                        {
+                            Id = 3,
+                            Name = "Старшая группа (Д. 35-42, М. 36-47)"
+                        },
+                        new
+                        {
+                            Id = 4,
+                            Name = "Старшая+ группа (Д. 40-47, М. 45-59)"
                         });
                 });
 

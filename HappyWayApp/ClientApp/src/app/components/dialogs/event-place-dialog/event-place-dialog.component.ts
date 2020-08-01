@@ -28,9 +28,9 @@ export class EventPlaceDialogComponent implements OnInit, OnDestroy {
     this.form = this.fb.group({
       city: this.fb.control(city, [Validators.required, CustomValidators.type(Object)]),
       name: this.fb.control(name, Validators.required),
-      googleUrl: this.fb.control(googleUrl, [Validators.required, CustomValidators.url]),
-      facebookUrl: this.fb.control(facebookUrl, [Validators.required, CustomValidators.url]),
-      instagramUrl: this.fb.control(instagramUrl, [Validators.required, CustomValidators.url])
+      googleUrl: this.fb.control(googleUrl, [Validators.required, CustomValidators.fullUrl]),
+      facebookUrl: this.fb.control(facebookUrl, [Validators.required, CustomValidators.fullUrl]),
+      instagramUrl: this.fb.control(instagramUrl, [Validators.required, CustomValidators.fullUrl])
     });
   }
 
