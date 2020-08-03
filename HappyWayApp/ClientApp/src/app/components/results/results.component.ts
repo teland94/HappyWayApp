@@ -14,7 +14,7 @@ import {ProgressSpinnerService} from '../../services/progress-spinner.service';
 import {Clipboard} from '@angular/cdk/clipboard';
 import {BaseComponent} from '../base/base.component';
 import {EventPlaceViewModel} from '../../models/event-place.model';
-import {EventPlaceViewService} from '../../services/event-place-view.service';
+import {EventPlaceStoreService} from "../../services/event-place-store.service";
 
 @Component({
   selector: 'app-results',
@@ -49,7 +49,7 @@ export class ResultsComponent extends BaseComponent implements OnInit, OnDestroy
   resultMembers: ResultMemberModel[];
 
   constructor(private readonly eventService: EventService,
-              private readonly eventPlaceViewService: EventPlaceViewService,
+              private readonly eventPlaceStoreService: EventPlaceStoreService,
               private readonly eventMemberService: EventMemberService,
               private readonly likeService: LikeService,
               private readonly sanitizer: DomSanitizer,
@@ -89,34 +89,31 @@ export class ResultsComponent extends BaseComponent implements OnInit, OnDestroy
   }
 
   private load(eventId: number) {
-    this.eventPlaceViewService.getEventPlace(this.event.eventPlaceId).subscribe(data => {
-      this.eventPlace = data;
+    this.eventPlace = this.eventPlaceStoreService.eventPlaces.find(ep => ep.id === this.event.eventPlaceId);
+    this.sexChangesSubscription = this.eventMemberService.sexChanges.subscribe(sex => {
+      this.progressSpinnerService.start();
+      this.eventMemberService.get(eventId).subscribe(data => {
+        this.members = data;
+        const sexMembers = data.filter(m => m.sex === sex);
 
-      this.sexChangesSubscription = this.eventMemberService.sexChanges.subscribe(sex => {
-        this.progressSpinnerService.start();
-        this.eventMemberService.get(eventId).subscribe(data => {
-          this.members = data;
-          const sexMembers = data.filter(m => m.sex === sex);
-
-          this.resultMembers = [];
-          const setResultObs = sexMembers.map(m => this.getResultData(m));
-          concat(...setResultObs).subscribe(resultMember => {
-            this.resultMembers.push(resultMember);
-            this.progressSpinnerService.stop();
-          }, error => {
-            this.progressSpinnerService.stop();
-            this.showError('Ошибка загрузки результатов участников 💔', error);
-          });
-
+        this.resultMembers = [];
+        const setResultObs = sexMembers.map(m => this.getResultData(m));
+        concat(...setResultObs).subscribe(resultMember => {
+          this.resultMembers.push(resultMember);
           this.progressSpinnerService.stop();
         }, error => {
           this.progressSpinnerService.stop();
-          this.showError('Ошибка загрузки участиков 💔', error);
+          this.showError('Ошибка загрузки результатов участников 💔', error);
         });
+
+        this.progressSpinnerService.stop();
       }, error => {
         this.progressSpinnerService.stop();
-        this.showError('Ошибка загрузки мест мероприятий 💔', error);
+        this.showError('Ошибка загрузки участиков 💔', error);
       });
+    }, error => {
+      this.progressSpinnerService.stop();
+      this.showError('Ошибка загрузки мест мероприятий 💔', error);
     });
   }
 

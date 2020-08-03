@@ -69,7 +69,6 @@ export class EventMembersComponent extends BaseComponent implements OnInit, OnDe
     this.progressSpinnerService.start();
     this.importDataService.downloadDocData(this.eventId, this.docUrl)
       .subscribe(() => {
-        this.docUrl = null;
         this.progressSpinnerService.stop();
         this.snackBar.open('Данные успешно загружены.');
         this.load(this.eventId);

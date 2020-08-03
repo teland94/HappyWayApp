@@ -13,10 +13,10 @@ import { ConfirmationService } from '../../services/confirmation.service';
 import { ImportDataService } from '../../services/import-data.service';
 import { ProgressSpinnerService } from '../../services/progress-spinner.service';
 import { BaseComponent } from '../base/base.component';
-import { EventPlaceViewService } from '../../services/event-place-view.service';
-import { GroupService } from "../../services/group.service";
-import { forkJoin } from "rxjs";
-import { catchError, switchMap } from "rxjs/operators";
+import { GroupModel } from "../../models/group.model";
+import { GroupStoreService } from "../../services/group-store.service";
+import { EventPlaceViewModel } from "../../models/event-place.model";
+import { EventPlaceStoreService } from "../../services/event-place-store.service";
 
 @Component({
   selector: 'app-layout',
@@ -31,14 +31,17 @@ export class LayoutComponent extends BaseComponent implements OnInit, AfterViewI
   currentUser: UserModel;
   date = new Date();
 
+  groups: GroupModel[];
+  eventPlaces: EventPlaceViewModel[];
+
   constructor(private readonly router: Router,
               private readonly authenticationService: AuthenticationService,
               private readonly confirmationService: ConfirmationService,
               private readonly dialog: MatDialog,
               protected readonly snackBar: MatSnackBar,
-              private readonly groupService: GroupService,
+              private readonly groupStoreService: GroupStoreService,
               private readonly eventService: EventService,
-              private readonly eventPlaceViewService: EventPlaceViewService,
+              private readonly eventPlaceStoreService: EventPlaceStoreService,
               private readonly databaseService: DatabaseService,
               private readonly importDataService: ImportDataService,
               private readonly progressSpinnerService: ProgressSpinnerService) {
@@ -49,6 +52,16 @@ export class LayoutComponent extends BaseComponent implements OnInit, AfterViewI
   ngOnInit() {
     this.authenticationService.currentUser.subscribe(user => {
       if (!user) { return; }
+      this.groupStoreService.fetchAll().subscribe(data => {
+        this.groupStoreService.groups$.subscribe(groups => {
+          this.groups = groups;
+        });
+      });
+      this.eventPlaceStoreService.fetchAll().subscribe(data => {
+        this.eventPlaceStoreService.eventPlaces$.subscribe(eventPlaces => {
+          this.eventPlaces = eventPlaces;
+        })
+      })
       this.eventService.getEventFromStorage()
         .subscribe(event => {
           this.eventService.setCurrentEvent(event);
@@ -182,23 +195,14 @@ export class LayoutComponent extends BaseComponent implements OnInit, AfterViewI
   }
 
   private openDialog(event?: EventModel) {
-    this.progressSpinnerService.start();
-    return forkJoin([this.groupService.get(), this.eventPlaceViewService.getEventPlaces()])
-      .pipe(switchMap(([groups, eventPlaces]) => {
-        const dialogRef = this.dialog.open(EventDialogComponent, {
-          width: '370px',
-          data: <EventDialogData>{
-            event: event ? event : { },
-            groups: groups,
-            eventPlaces: eventPlaces,
-          }
-        });
-        this.progressSpinnerService.stop();
-        return dialogRef.afterClosed();
-      }), catchError(err => {
-        this.progressSpinnerService.stop();
-        this.showError('Ошибка загрузки данных.', err);
-        throw err;
-      }));
+    const dialogRef = this.dialog.open(EventDialogComponent, {
+      width: '370px',
+      data: <EventDialogData>{
+        event: event ? event : { },
+        groups: this.groups,
+        eventPlaces: this.eventPlaces
+      }
+    });
+    return dialogRef.afterClosed();
   }
 }

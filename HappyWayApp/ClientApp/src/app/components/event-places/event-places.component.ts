@@ -1,5 +1,4 @@
-import { Component, OnInit } from '@angular/core';
-import {EventPlaceService} from "../../services/event-place.service";
+import {Component, OnDestroy, OnInit} from '@angular/core';
 import {ProgressSpinnerService} from "../../services/progress-spinner.service";
 import {EventPlaceModel, EventPlaceViewModel} from "../../models/event-place.model";
 import {BaseComponent} from "../base/base.component";
@@ -8,14 +7,17 @@ import {ConfirmationService} from "../../services/confirmation.service";
 import {EventPlaceDialogComponent} from "../dialogs/event-place-dialog/event-place-dialog.component";
 import {MatDialog} from "@angular/material/dialog";
 import {CityService} from "../../services/city.service";
-import {EventPlaceViewService} from "../../services/event-place-view.service";
+import {EventPlaceStoreService} from "../../services/event-place-store.service";
+import {Subscription} from "rxjs";
 
 @Component({
   selector: 'app-event-places',
   templateUrl: './event-places.component.html',
   styleUrls: ['./event-places.component.css']
 })
-export class EventPlacesComponent extends BaseComponent implements OnInit {
+export class EventPlacesComponent extends BaseComponent implements OnInit, OnDestroy {
+
+  private eventPlacesSubscription: Subscription;
 
   eventPlaces: EventPlaceViewModel[];
 
@@ -23,8 +25,7 @@ export class EventPlacesComponent extends BaseComponent implements OnInit {
 
   constructor(protected readonly snackBar: MatSnackBar,
               private readonly dialog: MatDialog,
-              private readonly eventPlaceService: EventPlaceService,
-              private readonly eventPlaceViewService: EventPlaceViewService,
+              private readonly eventPlaceStoreService: EventPlaceStoreService,
               private readonly cityService: CityService,
               private readonly progressSpinnerService: ProgressSpinnerService,
               private readonly confirmationService: ConfirmationService) {
@@ -33,21 +34,20 @@ export class EventPlacesComponent extends BaseComponent implements OnInit {
 
   ngOnInit() {
     this.load();
+    this.eventPlacesSubscription = this.eventPlaceStoreService.eventPlaces$.subscribe(data => {
+      this.eventPlaces = data;
+    })
+  }
+
+  ngOnDestroy() {
+    this.eventPlacesSubscription.unsubscribe();
   }
 
   add() {
     this.openDialog().subscribe(eventPlaceVm => {
       if (!eventPlaceVm) { return; }
-      const eventPlace = <EventPlaceModel> {
-        name: eventPlaceVm.name,
-        googleUrl: eventPlaceVm.googleUrl,
-        facebookUrl: eventPlaceVm.facebookUrl,
-        instagramUrl: eventPlaceVm.instagramUrl,
-        cityId: eventPlaceVm.city.id
-      }
-      this.eventPlaceService.create(eventPlace)
+      this.eventPlaceStoreService.create(eventPlaceVm)
         .subscribe(() => {
-          this.load();
         }, error => {
           this.showError('Ошибка добавления места мероприятия.', error);
         });
@@ -58,10 +58,8 @@ export class EventPlacesComponent extends BaseComponent implements OnInit {
     this.openDialog(eventPlace).subscribe(editedEventPlace => {
       if (!editedEventPlace) { return; }
       editedEventPlace.id = eventPlace.id;
-      editedEventPlace.cityId = eventPlace.city.id;
-      this.eventPlaceService.update(editedEventPlace)
+      this.eventPlaceStoreService.update(editedEventPlace)
         .subscribe(() => {
-          this.load();
         }, error => {
           this.showError('Ошибка редактирования места мероприятия.', error);
         });
@@ -71,9 +69,8 @@ export class EventPlacesComponent extends BaseComponent implements OnInit {
   delete(eventPlace: EventPlaceViewModel) {
     this.confirmationService.openConfirmDialogWithPassword('удалить').subscribe(data => {
       if (!data) { return; }
-      this.eventPlaceService.delete(eventPlace.id)
+      this.eventPlaceStoreService.delete(eventPlace.id)
         .subscribe(() => {
-          this.load();
         }, error => {
           this.showError('Ошибка удаления места мероприятия.', error);
         });
@@ -82,8 +79,7 @@ export class EventPlacesComponent extends BaseComponent implements OnInit {
 
   private load() {
     this.progressSpinnerService.start();
-    this.eventPlaceViewService.getEventPlaces().subscribe(data => {
-      this.eventPlaces = data;
+    this.eventPlaceStoreService.fetchAll().subscribe(data => {
       this.progressSpinnerService.stop();
     }, error => {
       this.progressSpinnerService.stop();

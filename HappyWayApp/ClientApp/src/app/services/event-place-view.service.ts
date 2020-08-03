@@ -1,6 +1,6 @@
 import {Injectable} from '@angular/core';
 import {map, switchMap} from "rxjs/operators";
-import {EventPlaceViewModel} from "../models/event-place.model";
+import {EventPlaceModel, EventPlaceViewModel} from "../models/event-place.model";
 import {EventPlaceService} from "./event-place.service";
 import {CityService} from "./city.service";
 
@@ -30,5 +30,28 @@ export class EventPlaceViewService {
         });
       }));
     }));
+  }
+
+  create(eventPlaceVm: EventPlaceViewModel) {
+    return this.eventPlaceService.create(this.getEventPlaceModel(eventPlaceVm));
+  }
+
+  update(eventPlaceVm: EventPlaceViewModel) {
+    return this.eventPlaceService.update(this.getEventPlaceModel(eventPlaceVm));
+  }
+
+  delete(id: number) {
+    return this.eventPlaceService.delete(id);
+  }
+
+  private getEventPlaceModel(eventPlaceVm: EventPlaceViewModel) {
+    return <EventPlaceModel> {
+      id: eventPlaceVm.id,
+      name: eventPlaceVm.name,
+      googleUrl: eventPlaceVm.googleUrl,
+      facebookUrl: eventPlaceVm.facebookUrl,
+      instagramUrl: eventPlaceVm.instagramUrl,
+      cityId: eventPlaceVm.city.id
+    }
   }
 }

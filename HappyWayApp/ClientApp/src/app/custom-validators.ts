@@ -1,4 +1,25 @@
-import { AbstractControl, ValidationErrors, ValidatorFn, Validators } from "@angular/forms";
+import {AbstractControl, NG_VALIDATORS, ValidationErrors, Validator, ValidatorFn, Validators} from '@angular/forms';
+import {Directive, forwardRef} from '@angular/core';
+
+//Directives
+
+const URL_VALIDATOR: any = {
+  provide: NG_VALIDATORS,
+  useExisting: forwardRef(() => UrlValidator),
+  multi: true
+};
+
+@Directive({
+  selector: '[url][formControlName],[url][formControl],[url][ngModel]',
+  providers: [URL_VALIDATOR]
+})
+export class UrlValidator implements Validator {
+  validate(c: AbstractControl): {[key: string]: any} {
+    return url(c);
+  }
+}
+
+// Validators
 
 function isPresent(obj: any): boolean {
   return obj !== undefined && obj !== null;

@@ -1,9 +1,10 @@
 <ng-container *ngIf="eventId">
   <mat-form-field class="full-width">
-    <input matInput type="url" placeholder="URL документа" [(ngModel)]="docUrl" required>
+    <input #docUrlModel="ngModel" matInput type="url" placeholder="URL документа" [(ngModel)]="docUrl" required url>
+    <mat-error app-validation-error [control]="docUrlModel" propertyName="URL документа"></mat-error>
   </mat-form-field>
   <div class="table-controls">
-    <button mat-raised-button (click)="downloadDocData()" [disabled]="!docUrl">Загрузить</button>
+    <button mat-raised-button (click)="downloadDocData(); docUrlModel.reset();" [disabled]="!docUrlModel.valid">Загрузить</button>
   </div>
   <div class="scrollable-grid">
     <table mat-table *ngIf="eventMembers && eventMembers.length > 0" [dataSource]="eventMembers" class="mat-elevation-z8">

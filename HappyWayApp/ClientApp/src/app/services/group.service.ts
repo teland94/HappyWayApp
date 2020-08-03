@@ -20,7 +20,7 @@ export class GroupService {
   }
 
   create(group: GroupModel) {
-    return this.httpClient.post(this.baseUrl, group);
+    return this.httpClient.post<GroupModel>(this.baseUrl, group);
   }
 
   update(group: GroupModel) {

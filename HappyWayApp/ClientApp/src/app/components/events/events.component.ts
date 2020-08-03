@@ -14,9 +14,9 @@ import { ImportDataService } from '../../services/import-data.service';
 import { ProgressSpinnerService } from '../../services/progress-spinner.service';
 import { BaseComponent } from '../base/base.component';
 import { EventPlaceViewModel } from '../../models/event-place.model';
-import { EventPlaceViewService } from '../../services/event-place-view.service';
 import { GroupModel } from "../../models/group.model";
-import { GroupService } from "../../services/group.service";
+import { GroupStoreService } from "../../services/group-store.service";
+import { EventPlaceStoreService } from "../../services/event-place-store.service";
 
 @Component({
   selector: 'app-events',
@@ -34,9 +34,9 @@ export class EventsComponent extends BaseComponent implements OnInit, OnDestroy 
   eventPlaces: EventPlaceViewModel[];
   currentEvent: EventModel;
 
-  constructor(private readonly groupService: GroupService,
+  constructor(private readonly groupStoreService: GroupStoreService,
               private readonly eventService: EventService,
-              private readonly eventPlaceViewService: EventPlaceViewService,
+              private readonly eventPlaceStoreService: EventPlaceStoreService,
               private readonly importDataService: ImportDataService,
               private readonly databaseService: DatabaseService,
               private readonly confirmationService: ConfirmationService,
@@ -145,7 +145,7 @@ export class EventsComponent extends BaseComponent implements OnInit, OnDestroy 
 
   private load() {
     this.progressSpinnerService.start();
-    forkJoin([this.eventService.get(), this.groupService.get(), this.eventPlaceViewService.getEventPlaces()])
+    forkJoin([this.eventService.get(), this.groupStoreService.groups$, this.eventPlaceStoreService.eventPlaces$])
       .subscribe(([events, groups, eventPlaces]) => {
         this.events = events.map(e => {
           const eventPlace = eventPlaces.find(ep => ep.id === e.eventPlaceId);

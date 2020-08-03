@@ -20,7 +20,7 @@ export class EventPlaceService {
   }
 
   create(eventMember: EventPlaceModel) {
-    return this.httpClient.post(this.baseUrl, eventMember);
+    return this.httpClient.post<EventPlaceModel>(this.baseUrl, eventMember);
   }
 
   update(eventMember: EventPlaceModel) {
