@@ -21,7 +21,7 @@ export class EventMemberService {
   }
 
   create(eventMember: EventMemberModel) {
-    return this.httpClient.post(this.baseUrl, eventMember);
+    return this.httpClient.post<EventMemberModel>(this.baseUrl, eventMember);
   }
 
   update(eventMember: EventMemberModel) {

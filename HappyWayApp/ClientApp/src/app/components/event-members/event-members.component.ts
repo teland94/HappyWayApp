@@ -11,6 +11,7 @@ import { Subscription } from 'rxjs';
 import { ImportDataService } from '../../services/import-data.service';
 import { ProgressSpinnerService } from '../../services/progress-spinner.service';
 import { BaseComponent } from '../base/base.component';
+import { EventMemberStoreService } from '../../services/event-member-store.service';
 
 @Component({
   selector: 'app-event-members',
@@ -21,6 +22,7 @@ export class EventMembersComponent extends BaseComponent implements OnInit, OnDe
 
   private eventChangesSubscription: Subscription;
   private sexChangesSubscription: Subscription;
+  private eventMembersSubscription: Subscription;
 
   displayedColumns: string[] = ['number', 'name', 'phoneNumber', 'edit', 'delete'];
 
@@ -31,6 +33,7 @@ export class EventMembersComponent extends BaseComponent implements OnInit, OnDe
   constructor(private readonly eventService: EventService,
               private readonly importDataService: ImportDataService,
               private readonly eventMemberService: EventMemberService,
+              private readonly eventMemberStoreService: EventMemberStoreService,
               private readonly confirmationService: ConfirmationService,
               protected readonly snackBar: MatSnackBar,
               private readonly dialog: MatDialog,
@@ -63,6 +66,9 @@ export class EventMembersComponent extends BaseComponent implements OnInit, OnDe
     if (this.sexChangesSubscription) {
       this.sexChangesSubscription.unsubscribe();
     }
+    if (this.eventMembersSubscription) {
+      this.eventMembersSubscription.unsubscribe();
+    }
   }
 
   downloadDocData() {
@@ -82,28 +88,14 @@ export class EventMembersComponent extends BaseComponent implements OnInit, OnDe
       });
   }
 
-  private load(eventId: number) {
-    this.progressSpinnerService.start();
-    this.sexChangesSubscription = this.eventMemberService.sexChanges.subscribe(sex => {
-      this.eventMemberService.get(eventId).subscribe(data => {
-        this.eventMembers = data.filter(m => m.sex === sex);
-        this.progressSpinnerService.stop();
-      }, error => {
-        this.progressSpinnerService.stop();
-        this.showError('Ошибка загрузки участников.', error);
-      });
-    });
-  }
-
   edit(eventMember: EventMemberModel) {
     this.openDialog(eventMember).subscribe(editedEventMember => {
       if (!editedEventMember) { return; }
       editedEventMember.id = eventMember.id;
       editedEventMember.sex = eventMember.sex;
       editedEventMember.eventId = eventMember.eventId;
-      this.eventMemberService.update(editedEventMember)
+      this.eventMemberStoreService.update(editedEventMember)
         .subscribe(() => {
-          this.load(this.eventId);
         }, error => {
           this.showError('Ошибка редактирования участника.', error);
         });
@@ -113,12 +105,31 @@ export class EventMembersComponent extends BaseComponent implements OnInit, OnDe
   delete(eventMember: EventMemberModel) {
     this.confirmationService.openConfirmDialog('удалить').subscribe(data => {
       if (!data) { return; }
-      this.eventMemberService.delete(eventMember.id)
+      this.eventMemberStoreService.delete(eventMember.id)
         .subscribe(() => {
-          this.load(this.eventId);
         }, error => {
           this.showError('Ошибка удаления участника.', error);
         });
+    });
+  }
+
+  private load(eventId: number) {
+    this.progressSpinnerService.start();
+    this.eventMemberStoreService.fetchByEventId(eventId).subscribe(data => {
+      this.initData();
+      this.progressSpinnerService.stop();
+    }, error => {
+      this.progressSpinnerService.stop();
+      this.showError('Ошибка загрузки участников.', error);
+    });
+  }
+
+  private initData() {
+    this.sexChangesSubscription = this.eventMemberService.sexChanges.subscribe(sex => {
+      this.eventMembersSubscription = this.eventMemberStoreService.getByEventId(this.eventId).subscribe(data => {
+        if (!data) { return; }
+        this.eventMembers = data.filter(m => m.sex === sex);
+      });
     });
   }
 

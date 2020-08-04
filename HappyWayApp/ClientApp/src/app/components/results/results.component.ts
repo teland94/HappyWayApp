@@ -15,6 +15,7 @@ import {Clipboard} from '@angular/cdk/clipboard';
 import {BaseComponent} from '../base/base.component';
 import {EventPlaceViewModel} from '../../models/event-place.model';
 import {EventPlaceStoreService} from "../../services/event-place-store.service";
+import {EventMemberStoreService} from '../../services/event-member-store.service';
 
 @Component({
   selector: 'app-results',
@@ -42,6 +43,7 @@ export class ResultsComponent extends BaseComponent implements OnInit, OnDestroy
 
   private eventChangesSubscription: Subscription;
   private sexChangesSubscription: Subscription;
+  private eventMembersSubscription: Subscription;
 
   event: EventModel;
   eventPlace: EventPlaceViewModel;
@@ -51,6 +53,7 @@ export class ResultsComponent extends BaseComponent implements OnInit, OnDestroy
   constructor(private readonly eventService: EventService,
               private readonly eventPlaceStoreService: EventPlaceStoreService,
               private readonly eventMemberService: EventMemberService,
+              private readonly eventMemberStoreService: EventMemberStoreService,
               private readonly likeService: LikeService,
               private readonly sanitizer: DomSanitizer,
               protected readonly snackBar: MatSnackBar,
@@ -63,7 +66,27 @@ export class ResultsComponent extends BaseComponent implements OnInit, OnDestroy
     this.eventChangesSubscription = this.eventService.eventChanges.subscribe(event => {
       if (!event) { return; }
       this.event = event;
-      this.load(event.id);
+      this.eventPlaceStoreService.eventPlaces$.subscribe(eventPlaces => {
+        if (!eventPlaces) { return; }
+        this.eventPlace = eventPlaces.find(ep => ep.id === this.event.eventPlaceId);
+        this.sexChangesSubscription = this.eventMemberService.sexChanges.subscribe(sex => {
+          this.eventMembersSubscription = this.eventMemberStoreService.getByEventId(event.id).subscribe(eventMembers => {
+            if (!eventMembers) { return; }
+            this.members = eventMembers;
+            const sexMembers = eventMembers.filter(m => m.sex === sex);
+            this.resultMembers = [];
+            const setResultObs = sexMembers.map(m => this.getResultData(m));
+            this.progressSpinnerService.start();
+            concat(...setResultObs).subscribe(resultMember => {
+              this.resultMembers.push(resultMember);
+              this.progressSpinnerService.stop();
+            }, error => {
+              this.progressSpinnerService.stop();
+              this.showError('Ошибка загрузки результатов участников 💔', error);
+            });
+          });
+        });
+      });
     });
   }
 
@@ -71,6 +94,9 @@ export class ResultsComponent extends BaseComponent implements OnInit, OnDestroy
     this.eventChangesSubscription.unsubscribe();
     if (this.sexChangesSubscription) {
       this.sexChangesSubscription.unsubscribe();
+    }
+    if (this.eventMembersSubscription) {
+      this.eventMembersSubscription.unsubscribe();
     }
   }
 
@@ -88,37 +114,7 @@ export class ResultsComponent extends BaseComponent implements OnInit, OnDestroy
     this.snackBar.open('Успешно скопировано ❤');
   }
 
-  private load(eventId: number) {
-    this.eventPlace = this.eventPlaceStoreService.eventPlaces.find(ep => ep.id === this.event.eventPlaceId);
-    this.sexChangesSubscription = this.eventMemberService.sexChanges.subscribe(sex => {
-      this.progressSpinnerService.start();
-      this.eventMemberService.get(eventId).subscribe(data => {
-        this.members = data;
-        const sexMembers = data.filter(m => m.sex === sex);
-
-        this.resultMembers = [];
-        const setResultObs = sexMembers.map(m => this.getResultData(m));
-        concat(...setResultObs).subscribe(resultMember => {
-          this.resultMembers.push(resultMember);
-          this.progressSpinnerService.stop();
-        }, error => {
-          this.progressSpinnerService.stop();
-          this.showError('Ошибка загрузки результатов участников 💔', error);
-        });
-
-        this.progressSpinnerService.stop();
-      }, error => {
-        this.progressSpinnerService.stop();
-        this.showError('Ошибка загрузки участиков 💔', error);
-      });
-    }, error => {
-      this.progressSpinnerService.stop();
-      this.showError('Ошибка загрузки мест мероприятий 💔', error);
-    });
-  }
-
   private getResultData(member: EventMemberModel) {
-    this.progressSpinnerService.start();
     return this.likeService.getAllByMember(member.id).pipe(map(likes => {
       return <ResultMemberModel>{
         member: member,

@@ -10,6 +10,7 @@ import { of, Subscription } from 'rxjs';
 import { EventService } from '../../services/event.service';
 import { ProgressSpinnerService } from '../../services/progress-spinner.service';
 import { BaseComponent } from '../base/base.component';
+import {EventMemberStoreService} from '../../services/event-member-store.service';
 
 @Component({
   selector: 'app-home',
@@ -19,8 +20,9 @@ import { BaseComponent } from '../base/base.component';
 })
 export class HomeComponent extends BaseComponent implements OnInit, OnDestroy {
 
-  private eventChangesSubscription: Subscription;
+  private eventSubscription: Subscription;
   private sexChangesSubscription: Subscription;
+  private eventMembersSubscription: Subscription;
 
   stepper: MatStepper;
 
@@ -39,23 +41,34 @@ export class HomeComponent extends BaseComponent implements OnInit, OnDestroy {
 
   constructor(private readonly eventService: EventService,
               private readonly eventMemberService: EventMemberService,
+              private readonly eventMemberStoreService: EventMemberStoreService,
               private readonly likeService: LikeService,
-              protected readonly snackBar: MatSnackBar,
-              private readonly progressSpinnerService: ProgressSpinnerService) {
+              protected readonly snackBar: MatSnackBar) {
     super(snackBar);
   }
 
   ngOnInit() {
-    this.eventChangesSubscription = this.eventService.eventChanges.subscribe(event => {
+    this.eventSubscription = this.eventService.eventChanges.subscribe(event => {
       if (!event) { return; }
-      this.load(event.id);
+      this.sexChangesSubscription = this.eventMemberService.sexChanges.subscribe(sex => {
+        this.eventMembersSubscription = this.eventMemberStoreService.getByEventId(event.id).subscribe(data => {
+          if (!data) { return; }
+          this.setCardMembers(data, sex);
+          if (this.cardMembers && this.cardMembers.length > 0) {
+            this.setLikedMembers(this.cardMembers[0]);
+          }
+        });
+      });
     });
   }
 
   ngOnDestroy() {
-    this.eventChangesSubscription.unsubscribe();
+    this.eventSubscription.unsubscribe();
     if (this.sexChangesSubscription) {
       this.sexChangesSubscription.unsubscribe();
+    }
+    if (this.eventMembersSubscription) {
+      this.eventMembersSubscription.unsubscribe();
     }
   }
 
@@ -103,23 +116,6 @@ export class HomeComponent extends BaseComponent implements OnInit, OnDestroy {
       }
     }, error => {
       this.showError('Ошибка сохранения 💔', error);
-    });
-  }
-
-  private load(eventId: number) {
-    this.sexChangesSubscription = this.eventMemberService.sexChanges.subscribe(sex => {
-      this.progressSpinnerService.start();
-      this.cardMembers = [];
-      this.eventMemberService.get(eventId).subscribe(data => {
-        this.setCardMembers(data, sex);
-        if (this.cardMembers && this.cardMembers.length > 0) {
-          this.setLikedMembers(this.cardMembers[0]);
-        }
-        this.progressSpinnerService.stop();
-      }, error => {
-        this.progressSpinnerService.stop();
-        this.showError('Ошибка загрузки участников 💔', error);
-      });
     });
   }
 

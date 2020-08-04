@@ -26,6 +26,8 @@ import { EventPlaceStoreService } from "../../services/event-place-store.service
 export class EventsComponent extends BaseComponent implements OnInit, OnDestroy {
 
   private eventChangesSubscription: Subscription;
+  private groupsSubscription: Subscription;
+  private eventPlacesSubscription: Subscription;
 
   displayedColumns: string[] = ['name', 'eventPlace', 'date', 'user', 'active', 'edit', 'delete'];
 
@@ -51,10 +53,19 @@ export class EventsComponent extends BaseComponent implements OnInit, OnDestroy 
     this.eventChangesSubscription = this.eventService.eventChanges.subscribe(event => {
       this.currentEvent = event;
     });
-    this.load();
+    this.groupsSubscription = this.groupStoreService.groups$.subscribe(groups => {
+      this.groups = groups;
+    });
+    this.eventChangesSubscription = this.eventPlaceStoreService.eventPlaces$.subscribe(eventPlaces => {
+      this.eventPlaces = eventPlaces;
+      if (!eventPlaces) { return; }
+      this.load();
+    });
   }
 
   ngOnDestroy() {
+    this.eventChangesSubscription.unsubscribe();
+    this.groupsSubscription.unsubscribe();
     this.eventChangesSubscription.unsubscribe();
   }
 
@@ -145,18 +156,16 @@ export class EventsComponent extends BaseComponent implements OnInit, OnDestroy 
 
   private load() {
     this.progressSpinnerService.start();
-    forkJoin([this.eventService.get(), this.groupStoreService.groups$, this.eventPlaceStoreService.eventPlaces$])
-      .subscribe(([events, groups, eventPlaces]) => {
+    forkJoin([this.eventService.get()])
+      .subscribe(([events]) => {
         this.events = events.map(e => {
-          const eventPlace = eventPlaces.find(ep => ep.id === e.eventPlaceId);
+          const eventPlace = this.eventPlaces.find(ep => ep.id === e.eventPlaceId);
           return new EventViewModel(e, eventPlace);
         });
         if (this.currentEvent) {
           this.currentEvent = events.find(ev => ev.id === this.currentEvent.id);
         }
         this.checkEvent(this.currentEvent);
-        this.groups = groups;
-        this.eventPlaces = eventPlaces;
         this.progressSpinnerService.stop();
       }, error => {
         this.progressSpinnerService.stop();

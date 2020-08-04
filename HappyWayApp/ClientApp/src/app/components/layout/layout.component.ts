@@ -17,6 +17,7 @@ import { GroupModel } from "../../models/group.model";
 import { GroupStoreService } from "../../services/group-store.service";
 import { EventPlaceViewModel } from "../../models/event-place.model";
 import { EventPlaceStoreService } from "../../services/event-place-store.service";
+import { EventMemberStoreService } from '../../services/event-member-store.service';
 
 @Component({
   selector: 'app-layout',
@@ -41,6 +42,7 @@ export class LayoutComponent extends BaseComponent implements OnInit, AfterViewI
               protected readonly snackBar: MatSnackBar,
               private readonly groupStoreService: GroupStoreService,
               private readonly eventService: EventService,
+              private readonly eventMemberStoreService: EventMemberStoreService,
               private readonly eventPlaceStoreService: EventPlaceStoreService,
               private readonly databaseService: DatabaseService,
               private readonly importDataService: ImportDataService,
@@ -60,8 +62,8 @@ export class LayoutComponent extends BaseComponent implements OnInit, AfterViewI
       this.eventPlaceStoreService.fetchAll().subscribe(data => {
         this.eventPlaceStoreService.eventPlaces$.subscribe(eventPlaces => {
           this.eventPlaces = eventPlaces;
-        })
-      })
+        });
+      });
       this.eventService.getEventFromStorage()
         .subscribe(event => {
           this.eventService.setCurrentEvent(event);
@@ -71,10 +73,11 @@ export class LayoutComponent extends BaseComponent implements OnInit, AfterViewI
           if (error.status === 403 || error.status === 404) { return; }
           this.showError('Ошибка установки мероприятия.', error);
         });
-    });
-    this.eventService.eventChanges.subscribe(event => {
-      if (!event) { return; }
-      this.event = event;
+      this.eventService.eventChanges.subscribe(event => {
+        if (!event) { return; }
+        this.event = event;
+        this.eventMemberStoreService.fetchByEventId(event.id).subscribe();
+      });
     });
   }
 
