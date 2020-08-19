@@ -32,6 +32,7 @@ namespace HappyWayApp.Controllers
 
             return await _context.Cities
                 .Where(c => c.Name.StartsWith(query))
+                .OrderBy(c => c.Name)
                 .ToListAsync();
         }
 

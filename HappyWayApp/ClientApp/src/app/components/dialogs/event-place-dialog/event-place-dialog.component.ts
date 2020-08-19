@@ -55,6 +55,6 @@ export class EventPlaceDialogComponent implements OnInit, OnDestroy {
   }
 
   displayCity(city: CityModel) {
-    return city ? city.name : undefined;
+    return city ? (city.region ? `${city.name} (${city.region})` : city.name) : undefined;
   }
 }

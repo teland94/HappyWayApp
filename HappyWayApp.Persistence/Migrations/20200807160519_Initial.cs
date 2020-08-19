@@ -14,7 +14,8 @@ namespace HappyWayApp.Persistence.Migrations
                     Id = table.Column<int>(nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
                     Name = table.Column<string>(nullable: false),
-                    NameGenitive = table.Column<string>(nullable: true)
+                    LocativeName = table.Column<string>(nullable: true),
+                    Region = table.Column<string>(nullable: true)
                 },
                 constraints: table =>
                 {
@@ -174,13 +175,13 @@ namespace HappyWayApp.Persistence.Migrations
 
             migrationBuilder.InsertData(
                 table: "Cities",
-                columns: new[] { "Id", "Name", "NameGenitive" },
-                values: new object[] { 1, "Харьков", "Харькове" });
+                columns: new[] { "Id", "LocativeName", "Name", "Region" },
+                values: new object[] { 1, "Харькове", "Харьков", null });
 
             migrationBuilder.InsertData(
                 table: "Cities",
-                columns: new[] { "Id", "Name", "NameGenitive" },
-                values: new object[] { 2, "Днепр", "Днепре" });
+                columns: new[] { "Id", "LocativeName", "Name", "Region" },
+                values: new object[] { 2, "Днепре", "Днепр", null });
 
             migrationBuilder.InsertData(
                 table: "Groups",
@@ -200,7 +201,7 @@ namespace HappyWayApp.Persistence.Migrations
             migrationBuilder.InsertData(
                 table: "Groups",
                 columns: new[] { "Id", "Name" },
-                values: new object[] { 4, "Старшая+ группа (Д. 40-47, М. 45-59)" });
+                values: new object[] { 4, "Старшая+ группа (Д. 40-57, М. 45-59)" });
 
             migrationBuilder.InsertData(
                 table: "Roles",

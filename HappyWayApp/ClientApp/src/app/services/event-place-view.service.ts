@@ -1,8 +1,8 @@
 import {Injectable} from '@angular/core';
-import {map, switchMap} from "rxjs/operators";
-import {EventPlaceModel, EventPlaceViewModel} from "../models/event-place.model";
-import {EventPlaceService} from "./event-place.service";
-import {CityService} from "./city.service";
+import {map, switchMap} from 'rxjs/operators';
+import {EventPlaceModel, EventPlaceViewModel} from '../models/event-place.model';
+import {EventPlaceService} from './event-place.service';
+import {CityService} from './city.service';
 
 @Injectable({
   providedIn: 'root'
@@ -22,8 +22,8 @@ export class EventPlaceViewService {
 
   getEventPlaces() {
     return this.eventPlaceService.get().pipe(switchMap(eventPlaces => {
-      const ids = eventPlaces.map(ep => ep.cityId);
-      return this.cityService.getCitiesById(ids).pipe(map(cities => {
+      const uniqueIds = [...new Set(eventPlaces.map(ep => ep.cityId))];
+      return this.cityService.getCitiesById(uniqueIds).pipe(map(cities => {
         return eventPlaces.map(ep => {
           const city = cities.find(c => c.id === ep.cityId);
           return new EventPlaceViewModel(ep, city);
@@ -52,6 +52,6 @@ export class EventPlaceViewService {
       facebookUrl: eventPlaceVm.facebookUrl,
       instagramUrl: eventPlaceVm.instagramUrl,
       cityId: eventPlaceVm.city.id
-    }
+    };
   }
 }

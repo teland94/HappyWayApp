@@ -34,6 +34,16 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Remove="cities_db.csv" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="cities_db.csv">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\HappyWayApp.Persistence\HappyWayApp.Persistence.csproj" />
   </ItemGroup>
 

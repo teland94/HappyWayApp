@@ -14,7 +14,7 @@ import {ProgressSpinnerService} from '../../services/progress-spinner.service';
 import {Clipboard} from '@angular/cdk/clipboard';
 import {BaseComponent} from '../base/base.component';
 import {EventPlaceViewModel} from '../../models/event-place.model';
-import {EventPlaceStoreService} from "../../services/event-place-store.service";
+import {EventPlaceStoreService} from '../../services/event-place-store.service';
 import {EventMemberStoreService} from '../../services/event-member-store.service';
 
 @Component({
@@ -131,7 +131,7 @@ export class ResultsComponent extends BaseComponent implements OnInit, OnDestroy
       resText = `${this.matchedText.replace('{{date}}', getDateText(this.event.date))
         .replace('{{eventPlace}}', this.eventPlace.name)
         .replace('""', '"')
-        .replace('{{city}}', this.eventPlace.city.nameGenitive)}\n\n`;
+        .replace('{{city}}', this.eventPlace.city.locativeName || this.eventPlace.city.name)}\n\n`;
       const matchedMembers = this.getLikedMembers(matched);
       matchedMembers.forEach(m => {
         resText += `${this.getMemberText(m)}\n`;
@@ -140,7 +140,7 @@ export class ResultsComponent extends BaseComponent implements OnInit, OnDestroy
       resText = `${this.nonMatchedText.replace('{{date}}', getDateText(this.event.date))
         .replace('{{eventPlace}}', this.eventPlace.name)
         .replace('""', '"')
-        .replace('{{city}}', this.eventPlace.city.nameGenitive)}\n`;
+        .replace('{{city}}', this.eventPlace.city.locativeName || this.eventPlace.city.name)}\n`;
     }
     if (liked && liked.length > 0) {
       resText += `\n${this.likedText}\n\n`;

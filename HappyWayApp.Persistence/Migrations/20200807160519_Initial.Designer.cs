@@ -9,7 +9,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace HappyWayApp.Persistence.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20200801131547_Initial")]
+    [Migration("20200807160519_Initial")]
     partial class Initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -24,11 +24,14 @@ namespace HappyWayApp.Persistence.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
+                    b.Property<string>("LocativeName")
+                        .HasColumnType("TEXT");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("NameGenitive")
+                    b.Property<string>("Region")
                         .HasColumnType("TEXT");
 
                     b.HasKey("Id");
@@ -39,14 +42,14 @@ namespace HappyWayApp.Persistence.Migrations
                         new
                         {
                             Id = 1,
-                            Name = "Харьков",
-                            NameGenitive = "Харькове"
+                            LocativeName = "Харькове",
+                            Name = "Харьков"
                         },
                         new
                         {
                             Id = 2,
-                            Name = "Днепр",
-                            NameGenitive = "Днепре"
+                            LocativeName = "Днепре",
+                            Name = "Днепр"
                         });
                 });
 
@@ -188,7 +191,7 @@ namespace HappyWayApp.Persistence.Migrations
                         new
                         {
                             Id = 4,
-                            Name = "Старшая+ группа (Д. 40-47, М. 45-59)"
+                            Name = "Старшая+ группа (Д. 40-57, М. 45-59)"
                         });
                 });
 

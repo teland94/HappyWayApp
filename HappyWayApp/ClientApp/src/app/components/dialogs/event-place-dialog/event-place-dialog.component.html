@@ -30,6 +30,6 @@
 
 <mat-autocomplete #auto="matAutocomplete" [displayWith]="displayCity">
   <mat-option *ngFor="let city of cities" [value]="city">
-    {{ city.name }}
+    <span>{{city.name}}<ng-container *ngIf="city.region"> ({{city.region}})</ng-container></span>
   </mat-option>
 </mat-autocomplete>

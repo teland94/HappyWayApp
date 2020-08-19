@@ -5,7 +5,7 @@ import {EventModel} from '../../../models/event.model';
 import {EventPlaceViewModel} from '../../../models/event-place.model';
 import {CustomValidators} from '../../../custom-validators';
 import {getNowDateWithoutTime} from '../../../utilities';
-import {GroupModel} from "../../../models/group.model";
+import {GroupModel} from '../../../models/group.model';
 
 export class EventDialogResult {
   event: EventModel;

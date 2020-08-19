@@ -6,7 +6,9 @@ namespace HappyWayApp.Persistence.Entities
     {
         public string Name { get; set; }
 
-        public string NameGenitive { get; set; }
+        public string LocativeName { get; set; }
+
+        public string Region { get; set; }
 
         public List<EventPlace> EventPlaces { get; set; }
     }

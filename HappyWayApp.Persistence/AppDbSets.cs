@@ -1,4 +1,7 @@
 ﻿using System;
+using System.Globalization;
+using System.IO;
+using CsvHelper;
 using HappyWayApp.Persistence.Configuration;
 using HappyWayApp.Persistence.Entities;
 using HappyWayApp.Persistence.Helpers;
@@ -140,21 +143,7 @@ namespace HappyWayApp.Persistence
                     }
                 );
 
-            modelBuilder.Entity<City>()
-                .HasData(
-                    new City
-                    {
-                        Id = 1,
-                        Name = "Харьков",
-                        NameGenitive = "Харькове"
-                    },
-                    new City
-                    {
-                        Id = 2,
-                        Name = "Днепр",
-                        NameGenitive = "Днепре"
-                    }
-                );
+            modelBuilder.Entity<City>().HasData(SampleData.SampleCities);
 
             modelBuilder.Entity<EventPlace>()
                 .HasData(
