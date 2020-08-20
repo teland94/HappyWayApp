@@ -3,6 +3,7 @@ import {BehaviorSubject, of} from 'rxjs';
 import {map} from 'rxjs/operators';
 import {EventMemberModel} from '../models/event-member';
 import {EventMemberService} from './event-member.service';
+import '../../extensions';
 
 @Injectable({
   providedIn: 'root'
@@ -43,9 +44,7 @@ export class EventMemberStoreService {
   update(eventMember: EventMemberModel) {
     return this.eventMemberService.update(eventMember)
       .pipe(map(data => {
-        const index = this.eventMembers.findIndex(em => em.id === eventMember.id);
-        this.eventMembers[index] = {...eventMember};
-        this.eventMembers = [...this.eventMembers];
+        this.eventMembers = this.eventMembers.replace(em => em.id === eventMember.id, eventMember);
         return data;
       }));
   }

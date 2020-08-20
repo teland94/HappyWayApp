@@ -62,7 +62,7 @@ namespace HappyWayApp.Persistence
                 }
             }
 
-            context.SaveChanges();
+            await context.SaveChangesAsync();
         }
     }
 }

@@ -1,8 +1,9 @@
 import {Injectable} from '@angular/core';
-import {BehaviorSubject} from "rxjs";
-import {EventPlaceViewModel} from "../models/event-place.model";
-import {map} from "rxjs/operators";
-import {EventPlaceViewService} from "./event-place-view.service";
+import {BehaviorSubject} from 'rxjs';
+import {EventPlaceViewModel} from '../models/event-place.model';
+import {map} from 'rxjs/operators';
+import {EventPlaceViewService} from './event-place-view.service';
+import '../../extensions';
 
 @Injectable({
   providedIn: 'root'
@@ -37,9 +38,7 @@ export class EventPlaceStoreService {
   update(eventPlace: EventPlaceViewModel) {
     return this.eventPlaceViewService.update(eventPlace)
       .pipe(map(data => {
-        const index = this.eventPlaces.findIndex(ep => ep.id === eventPlace.id);
-        this.eventPlaces[index] = {...eventPlace};
-        this.eventPlaces = [...this.eventPlaces];
+        this.eventPlaces = this.eventPlaces.replace(ep => ep.id === eventPlace.id, eventPlace);
         return data;
       }));
   }

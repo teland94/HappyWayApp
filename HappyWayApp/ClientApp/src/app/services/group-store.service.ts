@@ -1,8 +1,9 @@
 import { Injectable } from '@angular/core';
-import {BehaviorSubject} from "rxjs";
-import {GroupModel} from "../models/group.model";
-import {map} from "rxjs/operators";
-import {GroupService} from "./group.service";
+import {BehaviorSubject} from 'rxjs';
+import {GroupModel} from '../models/group.model';
+import {map} from 'rxjs/operators';
+import {GroupService} from './group.service';
+import '../../extensions';
 
 @Injectable({
   providedIn: 'root'
@@ -36,9 +37,7 @@ export class GroupStoreService {
   update(group: GroupModel) {
     return this.groupService.update(group)
       .pipe(map(data => {
-        const index = this.groups.findIndex(g => g.id === group.id);
-        this.groups[index] = {...group};
-        this.groups = [...this.groups];
+        this.groups = this.groups.replace(g => g.id === group.id, group);
         return data;
       }));
   }
