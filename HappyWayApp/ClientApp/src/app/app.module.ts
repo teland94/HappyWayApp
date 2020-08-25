@@ -1,12 +1,10 @@
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule, LOCALE_ID } from '@angular/core';
-import { registerLocaleData } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
-import { RouterModule } from '@angular/router';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { AppMaterialModule } from '../material.module';
-import localeRu from '@angular/common/locales/ru';
+import '@angular/common/locales/global/ru';
 import { appRoutingModule } from './app.routing';
 import { UsersComponent } from './components/users/users.component';
 import { PasswordPromptDialogComponent } from './components/dialogs/password-prompt-dialog/password-prompt-dialog.component';
@@ -35,8 +33,6 @@ import { EventPlacesComponent } from "./components/event-places/event-places.com
 import { EventPlaceDialogComponent } from "./components/dialogs/event-place-dialog/event-place-dialog.component";
 import { GroupsComponent } from "./components/groups/groups.component";
 import { GroupDialogComponent } from "./components/dialogs/group-dialog/group-dialog.component";
-
-registerLocaleData(localeRu, 'ru');
 
 @NgModule({
   declarations: [

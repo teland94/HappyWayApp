@@ -20,3 +20,9 @@ export function getNowDateWithoutTime() {
   nowDate.setHours(0, 0, 0, 0);
   return nowDate;
 }
+
+export function isSame<T>(a1: T[], a2: T[]) {
+  return (a1.length === a2.length) && a1.every((element, index) => {
+    return element === a2[index];
+  });
+}

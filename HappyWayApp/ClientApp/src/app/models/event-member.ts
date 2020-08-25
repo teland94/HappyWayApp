@@ -9,10 +9,10 @@ export class EventMemberModel {
 
 export class EventMemberCardModel {
   member: EventMemberModel;
-  likedMembers: CardLikedMember[];
+  targetMembers: CardTargetMember[];
 }
 
-export class CardLikedMember {
+export class CardTargetMember {
   id: number;
   number: number;
   liked: boolean;

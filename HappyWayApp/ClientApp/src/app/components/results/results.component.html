@@ -1,23 +1,31 @@
-<div *ngIf="resultMembers && resultMembers.length > 0" class="container">
-  <mat-card *ngFor="let result of resultMembers">
-    <mat-card-title>{{result.member.number}}. {{result.member.name}}
-      <a href="javasript:void(0);" (click)="copy(result.member.phoneNumber)">({{result.member.phoneNumber}})</a></mat-card-title>
-    <mat-card-content>
-      <textarea matInput #resultTextArea cdkTextareaAutosize readonly>{{result.text}}</textarea>
-    </mat-card-content>
-    <mat-card-actions align="end">
-      <button mat-icon-button (click)="copy(resultTextArea.value)">
-        <mat-icon svgIcon="copy"></mat-icon>
-      </button>
-      <div class="fill-remaining-space"></div>
-      <a [href]="getViberUrl(result.member.phoneNumber)">
-        <button mat-icon-button (click)="copy(resultTextArea.value)">
-          <mat-icon svgIcon="viber"></mat-icon>
-        </button>
-      </a>
-    </mat-card-actions>
-  </mat-card>
-</div>
-<ng-container *ngIf="!resultMembers || resultMembers.length === 0">
-  <span>Нет данных об участниках мероприятия.</span>
+<ng-container *ngIf="event">
+  <ng-container *ngIf="resultMembers">
+    <div *ngIf="members.length > 0" class="container">
+      <mat-card *ngFor="let result of resultMembers">
+        <mat-card-title>{{result.member.number}}. {{result.member.name}}
+          <a href="javascript:void(0);" (click)="copy(result.member.phoneNumber)">({{result.member.phoneNumber}})</a></mat-card-title>
+        <mat-card-content>
+          <textarea matInput #resultTextArea cdkTextareaAutosize readonly>{{result.text}}</textarea>
+        </mat-card-content>
+        <mat-card-actions align="end">
+          <button mat-icon-button (click)="copy(resultTextArea.value)">
+            <mat-icon svgIcon="copy"></mat-icon>
+          </button>
+          <div class="fill-remaining-space"></div>
+          <a [href]="getViberUrl(result.member.phoneNumber)">
+            <button mat-icon-button (click)="copy(resultTextArea.value)">
+              <mat-icon svgIcon="viber"></mat-icon>
+            </button>
+          </a>
+        </mat-card-actions>
+      </mat-card>
+    </div>
+    <ng-container *ngIf="resultMembers.length === 0">
+      <span>Нет данных об участниках мероприятия.</span>
+    </ng-container>
+  </ng-container>
 </ng-container>
+<ng-container *ngIf="event === null">
+  <span>Нет данных о текущем мероприятии.</span>
+</ng-container>
+

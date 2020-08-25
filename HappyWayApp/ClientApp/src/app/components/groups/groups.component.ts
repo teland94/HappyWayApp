@@ -1,14 +1,13 @@
 import {Component, OnDestroy, OnInit} from '@angular/core';
-import {GroupModel} from "../../models/group.model";
-import {GroupService} from "../../services/group.service";
-import {MatSnackBar} from "@angular/material/snack-bar";
-import {MatDialog} from "@angular/material/dialog";
-import {GroupDialogComponent} from "../dialogs/group-dialog/group-dialog.component";
-import {BaseComponent} from "../base/base.component";
-import {ConfirmationService} from "../../services/confirmation.service";
-import {ProgressSpinnerService} from "../../services/progress-spinner.service";
-import {Subscription} from "rxjs";
-import {GroupStoreService} from "../../services/group-store.service";
+import {GroupModel} from '../../models/group.model';
+import {MatSnackBar} from '@angular/material/snack-bar';
+import {MatDialog} from '@angular/material/dialog';
+import {GroupDialogComponent} from '../dialogs/group-dialog/group-dialog.component';
+import {BaseComponent} from '../base/base.component';
+import {ConfirmationService} from '../../services/confirmation.service';
+import {ProgressSpinnerService} from '../../services/progress-spinner.service';
+import {Subscription} from 'rxjs';
+import {GroupStoreService} from '../../services/group-store.service';
 
 @Component({
   selector: 'app-groups',

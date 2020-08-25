@@ -5,7 +5,6 @@ import {UserModel} from '../../../models/user.model';
 
 export class UserDialogData {
   user: UserModel;
-  cities: string[];
 }
 
 @Component({
@@ -36,9 +35,6 @@ export class UserDialogComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.form.get('city').valueChanges.subscribe(value => {
-      this.filteredCities = this.data.cities.filter(c => c.startsWith(value));
-    });
   }
 
   submit(form: FormGroup) {

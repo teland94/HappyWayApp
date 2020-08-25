@@ -8,16 +8,17 @@ import { AuthenticationService } from '../../services/authentication.service';
 import { Role, UserModel } from '../../models/user.model';
 import { EventModel } from '../../models/event.model';
 import { EventDialogComponent, EventDialogData } from '../dialogs/event-dialog/event-dialog.component';
-import { DatabaseService } from '../../services/database.service';
 import { ConfirmationService } from '../../services/confirmation.service';
 import { ImportDataService } from '../../services/import-data.service';
 import { ProgressSpinnerService } from '../../services/progress-spinner.service';
 import { BaseComponent } from '../base/base.component';
-import { GroupModel } from "../../models/group.model";
-import { GroupStoreService } from "../../services/group-store.service";
-import { EventPlaceViewModel } from "../../models/event-place.model";
-import { EventPlaceStoreService } from "../../services/event-place-store.service";
+import { GroupModel } from '../../models/group.model';
+import { GroupStoreService } from '../../services/group-store.service';
+import { EventPlaceViewModel } from '../../models/event-place.model';
+import { EventPlaceStoreService } from '../../services/event-place-store.service';
 import { EventMemberStoreService } from '../../services/event-member-store.service';
+import { catchError, map, switchMap} from 'rxjs/operators';
+import { of } from "rxjs";
 
 @Component({
   selector: 'app-layout',
@@ -44,7 +45,6 @@ export class LayoutComponent extends BaseComponent implements OnInit, AfterViewI
               private readonly eventService: EventService,
               private readonly eventMemberStoreService: EventMemberStoreService,
               private readonly eventPlaceStoreService: EventPlaceStoreService,
-              private readonly databaseService: DatabaseService,
               private readonly importDataService: ImportDataService,
               private readonly progressSpinnerService: ProgressSpinnerService) {
     super(snackBar);
@@ -54,29 +54,40 @@ export class LayoutComponent extends BaseComponent implements OnInit, AfterViewI
   ngOnInit() {
     this.authenticationService.currentUser.subscribe(user => {
       if (!user) { return; }
-      this.groupStoreService.fetchAll().subscribe(data => {
-        this.groupStoreService.groups$.subscribe(groups => {
-          this.groups = groups;
-        });
+      this.progressSpinnerService.start();
+      this.groupStoreService.load().subscribe(groups => {
+        this.groups = groups;
+      }, error => {
+        this.progressSpinnerService.stop();
+        this.showError('Ошибка загрузки данных.', error);
       });
-      this.eventPlaceStoreService.fetchAll().subscribe(data => {
-        this.eventPlaceStoreService.eventPlaces$.subscribe(eventPlaces => {
-          this.eventPlaces = eventPlaces;
-        });
+      this.eventPlaceStoreService.load().subscribe(eventPlaces => {
+        this.eventPlaces = eventPlaces;
+      }, error => {
+        this.progressSpinnerService.stop();
+        this.showError('Ошибка загрузки данных.', error);
       });
       this.eventService.getEventFromStorage()
         .subscribe(event => {
-          this.eventService.setCurrentEvent(event);
-          this.progressSpinnerService.stop();
+          this.setCurrentEvent(event);
         }, error => {
           this.progressSpinnerService.stop();
-          if (error.status === 403 || error.status === 404) { return; }
+          if (error.status === 403 || error.status === 404) {
+            this.setCurrentEvent(null);
+            return;
+          }
+          if (error.status === 401) { return; }
           this.showError('Ошибка установки мероприятия.', error);
         });
       this.eventService.eventChanges.subscribe(event => {
-        if (!event) { return; }
         this.event = event;
-        this.eventMemberStoreService.fetchByEventId(event.id).subscribe();
+        if (!event) { this.progressSpinnerService.stop(); return; }
+        this.eventMemberStoreService.fetchByEventId(event.id).subscribe(data => {
+          this.progressSpinnerService.stop();
+        }, error => {
+          this.progressSpinnerService.stop();
+          this.showError('Ошибка загрузки данных.', error);
+        });
       });
     });
   }
@@ -96,18 +107,24 @@ export class LayoutComponent extends BaseComponent implements OnInit, AfterViewI
   }
 
   createEvent() {
-    if (this.event && !this.event.completed) {
-      this.eventService.setCompleted(this.event.id, true).subscribe(() => {
-        this.openDialogAndCreateEvent();
-      }, error => {
-        console.log(error);
-        if (error.status === 404) {
-          this.openDialogAndCreateEvent();
+    this.progressSpinnerService.start();
+    this.openDialogAndCreateEvent().subscribe(createdEvent => {
+      if (!createdEvent) { this.progressSpinnerService.stop(); return; }
+      this.progressSpinnerService.stop();
+      this.setCurrentEvent(createdEvent, '/home');
+    }, error => {
+      this.progressSpinnerService.stop();
+      if (error.createdEvent) {
+        this.setCurrentEvent(error.createdEvent, '/event-members');
+        let errorText = 'Ошибка загрузки данных.';
+        if (error.status === 422) {
+          errorText += ` Отсутствует ${error.displayParamName}.`;
         }
-      });
-    } else {
-      this.openDialogAndCreateEvent();
-    }
+        this.showError(errorText, error);
+      } else {
+        this.showError('Ошибка добавления мероприятия.', error);
+      }
+    });
   }
 
   shutdown() {
@@ -133,34 +150,26 @@ export class LayoutComponent extends BaseComponent implements OnInit, AfterViewI
   }
 
   private openDialogAndCreateEvent() {
-    this.openDialog().subscribe(eventDialogResult => {
-      if (!eventDialogResult) { return; }
+    return this.openDialog().pipe(switchMap(eventDialogResult => {
+      if (!eventDialogResult) { return of(null); }
       const event = eventDialogResult.event;
-
-      this.progressSpinnerService.start();
-      this.eventService.create(event).subscribe(createdEvent => {
-        this.importDataService.downloadDocData(createdEvent.id, eventDialogResult.docUrl).subscribe(() => {
-          this.progressSpinnerService.stop();
-          this.setCurrentEvent(createdEvent, '/home');
-        }, error => {
-          this.progressSpinnerService.stop();
-          this.setCurrentEvent(createdEvent, '/event-members');
-          let errorText = 'Ошибка загрузки данных.';
-          if (error.status === 422) {
-            errorText += ` Отсутствует ${error.displayParamName}.`;
-          }
-          this.showError(errorText, error);
-        });
-      }, error => {
-        this.progressSpinnerService.stop();
-        this.showError('Ошибка добавления мероприятия.', error);
-      });
-    });
+      return this.setEventCompleted(this.event).pipe(switchMap(() => {
+        return this.eventService.create(event).pipe(switchMap(createdEvent => {
+          return this.importDataService.downloadDocData(createdEvent.id, eventDialogResult.docUrl)
+            .pipe(map(data => {
+              return createdEvent;
+            }), catchError(err => {
+              err.createdEvent = createdEvent;
+              throw err;
+            }));
+        }));
+      }));
+    }));
   }
 
   private logout(showMessage = true) {
     this.event = null;
-    this.eventService.setCurrentEvent(null);
+    this.setCurrentEvent(null);
     this.authenticationService.logout();
     this.router.navigate(['/login']).then(() => {
       this.progressSpinnerService.stop();
@@ -170,30 +179,25 @@ export class LayoutComponent extends BaseComponent implements OnInit, AfterViewI
     });
   }
 
-  private setCurrentEvent(event?: EventModel, navigateCommand?: string) {
-    if (event) {
-      this.event = event;
-      this.eventService.setCurrentEvent(event);
-      if (navigateCommand) {
-        this.drawer.close();
-        this.router.navigate([navigateCommand]);
-      }
+  private setEventCompleted(event: EventModel) {
+    if (event && !event.completed) {
+      return this.eventService.setCompleted(event.id, true).pipe(catchError(error => {
+        console.log(error);
+        if (error.status === 404) {
+          return of(null);
+        }
+        throw error;
+      }));
     } else {
-      this.progressSpinnerService.start();
-      this.eventService.getLastEvent()
-        .subscribe(ev => {
-          this.event = ev;
-          this.eventService.setCurrentEvent(event);
-          this.progressSpinnerService.stop();
-          if (navigateCommand) {
-            this.drawer.close();
-            this.router.navigate([navigateCommand]);
-          }
-        }, error => {
-          this.progressSpinnerService.stop();
-          if (error.status === 404) { return; }
-          this.showError('Ошибка установки мероприятия.', error);
-        });
+      return of(null);
+    }
+  }
+
+  private setCurrentEvent(event: EventModel, navigateCommand?: string) {
+    this.eventService.setCurrentEvent(event);
+    if (navigateCommand) {
+      this.drawer.close();
+      this.router.navigate([navigateCommand]);
     }
   }
 

@@ -7,8 +7,7 @@ import { MatSlideToggleChange } from '@angular/material/slide-toggle';
 import { MatSnackBar, MatSnackBarConfig } from '@angular/material/snack-bar';
 import { EventDialogComponent, EventDialogData } from '../dialogs/event-dialog/event-dialog.component';
 import { Router } from '@angular/router';
-import { forkJoin, Subscription } from 'rxjs';
-import { DatabaseService } from '../../services/database.service';
+import { Subscription } from 'rxjs';
 import { ConfirmationService } from '../../services/confirmation.service';
 import { ImportDataService } from '../../services/import-data.service';
 import { ProgressSpinnerService } from '../../services/progress-spinner.service';
@@ -40,7 +39,6 @@ export class EventsComponent extends BaseComponent implements OnInit, OnDestroy 
               private readonly eventService: EventService,
               private readonly eventPlaceStoreService: EventPlaceStoreService,
               private readonly importDataService: ImportDataService,
-              private readonly databaseService: DatabaseService,
               private readonly confirmationService: ConfirmationService,
               protected readonly snackBar: MatSnackBar,
               private readonly dialog: MatDialog,
@@ -56,7 +54,7 @@ export class EventsComponent extends BaseComponent implements OnInit, OnDestroy 
     this.groupsSubscription = this.groupStoreService.groups$.subscribe(groups => {
       this.groups = groups;
     });
-    this.eventChangesSubscription = this.eventPlaceStoreService.eventPlaces$.subscribe(eventPlaces => {
+    this.eventPlacesSubscription = this.eventPlaceStoreService.eventPlaces$.subscribe(eventPlaces => {
       this.eventPlaces = eventPlaces;
       if (!eventPlaces) { return; }
       this.load();
@@ -66,7 +64,7 @@ export class EventsComponent extends BaseComponent implements OnInit, OnDestroy 
   ngOnDestroy() {
     this.eventChangesSubscription.unsubscribe();
     this.groupsSubscription.unsubscribe();
-    this.eventChangesSubscription.unsubscribe();
+    this.eventPlacesSubscription.unsubscribe();
   }
 
   edit(event: EventModel) {
@@ -156,20 +154,19 @@ export class EventsComponent extends BaseComponent implements OnInit, OnDestroy 
 
   private load() {
     this.progressSpinnerService.start();
-    forkJoin([this.eventService.get()])
-      .subscribe(([events]) => {
-        this.events = events.map(e => {
-          const eventPlace = this.eventPlaces.find(ep => ep.id === e.eventPlaceId);
-          return new EventViewModel(e, eventPlace);
-        });
-        if (this.currentEvent) {
-          this.currentEvent = events.find(ev => ev.id === this.currentEvent.id);
-        }
-        this.checkEvent(this.currentEvent);
-        this.progressSpinnerService.stop();
-      }, error => {
-        this.progressSpinnerService.stop();
-        this.showError('Ошибка загрузки мероприятий.', error);
+    this.eventService.get().subscribe(events => {
+      this.events = events.map(e => {
+        const eventPlace = this.eventPlaces.find(ep => ep.id === e.eventPlaceId);
+        return new EventViewModel(e, eventPlace);
+      });
+      if (this.currentEvent) {
+        this.currentEvent = events.find(ev => ev.id === this.currentEvent.id);
+      }
+      this.checkEvent(this.currentEvent);
+      this.progressSpinnerService.stop();
+    }, error => {
+      this.progressSpinnerService.stop();
+      this.showError('Ошибка загрузки мероприятий.', error);
     });
   }
 

@@ -1,17 +1,17 @@
 import { Injectable } from '@angular/core';
 import {BehaviorSubject} from 'rxjs';
 import {GroupModel} from '../models/group.model';
-import {map} from 'rxjs/operators';
+import {filter, map, switchMap} from 'rxjs/operators';
 import {GroupService} from './group.service';
-import '../../extensions';
+import '../extensions';
 
 @Injectable({
   providedIn: 'root'
 })
 export class GroupStoreService {
 
-  private _groups = new BehaviorSubject<GroupModel[]>(null);
-  readonly groups$ = this._groups.asObservable();
+  private _groups = new BehaviorSubject<GroupModel[]>(undefined);
+  readonly groups$ = this._groups.asObservable().pipe(filter(val => val !== undefined));
 
   constructor(private groupService: GroupService) { }
 
@@ -21,6 +21,12 @@ export class GroupStoreService {
 
   set groups(val: GroupModel[]) {
     this._groups.next(val);
+  }
+
+  load() {
+    return this.fetchAll().pipe(switchMap(data => {
+      return this.groups$;
+    }));
   }
 
   create(group: GroupModel) {

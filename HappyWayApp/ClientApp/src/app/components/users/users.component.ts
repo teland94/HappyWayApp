@@ -4,9 +4,6 @@ import { UserModel, Role } from '../../models/user.model';
 import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar, MatSnackBarConfig } from '@angular/material/snack-bar';
 import { UserDialogComponent, UserDialogData } from '../dialogs/user-dialog/user-dialog.component';
-import { DatabaseService } from '../../services/database.service';
-import { forkJoin } from 'rxjs';
-import { Area } from '../../models/area.model';
 import { AuthenticationService } from '../../services/authentication.service';
 import { ConfirmationService } from '../../services/confirmation.service';
 import { ProgressSpinnerService } from '../../services/progress-spinner.service';
@@ -19,9 +16,8 @@ import { BaseComponent } from '../base/base.component';
 })
 export class UsersComponent extends BaseComponent implements OnInit {
 
-  users: UserModel[] = [];
+  users: UserModel[];
 
-  cities: string[];
   currentUser: UserModel;
   role = Role;
 
@@ -30,7 +26,6 @@ export class UsersComponent extends BaseComponent implements OnInit {
   constructor(private readonly userService: UserService,
               private readonly authenticationService: AuthenticationService,
               private readonly confirmationService: ConfirmationService,
-              private readonly databaseService: DatabaseService,
               protected readonly snackBar: MatSnackBar,
               private readonly dialog: MatDialog,
               private readonly progressSpinnerService: ProgressSpinnerService) {
@@ -81,36 +76,20 @@ export class UsersComponent extends BaseComponent implements OnInit {
 
   private load() {
     this.progressSpinnerService.start();
-    forkJoin([this.userService.getAll(), this.databaseService.getAreas()])
-      .subscribe(([users, areas]) => {
-        this.users = users;
-        this.cities = this.getCities(areas);
-        this.progressSpinnerService.stop();
-      }, error => {
-        this.progressSpinnerService.stop();
-        this.showError('Ошибка загрузки пользователей.', error);
-      });
-  }
-
-  private getCities(areas: Area[]) {
-    const cities = [];
-    const addCity = (area: Area) => {
-      if (!area.areas || area.areas.length === 0) {
-        cities.push(area.name);
-      }
-      area.areas.forEach(addCity);
-    };
-    areas.forEach(addCity);
-    cities.sort();
-    return cities;
+    this.userService.getAll().subscribe((users) => {
+      this.users = users;
+      this.progressSpinnerService.stop();
+    }, error => {
+      this.progressSpinnerService.stop();
+      this.showError('Ошибка загрузки пользователей.', error);
+    });
   }
 
   private openDialog(user?: UserModel) {
     const dialogRef = this.dialog.open(UserDialogComponent, {
       width: '370px',
       data: <UserDialogData>{
-        user: user ? user : { },
-        cities: this.cities
+        user: user ? user : { }
       }
     });
 

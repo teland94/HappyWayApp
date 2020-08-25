@@ -14,7 +14,7 @@ export class ConfirmationService {
 
   private readonly dialogWidth = '370px';
 
-  private passwordDialogRef: MatDialogRef<PasswordPromptDialogComponent, any>;
+  private passwordDialogRef: MatDialogRef<PasswordPromptDialogComponent, string>;
 
   constructor(private readonly dialog: MatDialog,
               private readonly snackBar: MatSnackBar,

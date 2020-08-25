@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { EventModel } from '../models/event.model';
-import { BehaviorSubject, of } from 'rxjs';
+import { of, ReplaySubject } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { getDateWithTimeZoneOffset } from '../utilities';
 
@@ -14,7 +14,7 @@ export class EventService {
 
   private baseUrl = 'api/event';
 
-  private eventChanges$ = new BehaviorSubject<EventModel>(null);
+  private eventChanges$ = new ReplaySubject<EventModel>(1);
   eventChanges = this.eventChanges$.asObservable();
 
   constructor(private httpClient: HttpClient) {
@@ -30,7 +30,7 @@ export class EventService {
 
   getEventFromStorage() {
     const eventId = localStorage.getItem(CurrentEventIdKey);
-    return eventId ? this.getById(+eventId) : of(null);
+    return eventId ? this.getById(+eventId) : of<EventModel>(null);
   }
 
   getLastEvent() {

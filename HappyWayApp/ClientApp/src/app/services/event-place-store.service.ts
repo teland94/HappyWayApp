@@ -1,17 +1,17 @@
 import {Injectable} from '@angular/core';
 import {BehaviorSubject} from 'rxjs';
 import {EventPlaceViewModel} from '../models/event-place.model';
-import {map} from 'rxjs/operators';
+import {filter, map, switchMap} from 'rxjs/operators';
 import {EventPlaceViewService} from './event-place-view.service';
-import '../../extensions';
+import '../extensions';
 
 @Injectable({
   providedIn: 'root'
 })
 export class EventPlaceStoreService {
 
-  private _eventPlaces = new BehaviorSubject<EventPlaceViewModel[]>(null);
-  readonly eventPlaces$ = this._eventPlaces.asObservable();
+  private _eventPlaces = new BehaviorSubject<EventPlaceViewModel[]>(undefined);
+  readonly eventPlaces$ = this._eventPlaces.asObservable().pipe(filter(val => val !== undefined));
 
   constructor(private readonly eventPlaceViewService: EventPlaceViewService) { }
 
@@ -21,6 +21,12 @@ export class EventPlaceStoreService {
 
   set eventPlaces(val: EventPlaceViewModel[]) {
     this._eventPlaces.next(val);
+  }
+
+  load() {
+    return this.fetchAll().pipe(switchMap(data => {
+      return this.eventPlaces$;
+    }));
   }
 
   create(eventPlace: EventPlaceViewModel) {

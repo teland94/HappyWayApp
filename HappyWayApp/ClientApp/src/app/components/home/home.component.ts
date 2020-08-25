@@ -1,16 +1,19 @@
 import { Component, OnDestroy, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
 import { EventMemberService } from 'src/app/services/event-member.service';
-import { EventMemberCardModel, Sex, CardLikedMember, EventMemberModel } from '../../models/event-member';
+import { EventMemberCardModel, Sex, CardTargetMember, EventMemberModel } from '../../models/event-member';
 import { MatSnackBar, MatSnackBarConfig } from '@angular/material/snack-bar';
 import { MatHorizontalStepper, MatStepper } from '@angular/material/stepper';
 import { StepperSelectionEvent } from '@angular/cdk/stepper';
 import { LikeService } from 'src/app/services/like.service';
 import { SaveLikeModel } from '../../models/like.model';
-import { of, Subscription } from 'rxjs';
+import { combineLatest, of, Subscription } from 'rxjs';
 import { EventService } from '../../services/event.service';
-import { ProgressSpinnerService } from '../../services/progress-spinner.service';
 import { BaseComponent } from '../base/base.component';
-import {EventMemberStoreService} from '../../services/event-member-store.service';
+import { EventMemberStoreService } from '../../services/event-member-store.service';
+import { switchMap } from 'rxjs/operators';
+import { ProgressSpinnerService } from '../../services/progress-spinner.service';
+import { EventModel } from '../../models/event.model';
+import { isSame } from '../../utilities';
 
 @Component({
   selector: 'app-home',
@@ -20,16 +23,17 @@ import {EventMemberStoreService} from '../../services/event-member-store.service
 })
 export class HomeComponent extends BaseComponent implements OnInit, OnDestroy {
 
-  private eventSubscription: Subscription;
-  private sexChangesSubscription: Subscription;
   private eventMembersSubscription: Subscription;
+  private hasChanges: boolean;
 
   stepper: MatStepper;
 
   displayedColumns: string[] = ['number', 'liked', 'name'];
 
+  event: EventModel;
   cardMembers: EventMemberCardModel[];
   currentCardMember: EventMemberCardModel;
+  currentCardMemberLikedIds: number[];
 
   @ViewChild(MatHorizontalStepper) set matStepper(stepper: MatHorizontalStepper) {
     if (!stepper) { return; }
@@ -43,39 +47,39 @@ export class HomeComponent extends BaseComponent implements OnInit, OnDestroy {
               private readonly eventMemberService: EventMemberService,
               private readonly eventMemberStoreService: EventMemberStoreService,
               private readonly likeService: LikeService,
-              protected readonly snackBar: MatSnackBar) {
+              protected readonly snackBar: MatSnackBar,
+              private readonly progressSpinnerService: ProgressSpinnerService) {
     super(snackBar);
   }
 
   ngOnInit() {
-    this.eventSubscription = this.eventService.eventChanges.subscribe(event => {
-      if (!event) { return; }
-      this.sexChangesSubscription = this.eventMemberService.sexChanges.subscribe(sex => {
-        this.eventMembersSubscription = this.eventMemberStoreService.getByEventId(event.id).subscribe(data => {
-          if (!data) { return; }
-          this.setCardMembers(data, sex);
-          if (this.cardMembers && this.cardMembers.length > 0) {
-            this.setLikedMembers(this.cardMembers[0]);
-          }
-        });
+    this.progressSpinnerService.start();
+    this.eventMembersSubscription = this.getEventMembers().subscribe(([sex, eventMembers]) => {
+      if (!eventMembers) { this.progressSpinnerService.stop(); return; }
+      this.cardMembers = null;
+      setTimeout(() => {
+        this.setCardMembers(eventMembers, sex);
+        if (this.cardMembers && this.cardMembers.length > 0) {
+          this.setLikedTargetMembers(this.cardMembers[0]);
+        }
       });
+      this.progressSpinnerService.stop();
+    }, error => {
+      this.progressSpinnerService.stop();
+      this.showError('Ошибка загрузки симпатий 💔', error);
     });
   }
 
   ngOnDestroy() {
-    this.eventSubscription.unsubscribe();
-    if (this.sexChangesSubscription) {
-      this.sexChangesSubscription.unsubscribe();
-    }
-    if (this.eventMembersSubscription) {
-      this.eventMembersSubscription.unsubscribe();
-    }
+    this.eventMembersSubscription.unsubscribe();
   }
 
   selectionChanged(event: StepperSelectionEvent) {
-    this.save(false);
+    if (this.hasChanges) {
+      this.save(false);
+    }
     const currentCardMember = this.cardMembers[event.selectedIndex];
-    this.setLikedMembers(currentCardMember);
+    this.setLikedTargetMembers(currentCardMember);
   }
 
   getMemberNumber(index: number) {
@@ -91,22 +95,28 @@ export class HomeComponent extends BaseComponent implements OnInit, OnDestroy {
     this.stepper.next();
   }
 
+  likeMember() {
+    if (!this.currentCardMember) { return; }
+    const ids = this.currentCardMember.targetMembers.filter(lm => lm.liked).map(lm => lm.id);
+    this.hasChanges = !isSame(this.currentCardMemberLikedIds, ids);
+  }
+
   isAnyLiked() {
     if (!this.currentCardMember) { return; }
-    return this.currentCardMember.likedMembers.some(l => l.liked);
+    return this.currentCardMember.targetMembers.some(l => l.liked);
   }
 
   isAllLiked() {
     if (!this.currentCardMember) { return; }
-    const numSelected = this.currentCardMember.likedMembers.filter(l => l.liked).length;
-    const numRows = this.currentCardMember.likedMembers.length;
+    const numSelected = this.currentCardMember.targetMembers.filter(l => l.liked).length;
+    const numRows = this.currentCardMember.targetMembers.length;
     return numSelected === numRows;
   }
 
   masterToggle() {
     if (!this.currentCardMember) { return; }
     const isAllLiked = this.isAllLiked();
-    this.currentCardMember.likedMembers.forEach(l => l.liked = !isAllLiked);
+    this.currentCardMember.targetMembers.forEach(l => l.liked = !isAllLiked);
   }
 
   save(showSuccessMessage = true) {
@@ -122,16 +132,30 @@ export class HomeComponent extends BaseComponent implements OnInit, OnDestroy {
   private saveCurrentMember() {
     if (!this.currentCardMember) { return of(null); }
     const member = this.currentCardMember;
-    const saveLike = <SaveLikeModel> {
+    const saveLike = <SaveLikeModel>{
       sourceMemberId: member.member.id,
       targetMemberIds: []
     };
-    member.likedMembers.forEach(lm => {
+    member.targetMembers.forEach(lm => {
       if (lm.liked) {
         saveLike.targetMemberIds.push(lm.id);
       }
     });
     return this.likeService.save(saveLike);
+  }
+
+  private setLikedTargetMembers(cardMember: EventMemberCardModel) {
+    this.currentCardMember = cardMember;
+    this.currentCardMemberLikedIds = [];
+    this.likeService.getByMember(cardMember.member.id).subscribe(likes => {
+      cardMember.targetMembers.forEach(lm => {
+        if (likes.some(l => l.targetMemberId === lm.id)) {
+          lm.liked = true;
+          this.currentCardMemberLikedIds.push(lm.id);
+        }
+      });
+      this.hasChanges = false;
+    });
   }
 
   private setCardMembers(members: EventMemberModel[], sex: Sex) {
@@ -140,7 +164,7 @@ export class HomeComponent extends BaseComponent implements OnInit, OnDestroy {
       const oppositeSexMembers = members.filter(m => sm.sex === this.getOppositeSex(m.sex));
       return <EventMemberCardModel>{
         member: sm,
-        likedMembers: oppositeSexMembers.map(lm => <CardLikedMember>{
+        targetMembers: oppositeSexMembers.map(lm => <CardTargetMember>{
           id: lm.id,
           number: lm.number,
           name: lm.name,
@@ -150,13 +174,12 @@ export class HomeComponent extends BaseComponent implements OnInit, OnDestroy {
     });
   }
 
-  private setLikedMembers(cardMember: EventMemberCardModel) {
-    this.currentCardMember = cardMember;
-    this.likeService.getByMember(cardMember.member.id).subscribe(likes => {
-      cardMember.likedMembers.forEach(lm => {
-        lm.liked = likes.some(l => l.targetMemberId === lm.id);
-      });
-    });
+  private getEventMembers() {
+    return this.eventService.eventChanges.pipe(switchMap(event => {
+      this.event = event;
+      if (!event) { return combineLatest([of<Sex>(null), of<EventMemberModel[]>(null)]); }
+      return combineLatest([this.eventMemberService.sexChanges, this.eventMemberStoreService.getByEventId(event.id)]);
+    }));
   }
 
   private getOppositeSex(sex: Sex) {

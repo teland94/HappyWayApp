@@ -1,12 +1,12 @@
 import {Component, Inject, OnDestroy, OnInit} from '@angular/core';
-import {FormBuilder, FormGroup, Validators} from "@angular/forms";
-import {MAT_DIALOG_DATA, MatDialogRef} from "@angular/material/dialog";
-import {EventPlaceModel, EventPlaceViewModel} from "../../../models/event-place.model";
-import {CityService} from "../../../services/city.service";
-import {CityModel} from "../../../models/city.model";
-import {debounceTime, distinctUntilChanged, switchMap} from "rxjs/operators";
-import {of, Subscription} from "rxjs";
-import {CustomValidators} from "../../../custom-validators";
+import {FormBuilder, FormGroup, Validators} from '@angular/forms';
+import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material/dialog';
+import {EventPlaceViewModel} from '../../../models/event-place.model';
+import {CityService} from '../../../services/city.service';
+import {CityModel} from '../../../models/city.model';
+import {debounceTime, distinctUntilChanged, switchMap} from 'rxjs/operators';
+import {of, Subscription} from 'rxjs';
+import {CustomValidators} from '../../../custom-validators';
 
 @Component({
   selector: 'app-event-place-dialog',

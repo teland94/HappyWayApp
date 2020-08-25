@@ -1,8 +1,8 @@
 <div class="table-controls">
   <button mat-raised-button (click)="add()">Добавить</button>
 </div>
-<div class="scrollable-grid">
-  <table mat-table *ngIf="events && events.length > 0" [dataSource]="events" class="mat-elevation-z8">
+<div *ngIf="events" class="scrollable-grid">
+  <table mat-table *ngIf="events.length > 0; else emptyText" [dataSource]="events" class="mat-elevation-z8">
     <ng-container matColumnDef="name">
       <th mat-header-cell *matHeaderCellDef>Название</th>
       <td mat-cell *matCellDef="let ev">{{ev.name}}</td>
@@ -19,22 +19,22 @@
       <th mat-header-cell *matHeaderCellDef>Пользователь</th>
       <td mat-cell *matCellDef="let ev">{{ev.user}}</td>
     </ng-container>
-    <!--  <ng-container matColumnDef="active">-->
-    <!--    <th mat-header-cell *matHeaderCellDef></th>-->
-    <!--    <td mat-cell *matCellDef="let ev">-->
-    <!--      <mat-radio-button (click)="$event.stopPropagation();"-->
-    <!--                        [value]="ev"-->
-    <!--                        [checked]="currentEvent?.id === ev?.id"-->
-    <!--                        [disabled]="ev.completed"-->
-    <!--                        (change)="currentEventChange($event)"></mat-radio-button>-->
-    <!--    </td>-->
-    <!--  </ng-container>-->
     <ng-container matColumnDef="active">
       <th mat-header-cell *matHeaderCellDef></th>
       <td mat-cell *matCellDef="let ev">
-        <mat-icon *ngIf="currentEvent?.id === ev?.id">check</mat-icon>
+        <mat-radio-button (click)="$event.stopPropagation();"
+                          [value]="ev"
+                          [checked]="currentEvent?.id === ev?.id"
+                          [disabled]="ev.completed"
+                          (change)="currentEventChange($event)"></mat-radio-button>
       </td>
     </ng-container>
+<!--    <ng-container matColumnDef="active">-->
+<!--      <th mat-header-cell *matHeaderCellDef></th>-->
+<!--      <td mat-cell *matCellDef="let ev">-->
+<!--        <mat-icon *ngIf="currentEvent?.id === ev?.id">check</mat-icon>-->
+<!--      </td>-->
+<!--    </ng-container>-->
     <ng-container matColumnDef="edit">
       <th mat-header-cell *matHeaderCellDef></th>
       <td mat-cell *matCellDef="let ev">
@@ -57,4 +57,7 @@
         [ngClass]="{'event-row': !ev.completed}"
         (click)="eventClick(ev)"></tr>
   </table>
+  <ng-template #emptyText>
+    <span>Список мероприятий пуст.</span>
+  </ng-template>
 </div>

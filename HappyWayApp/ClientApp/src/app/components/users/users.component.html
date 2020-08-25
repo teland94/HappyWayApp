@@ -1,8 +1,8 @@
 <div class="table-controls">
   <button mat-raised-button (click)="add()">Добавить хостес</button>
 </div>
-<div class="scrollable-grid">
-  <table mat-table *ngIf="users && users.length > 0" [dataSource]="users" class="mat-elevation-z8">
+<div *ngIf="users" class="scrollable-grid">
+  <table mat-table *ngIf="users.length > 0; else emptyText" [dataSource]="users" class="mat-elevation-z8">
     <ng-container matColumnDef="username">
       <th mat-header-cell *matHeaderCellDef>Имя пользователя</th>
       <td mat-cell *matCellDef="let user">{{user.username}}</td>
@@ -36,4 +36,7 @@
     <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
     <tr mat-row *matRowDef="let user; columns: displayedColumns;"></tr>
   </table>
+  <ng-template #emptyText>
+    <span>Список пользователей пуст.</span>
+  </ng-template>
 </div>

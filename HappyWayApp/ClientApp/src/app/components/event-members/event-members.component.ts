@@ -128,7 +128,7 @@ export class EventMembersComponent extends BaseComponent implements OnInit, OnDe
     this.sexChangesSubscription = this.eventMemberService.sexChanges.subscribe(sex => {
       this.eventMembersSubscription = this.eventMemberStoreService.getByEventId(this.eventId).subscribe(data => {
         if (!data) { return; }
-        this.eventMembers = data.filter(m => m.sex === sex);
+        this.eventMembers = data;
       });
     });
   }

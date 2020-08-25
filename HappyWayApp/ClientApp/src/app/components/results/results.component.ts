@@ -1,12 +1,12 @@
 import {Component, OnDestroy, OnInit} from '@angular/core';
 import {EventMemberService} from 'src/app/services/event-member.service';
-import {EventMemberModel, ResultLikedMemberModel, ResultMemberModel} from '../../models/event-member';
+import {EventMemberModel, ResultLikedMemberModel, ResultMemberModel, Sex} from '../../models/event-member';
 import {DomSanitizer} from '@angular/platform-browser';
 import {LikeService} from 'src/app/services/like.service';
 import {LikeModel} from '../../models/like.model';
 import {MatSnackBar} from '@angular/material/snack-bar';
-import {map} from 'rxjs/operators';
-import {concat, Subscription} from 'rxjs';
+import {defaultIfEmpty, map, switchMap} from 'rxjs/operators';
+import {combineLatest, forkJoin, of, Subscription} from 'rxjs';
 import {EventService} from 'src/app/services/event.service';
 import {EventModel} from 'src/app/models/event.model';
 import {getDateText} from '../../utilities';
@@ -41,8 +41,6 @@ export class ResultsComponent extends BaseComponent implements OnInit, OnDestroy
 Наш инстаграм: {{instagramUrl}}`;
   private readonly thanksText = 'Спасибо, что были с нами)';
 
-  private eventChangesSubscription: Subscription;
-  private sexChangesSubscription: Subscription;
   private eventMembersSubscription: Subscription;
 
   event: EventModel;
@@ -63,41 +61,27 @@ export class ResultsComponent extends BaseComponent implements OnInit, OnDestroy
   }
 
   ngOnInit() {
-    this.eventChangesSubscription = this.eventService.eventChanges.subscribe(event => {
-      if (!event) { return; }
-      this.event = event;
-      this.eventPlaceStoreService.eventPlaces$.subscribe(eventPlaces => {
-        if (!eventPlaces) { return; }
-        this.eventPlace = eventPlaces.find(ep => ep.id === this.event.eventPlaceId);
-        this.sexChangesSubscription = this.eventMemberService.sexChanges.subscribe(sex => {
-          this.eventMembersSubscription = this.eventMemberStoreService.getByEventId(event.id).subscribe(eventMembers => {
-            if (!eventMembers) { return; }
-            this.members = eventMembers;
-            const sexMembers = eventMembers.filter(m => m.sex === sex);
-            this.resultMembers = [];
-            const setResultObs = sexMembers.map(m => this.getResultData(m));
-            this.progressSpinnerService.start();
-            concat(...setResultObs).subscribe(resultMember => {
-              this.resultMembers.push(resultMember);
-              this.progressSpinnerService.stop();
-            }, error => {
-              this.progressSpinnerService.stop();
-              this.showError('Ошибка загрузки результатов участников 💔', error);
-            });
-          });
-        });
+    this.progressSpinnerService.start();
+    this.eventMembersSubscription = this.getEventMembers().subscribe(([sex, eventMembers]) => {
+      if (!eventMembers) { this.progressSpinnerService.stop(); return; }
+      this.members = eventMembers;
+      const sexMembers = eventMembers.filter(m => m.sex === sex);
+      const setResultObs = sexMembers.map(m => this.getResultData(m));
+      forkJoin(...setResultObs).pipe(defaultIfEmpty([])).subscribe(resultMembers => {
+        this.resultMembers = resultMembers;
+        this.progressSpinnerService.stop();
+      }, error => {
+        this.progressSpinnerService.stop();
+        this.showError('Ошибка загрузки результатов участников 💔', error);
       });
+    }, error => {
+      this.progressSpinnerService.stop();
+      this.showError('Ошибка загрузки результатов участников 💔', error);
     });
   }
 
   ngOnDestroy() {
-    this.eventChangesSubscription.unsubscribe();
-    if (this.sexChangesSubscription) {
-      this.sexChangesSubscription.unsubscribe();
-    }
-    if (this.eventMembersSubscription) {
-      this.eventMembersSubscription.unsubscribe();
-    }
+    this.eventMembersSubscription.unsubscribe();
   }
 
   getViberUrl(phoneNumber: string) {
@@ -187,5 +171,17 @@ export class ResultsComponent extends BaseComponent implements OnInit, OnDestroy
       && !matched.some(m => m === l.sourceMemberId))
       .map(l => l.sourceMemberId);
     return { matched, liked };
+  }
+
+  private getEventMembers() {
+    return this.eventService.eventChanges.pipe(switchMap(event => {
+      this.event = event;
+      if (!event) { return combineLatest([of<Sex>(null), of<EventMemberModel[]>(null)]); }
+      return this.eventPlaceStoreService.eventPlaces$.pipe(switchMap(eventPlaces => {
+        if (!eventPlaces) { return combineLatest([of<Sex>(null), of<EventMemberModel[]>(null)]); }
+        this.eventPlace = eventPlaces.find(ep => ep.id === event.eventPlaceId);
+        return combineLatest([this.eventMemberService.sexChanges, this.eventMemberStoreService.getByEventId(event.id)]);
+      }));
+    }));
   }
 }

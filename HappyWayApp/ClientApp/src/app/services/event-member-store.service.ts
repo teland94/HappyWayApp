@@ -1,17 +1,17 @@
 import { Injectable } from '@angular/core';
-import {BehaviorSubject, of} from 'rxjs';
-import {map} from 'rxjs/operators';
+import {BehaviorSubject} from 'rxjs';
+import {filter, map} from 'rxjs/operators';
 import {EventMemberModel} from '../models/event-member';
 import {EventMemberService} from './event-member.service';
-import '../../extensions';
+import '../extensions';
 
 @Injectable({
   providedIn: 'root'
 })
 export class EventMemberStoreService {
 
-  private _eventMembers = new BehaviorSubject<EventMemberModel[]>(null);
-  readonly eventMembers$ = this._eventMembers.asObservable();
+  private _eventMembers = new BehaviorSubject<EventMemberModel[]>(undefined);
+  readonly eventMembers$ = this._eventMembers.asObservable().pipe(filter(val => val !== undefined));
 
   constructor(private eventMemberService: EventMemberService) { }
 
@@ -60,12 +60,9 @@ export class EventMemberStoreService {
   fetchByEventId(eventId: number) {
     return this.eventMemberService.get(eventId)
       .pipe(map(eventMembers => {
-        if (this.eventMembers && this.eventMembers.length > 0) {
-          const index = this.eventMembers.findIndex(em => em.eventId === eventId);
-          this.eventMembers.splice(index, eventMembers.length, ...eventMembers);
-        } else {
-          this.eventMembers = eventMembers;
-        }
+        let resEventMembers = this.eventMembers ? [...this.eventMembers] : [];
+        resEventMembers = resEventMembers.addOrReplaceRange(em => em.eventId === eventId, eventMembers);
+        this.eventMembers = resEventMembers;
         return eventMembers;
       }));
   }

@@ -41,7 +41,7 @@ namespace HappyWayApp.Controllers
             catch (NotFoundException e)
             {
                 Console.WriteLine(e);
-                return NotFound();
+                return NotFound(new { message = "Неверный логин или пароль." });
             }
         }
 

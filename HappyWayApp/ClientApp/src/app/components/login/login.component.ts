@@ -57,13 +57,13 @@ export class LoginComponent implements OnInit {
           this.progressSpinnerService.stop();
         },
         error => {
+          this.progressSpinnerService.stop();
           if (error.message) {
             this.error = error.message;
           } else {
             console.log(error);
             this.error = 'Неизвестная ошибка.';
           }
-          this.progressSpinnerService.stop();
         });
   }
 }

@@ -1,7 +1,7 @@
 import { Component, Inject, OnInit } from '@angular/core';
 import { GroupModel } from '../../../models/group.model';
-import { FormBuilder, FormGroup, Validators } from "@angular/forms";
-import { MAT_DIALOG_DATA, MatDialogRef } from "@angular/material/dialog";
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 
 @Component({
   selector: 'app-group-dialog',

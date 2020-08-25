@@ -1,14 +1,14 @@
 import {Component, OnDestroy, OnInit} from '@angular/core';
-import {ProgressSpinnerService} from "../../services/progress-spinner.service";
-import {EventPlaceModel, EventPlaceViewModel} from "../../models/event-place.model";
-import {BaseComponent} from "../base/base.component";
-import {MatSnackBar} from "@angular/material/snack-bar";
-import {ConfirmationService} from "../../services/confirmation.service";
-import {EventPlaceDialogComponent} from "../dialogs/event-place-dialog/event-place-dialog.component";
-import {MatDialog} from "@angular/material/dialog";
-import {CityService} from "../../services/city.service";
-import {EventPlaceStoreService} from "../../services/event-place-store.service";
-import {Subscription} from "rxjs";
+import {ProgressSpinnerService} from '../../services/progress-spinner.service';
+import {EventPlaceViewModel} from '../../models/event-place.model';
+import {BaseComponent} from '../base/base.component';
+import {MatSnackBar} from '@angular/material/snack-bar';
+import {ConfirmationService} from '../../services/confirmation.service';
+import {EventPlaceDialogComponent} from '../dialogs/event-place-dialog/event-place-dialog.component';
+import {MatDialog} from '@angular/material/dialog';
+import {CityService} from '../../services/city.service';
+import {EventPlaceStoreService} from '../../services/event-place-store.service';
+import {Subscription} from 'rxjs';
 
 @Component({
   selector: 'app-event-places',
@@ -36,7 +36,7 @@ export class EventPlacesComponent extends BaseComponent implements OnInit, OnDes
     this.load();
     this.eventPlacesSubscription = this.eventPlaceStoreService.eventPlaces$.subscribe(data => {
       this.eventPlaces = data;
-    })
+    });
   }
 
   ngOnDestroy() {
