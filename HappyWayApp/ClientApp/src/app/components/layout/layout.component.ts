@@ -107,7 +107,6 @@ export class LayoutComponent extends BaseComponent implements OnInit, AfterViewI
   }
 
   createEvent() {
-    this.progressSpinnerService.start();
     this.openDialogAndCreateEvent().subscribe(createdEvent => {
       if (!createdEvent) { this.progressSpinnerService.stop(); return; }
       this.progressSpinnerService.stop();
@@ -153,6 +152,7 @@ export class LayoutComponent extends BaseComponent implements OnInit, AfterViewI
     return this.openDialog().pipe(switchMap(eventDialogResult => {
       if (!eventDialogResult) { return of(null); }
       const event = eventDialogResult.event;
+      this.progressSpinnerService.start();
       return this.setEventCompleted(this.event).pipe(switchMap(() => {
         return this.eventService.create(event).pipe(switchMap(createdEvent => {
           return this.importDataService.downloadDocData(createdEvent.id, eventDialogResult.docUrl)

@@ -41,8 +41,8 @@ namespace HappyWayApp.Controllers
         [HttpGet("{eventId}/{spreadsheetId}")]
         public async Task<IActionResult> Get(int eventId, string spreadsheetId)
         {
-            const string femaleRange = "C3:E";
-            const string maleRange = "N3:P";
+            const string femaleRange = "A3:D";
+            const string maleRange = "K3:N";
 
             try
             {
@@ -105,12 +105,12 @@ namespace HappyWayApp.Controllers
                 var dto = new EventMemberDocInfoDto();
 
                 CheckEmpty(row.ElementAtOrDefault(0), nameof(dto.Number));
-                CheckEmpty(row.ElementAtOrDefault(1), nameof(dto.Name));
-                CheckEmpty(row.ElementAtOrDefault(2), nameof(dto.PhoneNumber));
+                CheckEmpty(row.ElementAtOrDefault(2), nameof(dto.Name));
+                CheckEmpty(row.ElementAtOrDefault(3), nameof(dto.PhoneNumber));
 
                 dto.Number = Convert.ToInt32(row[0]);
-                dto.Name = row[1].ToString();
-                dto.PhoneNumber = row[2].ToString();
+                dto.Name = row[2].ToString();
+                dto.PhoneNumber = row[3].ToString();
 
                 return dto;
             });
