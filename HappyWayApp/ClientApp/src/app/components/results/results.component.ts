@@ -90,7 +90,7 @@ export class ResultsComponent extends BaseComponent implements OnInit, OnDestroy
       trimmedPhoneNumber.startsWith('0')
       ? `+38${trimmedPhoneNumber}`
       : `+${trimmedPhoneNumber}`;
-    return this.sanitizer.bypassSecurityTrustUrl(`viber://chat?number=${fullPhoneNumber}`);
+    return this.sanitizer.bypassSecurityTrustUrl(`viber://chat?number=${encodeURIComponent(fullPhoneNumber)}`);
   }
 
   copy(text: string) {
